@@ -26,7 +26,7 @@ under the License.
     <copyright>&#169;2010 - 2020 oshi</copyright>
     <item>
       <title>File: 234,
-             Errors: 6716,
+             Errors: 6717,
              Warnings: 0,
              Infos: 0
       </title>
@@ -293,7 +293,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  62
+                  65
                 </td>
               </tr>
                           <tr>
@@ -420,20 +420,6 @@ under the License.
                 </td>
                 <td>
                   24
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="https://github.com/oshi/oshi/oshi-core/checkstyle.html#oshi.driver.windows.perfmon.ThermalZoneInformation.java">oshi/driver/windows/perfmon/ThermalZoneInformation.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  13
                 </td>
               </tr>
                           <tr>
@@ -825,7 +811,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  35
+                  36
                 </td>
               </tr>
                           <tr>
@@ -1833,7 +1819,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  48
+                  47
                 </td>
               </tr>
                           <tr>
@@ -2496,6 +2482,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/oshi/oshi/oshi-core/checkstyle.html#oshi.driver.windows.wmi.MSAcpiThermalZoneTemperature.java">oshi/driver/windows/wmi/MSAcpiThermalZoneTemperature.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  8
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/oshi/oshi/oshi-core/checkstyle.html#oshi.hardware.platform.unix.solaris.SolarisBaseboard.java">oshi/hardware/platform/unix/solaris/SolarisBaseboard.java</a>
                 </td>
                 <td>
@@ -2757,7 +2757,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  6
+                  9
                 </td>
               </tr>
                           <tr>

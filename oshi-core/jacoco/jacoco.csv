@@ -37,6 +37,7 @@ oshi-core,oshi.driver.windows.wmi,Win32DiskDrive.DiskDriveProperty,64,0,0,0,2,0,
 oshi-core,oshi.driver.windows.wmi,Win32OperatingSystem.OSVersionProperty,54,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.wmi,Win32Bios.BiosSerialProperty,14,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.wmi,OhmHardware,29,0,0,0,4,0,1,0,1,0
+oshi-core,oshi.driver.windows.wmi,MSAcpiThermalZoneTemperature.TemperatureProperty,14,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.wmi,Win32ComputerSystemProduct.ComputerSystemProductProperty,14,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.wmi,Win32USBController.USBControllerProperty,14,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.wmi,Win32Process.CommandLineProperty,24,0,0,0,2,0,1,0,1,0
@@ -49,11 +50,12 @@ oshi-core,oshi.driver.windows.wmi,OhmSensor,31,0,0,0,5,0,1,0,1,0
 oshi-core,oshi.driver.windows.wmi,Win32Process,94,0,10,0,23,0,7,0,2,0
 oshi-core,oshi.driver.windows.wmi,Win32PhysicalMemory,20,0,0,0,4,0,2,0,2,0
 oshi-core,oshi.driver.windows.wmi,Win32Bios.BiosProperty,54,0,0,0,2,0,1,0,1,0
+oshi-core,oshi.driver.windows.wmi,MSAcpiThermalZoneTemperature,11,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.wmi,Win32BaseBoard.BaseBoardProperty,44,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.wmi,Win32ComputerSystemProduct,10,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.util.platform.windows,PerfCounterQueryHandler.new Thread() {...},10,0,0,0,3,0,2,0,2,0
 oshi-core,oshi.util.platform.windows,PerfCounterQuery,297,0,29,0,65,0,27,0,11,0
-oshi-core,oshi.util.platform.windows,WmiQueryHandler,295,0,35,0,79,0,33,0,14,0
+oshi-core,oshi.util.platform.windows,WmiQueryHandler,284,0,33,0,77,0,32,0,14,0
 oshi-core,oshi.util.platform.windows,PerfDataUtil.PerfCounter,54,0,2,0,14,0,6,0,5,0
 oshi-core,oshi.util.platform.windows,PerfCounterQuery.CounterDataSource,24,0,0,0,3,0,1,0,1,0
 oshi-core,oshi.util.platform.windows,PerfCounterQueryHandler,321,0,42,0,79,0,33,0,12,0
@@ -72,7 +74,7 @@ oshi-core,oshi.hardware.platform.windows,WindowsNetworks,148,0,6,0,37,0,6,0,3,0
 oshi-core,oshi.hardware.platform.windows,WindowsGlobalMemory,329,0,61,0,97,0,66,0,11,0
 oshi-core,oshi.hardware.platform.windows,WindowsDisks,661,0,54,0,110,0,35,0,8,0
 oshi-core,oshi.hardware.platform.windows,WindowsSoundCard,96,0,6,0,18,0,5,0,2,0
-oshi-core,oshi.hardware.platform.windows,WindowsSensors,342,0,60,0,92,0,41,0,11,0
+oshi-core,oshi.hardware.platform.windows,WindowsSensors,336,0,58,0,92,0,40,0,11,0
 oshi-core,oshi.hardware.platform.windows,WindowsPowerSource,697,0,82,0,155,0,46,0,5,0
 oshi-core,oshi.hardware.platform.windows,WindowsHardwareAbstractionLayer,42,0,0,0,11,0,11,0,11,0
 oshi-core,oshi.hardware.platform.windows,WindowsDisks.DiskStats,33,0,0,0,7,0,1,0,1,0
@@ -99,7 +101,7 @@ oshi-core,oshi.hardware.common,AbstractNetworks,98,0,10,0,26,0,9,0,4,0
 oshi-core,oshi.hardware.common,AbstractDisplay,20,0,0,0,5,0,3,0,3,0
 oshi-core,oshi.software.os.windows,WindowsOperatingSystem,1481,0,195,0,328,0,129,0,30,0
 oshi-core,oshi.software.os.windows,WindowsNetworkParams,204,0,22,0,47,0,20,0,9,0
-oshi-core,oshi.software.os.windows,WindowsFileSystem,698,0,54,0,150,0,39,0,10,0
+oshi-core,oshi.software.os.windows,WindowsFileSystem,708,0,56,0,150,0,40,0,10,0
 oshi-core,oshi.software.os.windows,WindowsOSVersionInfoEx,293,0,66,0,68,0,39,0,5,0
 oshi-core,oshi.software.os.windows,WindowsOSSystemInfo,65,0,4,0,21,0,7,0,5,0
 oshi-core,oshi.util.platform.unix.solaris,KstatUtil,190,0,26,0,38,0,21,0,4,0
@@ -119,12 +121,10 @@ oshi-core,oshi.driver.windows.perfmon,ProcessorInformation.InterruptsProperty,33
 oshi-core,oshi.driver.windows.perfmon,PagingFile,10,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.perfmon,SystemInformation.ContextSwitchProperty,33,0,0,0,8,0,4,0,4,0
 oshi-core,oshi.driver.windows.perfmon,PagingFile.PagingPercentProperty,33,0,0,0,8,0,4,0,4,0
-oshi-core,oshi.driver.windows.perfmon,ThermalZoneInformation.ThermalZoneProperty,37,0,0,0,7,0,3,0,3,0
 oshi-core,oshi.driver.windows.perfmon,ProcessInformation.HandleCountProperty,37,0,0,0,7,0,3,0,3,0
 oshi-core,oshi.driver.windows.perfmon,ProcessInformation.ProcessPerformanceProperty,103,0,0,0,13,0,3,0,3,0
 oshi-core,oshi.driver.windows.perfmon,ProcessorInformation.ProcessorFrequencyProperty,37,0,0,0,7,0,3,0,3,0
 oshi-core,oshi.driver.windows.perfmon,PhysicalDisk.PhysicalDiskProperty,92,0,0,0,12,0,3,0,3,0
-oshi-core,oshi.driver.windows.perfmon,ThermalZoneInformation,10,0,0,0,2,0,1,0,1,0
 oshi-core,oshi.driver.windows.perfmon,ProcessorInformation.ProcessorTickCountProperty,81,0,0,0,11,0,3,0,3,0
 oshi-core,oshi.util.tuples,Quartet,0,27,0,0,0,10,0,5,0,5
 oshi-core,oshi.util.tuples,Quintet,0,33,0,0,0,12,0,6,0,6
