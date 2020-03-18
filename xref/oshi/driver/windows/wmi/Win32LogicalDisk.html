@@ -67,7 +67,7 @@
 <a class="jxr_linenumber" name="L59" href="#L59">59</a>              where = <strong class="jxr_keyword">true</strong>;
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>          }
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>          <strong class="jxr_keyword">if</strong> (nameToMatch != <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>              wmiClassName.append(where ? <span class="jxr_string">" WHERE"</span> : <span class="jxr_string">" AND"</span>).append(<span class="jxr_string">" Name=\&quot;"</span>).append(nameToMatch).append('\&quot;');
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>              wmiClassName.append(where ? <span class="jxr_string">" AND"</span> : <span class="jxr_string">" WHERE"</span>).append(<span class="jxr_string">" Name=\&quot;"</span>).append(nameToMatch).append('\&quot;');
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>          }
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>          WmiQuery&lt;LogicalDiskProperty&gt; logicalDiskQuery = <strong class="jxr_keyword">new</strong> WmiQuery&lt;&gt;(wmiClassName.toString(),
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>                  LogicalDiskProperty.<strong class="jxr_keyword">class</strong>);
