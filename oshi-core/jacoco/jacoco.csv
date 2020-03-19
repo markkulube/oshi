@@ -85,7 +85,7 @@ oshi-core,oshi.software.os,OSProcess.State,0,74,0,0,0,8,0,1,0,1
 oshi-core,oshi.software.os,OperatingSystem.OSVersionInfo,4,59,3,3,1,14,4,4,1,4
 oshi-core,oshi.software.os,OSService.State,0,34,0,0,0,2,0,1,0,1
 oshi-core,oshi.software.os,OSFileStore,164,108,6,0,25,46,8,30,3,30
-oshi-core,oshi.software.os,OSProcess,30,418,4,10,5,128,5,56,1,53
+oshi-core,oshi.software.os,OSProcess,33,461,5,13,6,131,7,59,2,55
 oshi-core,oshi.hardware.common,AbstractVirtualMemory,30,0,0,0,7,0,2,0,2,0
 oshi-core,oshi.hardware.common,AbstractUsbDevice,162,0,8,0,28,0,15,0,11,0
 oshi-core,oshi.hardware.common,AbstractGlobalMemory,243,0,30,0,58,0,23,0,4,0
