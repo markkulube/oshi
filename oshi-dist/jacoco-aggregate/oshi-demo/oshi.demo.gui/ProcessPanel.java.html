@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ProcessPanel.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">oshi-dist</a> &gt; <a href="../index.html" class="el_bundle">oshi-demo</a> &gt; <a href="index.source.html" class="el_package">oshi.demo.gui</a> &gt; <span class="el_source">ProcessPanel.java</span></div><h1>ProcessPanel.java</h1><pre class="source lang-java linenums">/**
+ * MIT License
+ *
+ * Copyright (c) 2010 - 2020 The OSHI Project Contributors: https://github.com/oshi/oshi/graphs/contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the &quot;Software&quot;), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package oshi.demo.gui;
+
+import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+
+import oshi.SystemInfo;
+import oshi.hardware.GlobalMemory;
+import oshi.software.os.OSProcess;
+import oshi.software.os.OperatingSystem;
+import oshi.software.os.OperatingSystem.ProcessSort;
+import oshi.util.FormatUtil;
+
+/**
+ * Displays a process list, such as ps or task manager. This performs more like
+ * Windows Task Manger with current CPU as measured between polling intervals,
+ * while PS uses a cumulative CPU value.
+ */
+public class ProcessPanel extends OshiJPanel { // NOSONAR squid:S110
+
+    private static final long serialVersionUID = 1L;
+
+    private static final String PROCESSES = &quot;Processes&quot;;
+<span class="nc" id="L59">    private static final String[] COLUMNS = { &quot;PID&quot;, &quot;PPID&quot;, &quot;% CPU&quot;, &quot;Cumulative&quot;, &quot;% Memory&quot;, &quot;VSZ&quot;, &quot;RSS&quot;,</span>
+            &quot;Process Name&quot; };
+<span class="nc" id="L61">    private static final float[] COLUMN_WIDTH_PERCENT = { 0.075f, 0.075f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.35f };</span>
+
+<span class="nc" id="L63">    private transient Map&lt;Integer, OSProcess&gt; priorSnapshotMap = new HashMap&lt;&gt;();</span>
+
+    public ProcessPanel(SystemInfo si) {
+<span class="nc" id="L66">        super();</span>
+<span class="nc" id="L67">        init(si);</span>
+<span class="nc" id="L68">    }</span>
+
+    private void init(SystemInfo si) {
+<span class="nc" id="L71">        OperatingSystem os = si.getOperatingSystem();</span>
+<span class="nc" id="L72">        GlobalMemory mem = si.getHardware().getMemory();</span>
+<span class="nc" id="L73">        JLabel procLabel = new JLabel(PROCESSES);</span>
+<span class="nc" id="L74">        add(procLabel, BorderLayout.NORTH);</span>
+
+<span class="nc" id="L76">        TableModel model = new DefaultTableModel(parseProcesses(os.getProcesses(0, ProcessSort.CPU), mem), COLUMNS);</span>
+<span class="nc" id="L77">        JTable procTable = new JTable(model);</span>
+<span class="nc" id="L78">        JScrollPane scrollV = new JScrollPane(procTable);</span>
+<span class="nc" id="L79">        scrollV.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);</span>
+<span class="nc" id="L80">        resizeColumns(procTable.getColumnModel());</span>
+
+<span class="nc" id="L82">        add(scrollV, BorderLayout.CENTER);</span>
+
+<span class="nc" id="L84">        Timer timer = new Timer(Config.REFRESH_SLOW, e -&gt; {</span>
+<span class="nc" id="L85">            DefaultTableModel tableModel = (DefaultTableModel) procTable.getModel();</span>
+<span class="nc" id="L86">            Object[][] newData = parseProcesses(os.getProcesses(0, ProcessSort.CPU), mem);</span>
+<span class="nc" id="L87">            int rowCount = tableModel.getRowCount();</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">            for (int row = 0; row &lt; newData.length; row++) {</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">                if (row &lt; rowCount) {</span>
+                    // Overwrite row
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                    for (int col = 0; col &lt; newData[row].length; col++) {</span>
+<span class="nc" id="L92">                        tableModel.setValueAt(newData[row][col], row, col);</span>
+                    }
+                } else {
+                    // Add row
+<span class="nc" id="L96">                    tableModel.addRow(newData[row]);</span>
+                }
+            }
+            // Delelte any extra rows
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            for (int row = rowCount - 1; row &gt;= newData.length; row--) {</span>
+<span class="nc" id="L101">                tableModel.removeRow(row);</span>
+            }
+<span class="nc" id="L103">        });</span>
+<span class="nc" id="L104">        timer.start();</span>
+<span class="nc" id="L105">    }</span>
+
+    private Object[][] parseProcesses(OSProcess[] procs, GlobalMemory mem) {
+        // Build a sorted (by CPU) map
+<span class="nc" id="L109">        Map&lt;OSProcess, Double&gt; processCpuMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        for (OSProcess p : procs) {</span>
+            // Get previous update. OK to return null for next method call
+<span class="nc" id="L112">            OSProcess priorSnapshot = priorSnapshotMap.get(p.getProcessID());</span>
+<span class="nc" id="L113">            processCpuMap.put(p, p.getProcessCpuLoadBetweenTicks(priorSnapshot));</span>
+        }
+        // Now sort
+<span class="nc" id="L116">        List&lt;Entry&lt;OSProcess, Double&gt;&gt; procList = new ArrayList&lt;&gt;(processCpuMap.entrySet());</span>
+<span class="nc" id="L117">        procList.sort(Entry.comparingByValue());</span>
+        // Insert into array in reverse order (lowest CPU last)
+        // Simultaneously re-populate snapshot map
+<span class="nc" id="L120">        int i = procs.length;</span>
+<span class="nc" id="L121">        Object[][] procArr = new Object[procs.length][COLUMNS.length];</span>
+<span class="nc" id="L122">        priorSnapshotMap.clear();</span>
+        // These are in descending CPU order
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        for (Entry&lt;OSProcess, Double&gt; e : procList) {</span>
+<span class="nc" id="L125">            OSProcess p = e.getKey();</span>
+<span class="nc" id="L126">            priorSnapshotMap.put(p.getProcessID(), p);</span>
+            // Matches order of COLUMNS field
+<span class="nc" id="L128">            i--;</span>
+<span class="nc" id="L129">            procArr[i][0] = p.getProcessID();</span>
+<span class="nc" id="L130">            procArr[i][1] = p.getParentProcessID();</span>
+<span class="nc" id="L131">            procArr[i][2] = String.format(&quot;%.1f&quot;, 100d * e.getValue());</span>
+<span class="nc" id="L132">            procArr[i][3] = String.format(&quot;%.1f&quot;, 100d * p.getProcessCpuLoadCumulative());</span>
+<span class="nc" id="L133">            procArr[i][4] = String.format(&quot;%.1f&quot;, 100d * p.getResidentSetSize() / mem.getTotal());</span>
+<span class="nc" id="L134">            procArr[i][5] = FormatUtil.formatBytes(p.getVirtualSize());</span>
+<span class="nc" id="L135">            procArr[i][6] = FormatUtil.formatBytes(p.getResidentSetSize());</span>
+<span class="nc" id="L136">            procArr[i][7] = p.getName();</span>
+<span class="nc" id="L137">        }</span>
+<span class="nc" id="L138">        return procArr;</span>
+    }
+
+    private void resizeColumns(TableColumnModel tableColumnModel) {
+        TableColumn column;
+<span class="nc" id="L143">        int tW = tableColumnModel.getTotalColumnWidth();</span>
+<span class="nc" id="L144">        int cantCols = tableColumnModel.getColumnCount();</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        for (int i = 0; i &lt; cantCols; i++) {</span>
+<span class="nc" id="L146">            column = tableColumnModel.getColumn(i);</span>
+<span class="nc" id="L147">            int pWidth = Math.round(COLUMN_WIDTH_PERCENT[i] * tW);</span>
+<span class="nc" id="L148">            column.setPreferredWidth(pWidth);</span>
+        }
+<span class="nc" id="L150">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

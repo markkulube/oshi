@@ -23,6 +23,10 @@
  */
 package oshi.software.os;
 
+import static oshi.util.Memoizer.memoize;
+
+import java.util.function.Supplier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,19 +38,21 @@ import org.slf4j.LoggerFactory;
  */
 public class OSProcess {
 
-<span class="fc" id="L37">    private static final Logger LOG = LoggerFactory.getLogger(OSProcess.class);</span>
+<span class="fc" id="L41">    private static final Logger LOG = LoggerFactory.getLogger(OSProcess.class);</span>
 
     private final OperatingSystem operatingSystem;
 
-<span class="fc" id="L41">    private String name = &quot;&quot;;</span>
-<span class="fc" id="L42">    private String path = &quot;&quot;;</span>
-<span class="fc" id="L43">    private String commandLine = &quot;&quot;;</span>
-<span class="fc" id="L44">    private String currentWorkingDirectory = &quot;&quot;;</span>
-<span class="fc" id="L45">    private String user = &quot;&quot;;</span>
-<span class="fc" id="L46">    private String userID = &quot;&quot;;</span>
-<span class="fc" id="L47">    private String group = &quot;&quot;;</span>
-<span class="fc" id="L48">    private String groupID = &quot;&quot;;</span>
-<span class="fc" id="L49">    private State state = State.OTHER;</span>
+<span class="fc" id="L45">    private final Supplier&lt;Double&gt; cumulativeCpuLoad = memoize(this::queryCumulativeCpuLoad);</span>
+
+<span class="fc" id="L47">    private String name = &quot;&quot;;</span>
+<span class="fc" id="L48">    private String path = &quot;&quot;;</span>
+<span class="fc" id="L49">    private String commandLine = &quot;&quot;;</span>
+<span class="fc" id="L50">    private String currentWorkingDirectory = &quot;&quot;;</span>
+<span class="fc" id="L51">    private String user = &quot;&quot;;</span>
+<span class="fc" id="L52">    private String userID = &quot;&quot;;</span>
+<span class="fc" id="L53">    private String group = &quot;&quot;;</span>
+<span class="fc" id="L54">    private String groupID = &quot;&quot;;</span>
+<span class="fc" id="L55">    private State state = State.OTHER;</span>
     private int processID;
     private int parentProcessID;
     private int threadCount;
@@ -62,40 +68,40 @@ public class OSProcess {
     private long openFiles;
     private int bitness;
     // cache calculation for sorting
-<span class="fc" id="L65">    private double cpuPercent = -1d;</span>
+<span class="fc" id="L71">    private double cpuPercent = -1d;</span>
 
     /**
      * Process Execution States
      */
-<span class="fc" id="L70">    public enum State {</span>
+<span class="fc" id="L76">    public enum State {</span>
         /**
          * Intermediate state in process creation
          */
-<span class="fc" id="L74">        NEW,</span>
+<span class="fc" id="L80">        NEW,</span>
         /**
          * Actively executing process
          */
-<span class="fc" id="L78">        RUNNING,</span>
+<span class="fc" id="L84">        RUNNING,</span>
         /**
          * Interruptible sleep state
          */
-<span class="fc" id="L82">        SLEEPING,</span>
+<span class="fc" id="L88">        SLEEPING,</span>
         /**
          * Blocked, uninterruptible sleep state
          */
-<span class="fc" id="L86">        WAITING,</span>
+<span class="fc" id="L92">        WAITING,</span>
         /**
          * Intermediate state in process termination
          */
-<span class="fc" id="L90">        ZOMBIE,</span>
+<span class="fc" id="L96">        ZOMBIE,</span>
         /**
          * Stopped by the user, such as for debugging
          */
-<span class="fc" id="L94">        STOPPED,</span>
+<span class="fc" id="L100">        STOPPED,</span>
         /**
          * Other or unknown states not defined
          */
-<span class="fc" id="L98">        OTHER</span>
+<span class="fc" id="L104">        OTHER</span>
     }
 
     /**
@@ -106,9 +112,9 @@ public class OSProcess {
      * @param operatingSystem
      *            a {@link oshi.software.os.OperatingSystem} instance
      */
-<span class="fc" id="L109">    public OSProcess(OperatingSystem operatingSystem) {</span>
-<span class="fc" id="L110">        this.operatingSystem = operatingSystem;</span>
-<span class="fc" id="L111">    }</span>
+<span class="fc" id="L115">    public OSProcess(OperatingSystem operatingSystem) {</span>
+<span class="fc" id="L116">        this.operatingSystem = operatingSystem;</span>
+<span class="fc" id="L117">    }</span>
 
     /**
      * &lt;p&gt;
@@ -128,13 +134,13 @@ public class OSProcess {
      * @throws InstantiationException
      *             If a process by that ID does not exist.
      */
-<span class="fc" id="L131">    public OSProcess(OperatingSystem operatingSystem, int processID) throws InstantiationException {</span>
-<span class="fc" id="L132">        this.processID = processID;</span>
-<span class="fc" id="L133">        this.operatingSystem = operatingSystem;</span>
-<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (!updateAttributes(false)) {</span>
-<span class="fc" id="L135">            throw new InstantiationException(&quot;A process with ID &quot; + processID + &quot; does not exist.&quot;);</span>
+<span class="fc" id="L137">    public OSProcess(OperatingSystem operatingSystem, int processID) throws InstantiationException {</span>
+<span class="fc" id="L138">        this.processID = processID;</span>
+<span class="fc" id="L139">        this.operatingSystem = operatingSystem;</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">        if (!updateAttributes(false)) {</span>
+<span class="fc" id="L141">            throw new InstantiationException(&quot;A process with ID &quot; + processID + &quot; does not exist.&quot;);</span>
         }
-<span class="fc" id="L137">    }</span>
+<span class="fc" id="L143">    }</span>
 
     /**
      * Attempts to updates all process attributes. Returns false if the update
@@ -143,7 +149,7 @@ public class OSProcess {
      * @return True if the update was successful, false if the update failed
      */
     public boolean updateAttributes() {
-<span class="fc" id="L146">        return updateAttributes(true);</span>
+<span class="fc" id="L152">        return updateAttributes(true);</span>
     }
 
     /**
@@ -159,13 +165,13 @@ public class OSProcess {
      * @return True if the update was successful, false if the update failed
      */
     public boolean updateAttributes(boolean slowFields) {
-<span class="fc" id="L162">        OSProcess process = operatingSystem.getProcess(this.processID, slowFields);</span>
-<span class="fc bfc" id="L163" title="All 2 branches covered.">        if (process == null) {</span>
-<span class="fc" id="L164">            LOG.debug(&quot;No process found: {}&quot;, this.processID);</span>
-<span class="fc" id="L165">            return false;</span>
+<span class="fc" id="L168">        OSProcess process = operatingSystem.getProcess(this.processID, slowFields);</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">        if (process == null) {</span>
+<span class="fc" id="L170">            LOG.debug(&quot;No process found: {}&quot;, this.processID);</span>
+<span class="fc" id="L171">            return false;</span>
         }
-<span class="fc" id="L167">        copyValuesToThisProcess(process);</span>
-<span class="fc" id="L168">        return true;</span>
+<span class="fc" id="L173">        copyValuesToThisProcess(process);</span>
+<span class="fc" id="L174">        return true;</span>
     }
 
     /**
@@ -176,7 +182,7 @@ public class OSProcess {
      * @return Returns the name of the process.
      */
     public String getName() {
-<span class="fc" id="L179">        return this.name;</span>
+<span class="fc" id="L185">        return this.name;</span>
     }
 
     /**
@@ -187,7 +193,7 @@ public class OSProcess {
      * @return Returns the full path of the executing process.
      */
     public String getPath() {
-<span class="fc" id="L190">        return this.path;</span>
+<span class="fc" id="L196">        return this.path;</span>
     }
 
     /**
@@ -205,7 +211,7 @@ public class OSProcess {
      *         string is truncated to 80 characters.
      */
     public String getCommandLine() {
-<span class="fc" id="L208">        return this.commandLine;</span>
+<span class="fc" id="L214">        return this.commandLine;</span>
     }
 
     /**
@@ -218,7 +224,7 @@ public class OSProcess {
      *         On Windows, this value is only populated for the current process.
      */
     public String getCurrentWorkingDirectory() {
-<span class="fc" id="L221">        return this.currentWorkingDirectory;</span>
+<span class="fc" id="L227">        return this.currentWorkingDirectory;</span>
     }
 
     /**
@@ -230,7 +236,7 @@ public class OSProcess {
      *         prepended to the username.
      */
     public String getUser() {
-<span class="fc" id="L233">        return this.user;</span>
+<span class="fc" id="L239">        return this.user;</span>
     }
 
     /**
@@ -241,7 +247,7 @@ public class OSProcess {
      * @return Returns the userID. On Windows systems, returns the Security ID (SID)
      */
     public String getUserID() {
-<span class="fc" id="L244">        return this.userID;</span>
+<span class="fc" id="L250">        return this.userID;</span>
     }
 
     /**
@@ -260,7 +266,7 @@ public class OSProcess {
      *         this process, corresponding to the SIDs in {@link #getGroupID()}.
      */
     public String getGroup() {
-<span class="fc" id="L263">        return this.group;</span>
+<span class="fc" id="L269">        return this.group;</span>
     }
 
     /**
@@ -279,7 +285,7 @@ public class OSProcess {
      *         to this process, corresponding to the names in {@link #getGroup()}.
      */
     public String getGroupID() {
-<span class="fc" id="L282">        return this.groupID;</span>
+<span class="fc" id="L288">        return this.groupID;</span>
     }
 
     /**
@@ -290,7 +296,7 @@ public class OSProcess {
      * @return Returns the execution state of the process.
      */
     public State getState() {
-<span class="fc" id="L293">        return this.state;</span>
+<span class="fc" id="L299">        return this.state;</span>
     }
 
     /**
@@ -301,7 +307,7 @@ public class OSProcess {
      * @return Returns the processID.
      */
     public int getProcessID() {
-<span class="fc" id="L304">        return this.processID;</span>
+<span class="fc" id="L310">        return this.processID;</span>
     }
 
     /**
@@ -312,7 +318,7 @@ public class OSProcess {
      * @return Returns the parentProcessID, if any; 0 otherwise.
      */
     public int getParentProcessID() {
-<span class="fc" id="L315">        return this.parentProcessID;</span>
+<span class="fc" id="L321">        return this.parentProcessID;</span>
     }
 
     /**
@@ -323,7 +329,7 @@ public class OSProcess {
      * @return Returns the number of threads in this process.
      */
     public int getThreadCount() {
-<span class="fc" id="L326">        return this.threadCount;</span>
+<span class="fc" id="L332">        return this.threadCount;</span>
     }
 
     /**
@@ -349,7 +355,7 @@ public class OSProcess {
      *         by the scheduler.
      */
     public int getPriority() {
-<span class="fc" id="L352">        return this.priority;</span>
+<span class="fc" id="L358">        return this.priority;</span>
     }
 
     /**
@@ -362,7 +368,7 @@ public class OSProcess {
      *         memory that is from shared libraries.
      */
     public long getVirtualSize() {
-<span class="fc" id="L365">        return this.virtualSize;</span>
+<span class="fc" id="L371">        return this.virtualSize;</span>
     }
 
     /**
@@ -378,7 +384,7 @@ public class OSProcess {
      *         include all stack and heap memory.
      */
     public long getResidentSetSize() {
-<span class="fc" id="L381">        return this.residentSetSize;</span>
+<span class="fc" id="L387">        return this.residentSetSize;</span>
     }
 
     /**
@@ -390,7 +396,7 @@ public class OSProcess {
      *         kernel/system mode.
      */
     public long getKernelTime() {
-<span class="fc" id="L393">        return this.kernelTime;</span>
+<span class="fc" id="L399">        return this.kernelTime;</span>
     }
 
     /**
@@ -402,7 +408,7 @@ public class OSProcess {
      *         mode.
      */
     public long getUserTime() {
-<span class="fc" id="L405">        return this.userTime;</span>
+<span class="fc" id="L411">        return this.userTime;</span>
     }
 
     /**
@@ -413,7 +419,7 @@ public class OSProcess {
      * @return Returns the number of milliseconds since the process started.
      */
     public long getUpTime() {
-<span class="fc" id="L416">        return this.upTime;</span>
+<span class="fc" id="L422">        return this.upTime;</span>
     }
 
     /**
@@ -425,7 +431,7 @@ public class OSProcess {
      *         January 1, 1970.
      */
     public long getStartTime() {
-<span class="fc" id="L428">        return this.startTime;</span>
+<span class="fc" id="L434">        return this.startTime;</span>
     }
 
     /**
@@ -436,7 +442,7 @@ public class OSProcess {
      * @return Returns the number of bytes the process has read from disk.
      */
     public long getBytesRead() {
-<span class="fc" id="L439">        return this.bytesRead;</span>
+<span class="fc" id="L445">        return this.bytesRead;</span>
     }
 
     /**
@@ -447,7 +453,7 @@ public class OSProcess {
      * @return Returns the number of bytes the process has written to disk.
      */
     public long getBytesWritten() {
-<span class="fc" id="L450">        return this.bytesWritten;</span>
+<span class="fc" id="L456">        return this.bytesWritten;</span>
     }
 
     /**
@@ -457,8 +463,8 @@ public class OSProcess {
      *            process name
      */
     public void setName(String name) {
-<span class="fc" id="L460">        this.name = name;</span>
-<span class="fc" id="L461">    }</span>
+<span class="fc" id="L466">        this.name = name;</span>
+<span class="fc" id="L467">    }</span>
 
     /**
      * Set the full path of the executing process.
@@ -467,8 +473,8 @@ public class OSProcess {
      *            process path
      */
     public void setPath(String path) {
-<span class="fc" id="L470">        this.path = path;</span>
-<span class="fc" id="L471">    }</span>
+<span class="fc" id="L476">        this.path = path;</span>
+<span class="fc" id="L477">    }</span>
 
     /**
      * Sets the process command line.
@@ -477,8 +483,8 @@ public class OSProcess {
      *            The commandLine to set.
      */
     public void setCommandLine(String commandLine) {
-<span class="fc" id="L480">        this.commandLine = commandLine;</span>
-<span class="fc" id="L481">    }</span>
+<span class="fc" id="L486">        this.commandLine = commandLine;</span>
+<span class="fc" id="L487">    }</span>
 
     /**
      * Sets the process current working directory
@@ -487,8 +493,8 @@ public class OSProcess {
      *            The currentWorkingDirectory to set.
      */
     public void setCurrentWorkingDirectory(String currentWorkingDirectory) {
-<span class="fc" id="L490">        this.currentWorkingDirectory = currentWorkingDirectory;</span>
-<span class="fc" id="L491">    }</span>
+<span class="fc" id="L496">        this.currentWorkingDirectory = currentWorkingDirectory;</span>
+<span class="fc" id="L497">    }</span>
 
     /**
      * Sets the user.
@@ -497,8 +503,8 @@ public class OSProcess {
      *            The user to set.
      */
     public void setUser(String user) {
-<span class="fc" id="L500">        this.user = user;</span>
-<span class="fc" id="L501">    }</span>
+<span class="fc" id="L506">        this.user = user;</span>
+<span class="fc" id="L507">    }</span>
 
     /**
      * Sets the User ID.
@@ -507,8 +513,8 @@ public class OSProcess {
      *            The userID to set.
      */
     public void setUserID(String userID) {
-<span class="fc" id="L510">        this.userID = userID;</span>
-<span class="fc" id="L511">    }</span>
+<span class="fc" id="L516">        this.userID = userID;</span>
+<span class="fc" id="L517">    }</span>
 
     /**
      * Sets the group.
@@ -517,8 +523,8 @@ public class OSProcess {
      *            The group to set.
      */
     public void setGroup(String group) {
-<span class="fc" id="L520">        this.group = group;</span>
-<span class="fc" id="L521">    }</span>
+<span class="fc" id="L526">        this.group = group;</span>
+<span class="fc" id="L527">    }</span>
 
     /**
      * Sets the Group ID.
@@ -527,8 +533,8 @@ public class OSProcess {
      *            The groupID to set.
      */
     public void setGroupID(String groupID) {
-<span class="fc" id="L530">        this.groupID = groupID;</span>
-<span class="fc" id="L531">    }</span>
+<span class="fc" id="L536">        this.groupID = groupID;</span>
+<span class="fc" id="L537">    }</span>
 
     /**
      * Set the execution state of the process.
@@ -537,8 +543,8 @@ public class OSProcess {
      *            execution state
      */
     public void setState(State state) {
-<span class="fc" id="L540">        this.state = state;</span>
-<span class="fc" id="L541">    }</span>
+<span class="fc" id="L546">        this.state = state;</span>
+<span class="fc" id="L547">    }</span>
 
     /**
      * Set the processID.
@@ -547,8 +553,8 @@ public class OSProcess {
      *            process ID
      */
     public void setProcessID(int processID) {
-<span class="fc" id="L550">        this.processID = processID;</span>
-<span class="fc" id="L551">    }</span>
+<span class="fc" id="L556">        this.processID = processID;</span>
+<span class="fc" id="L557">    }</span>
 
     /**
      * Set the parentProcessID.
@@ -557,8 +563,8 @@ public class OSProcess {
      *            parent process ID
      */
     public void setParentProcessID(int parentProcessID) {
-<span class="fc" id="L560">        this.parentProcessID = parentProcessID;</span>
-<span class="fc" id="L561">    }</span>
+<span class="fc" id="L566">        this.parentProcessID = parentProcessID;</span>
+<span class="fc" id="L567">    }</span>
 
     /**
      * Set the number of threads in this process.
@@ -567,8 +573,8 @@ public class OSProcess {
      *            number of threads
      */
     public void setThreadCount(int threadCount) {
-<span class="fc" id="L570">        this.threadCount = threadCount;</span>
-<span class="fc" id="L571">    }</span>
+<span class="fc" id="L576">        this.threadCount = threadCount;</span>
+<span class="fc" id="L577">    }</span>
 
     /**
      * Set the priority of this process.
@@ -590,8 +596,8 @@ public class OSProcess {
      *            priority
      */
     public void setPriority(int priority) {
-<span class="fc" id="L593">        this.priority = priority;</span>
-<span class="fc" id="L594">    }</span>
+<span class="fc" id="L599">        this.priority = priority;</span>
+<span class="fc" id="L600">    }</span>
 
     /**
      * Set the Virtual Memory Size (VSZ). It includes all memory that the process
@@ -602,8 +608,8 @@ public class OSProcess {
      *            virtual size
      */
     public void setVirtualSize(long virtualSize) {
-<span class="fc" id="L605">        this.virtualSize = virtualSize;</span>
-<span class="fc" id="L606">    }</span>
+<span class="fc" id="L611">        this.virtualSize = virtualSize;</span>
+<span class="fc" id="L612">    }</span>
 
     /**
      * Set the Resident Set Size (RSS). It is used to show how much memory is
@@ -616,8 +622,8 @@ public class OSProcess {
      *            resident set size
      */
     public void setResidentSetSize(long residentSetSize) {
-<span class="fc" id="L619">        this.residentSetSize = residentSetSize;</span>
-<span class="fc" id="L620">    }</span>
+<span class="fc" id="L625">        this.residentSetSize = residentSetSize;</span>
+<span class="fc" id="L626">    }</span>
 
     /**
      * Set the number of milliseconds the process has executed in kernel mode.
@@ -626,8 +632,8 @@ public class OSProcess {
      *            kernel time
      */
     public void setKernelTime(long kernelTime) {
-<span class="fc" id="L629">        this.kernelTime = kernelTime;</span>
-<span class="fc" id="L630">    }</span>
+<span class="fc" id="L635">        this.kernelTime = kernelTime;</span>
+<span class="fc" id="L636">    }</span>
 
     /**
      * Set the number of milliseconds the process has executed in user mode.
@@ -636,8 +642,8 @@ public class OSProcess {
      *            user time
      */
     public void setUserTime(long userTime) {
-<span class="fc" id="L639">        this.userTime = userTime;</span>
-<span class="fc" id="L640">    }</span>
+<span class="fc" id="L645">        this.userTime = userTime;</span>
+<span class="fc" id="L646">    }</span>
 
     /**
      * Set the start time of the process in number of milliseconds since January 1,
@@ -647,8 +653,8 @@ public class OSProcess {
      *            start time
      */
     public void setStartTime(long startTime) {
-<span class="fc" id="L650">        this.startTime = startTime;</span>
-<span class="fc" id="L651">    }</span>
+<span class="fc" id="L656">        this.startTime = startTime;</span>
+<span class="fc" id="L657">    }</span>
 
     /**
      * Set the number of milliseconds since the process started.
@@ -657,8 +663,8 @@ public class OSProcess {
      *            up time
      */
     public void setUpTime(long upTime) {
-<span class="fc" id="L660">        this.upTime = upTime;</span>
-<span class="fc" id="L661">    }</span>
+<span class="fc" id="L666">        this.upTime = upTime;</span>
+<span class="fc" id="L667">    }</span>
 
     /**
      * Set the number of bytes the process has read from disk.
@@ -667,8 +673,8 @@ public class OSProcess {
      *            number of bytes read
      */
     public void setBytesRead(long bytesRead) {
-<span class="fc" id="L670">        this.bytesRead = bytesRead;</span>
-<span class="fc" id="L671">    }</span>
+<span class="fc" id="L676">        this.bytesRead = bytesRead;</span>
+<span class="fc" id="L677">    }</span>
 
     /**
      * Set the number of bytes the process has written to disk.
@@ -677,8 +683,8 @@ public class OSProcess {
      *            number of bytes written
      */
     public void setBytesWritten(long bytesWritten) {
-<span class="fc" id="L680">        this.bytesWritten = bytesWritten;</span>
-<span class="fc" id="L681">    }</span>
+<span class="fc" id="L686">        this.bytesWritten = bytesWritten;</span>
+<span class="fc" id="L687">    }</span>
 
     /**
      * Sets the number of open file handles (or network connections) that belongs to
@@ -688,8 +694,8 @@ public class OSProcess {
      *            The number of handles
      */
     public void setOpenFiles(long count) {
-<span class="fc" id="L691">        this.openFiles = count;</span>
-<span class="fc" id="L692">    }</span>
+<span class="fc" id="L697">        this.openFiles = count;</span>
+<span class="fc" id="L698">    }</span>
 
     /**
      * Sets the number of open file handles (or network connections) that belongs to
@@ -701,30 +707,59 @@ public class OSProcess {
      * @return open files or -1 if unknown or not supported
      */
     public long getOpenFiles() {
-<span class="fc" id="L704">        return this.openFiles;</span>
+<span class="fc" id="L710">        return this.openFiles;</span>
     }
 
     /**
-     * Calculates CPU usage of this process.
+     * Calculates cumulative CPU usage of this process.
+     *
+     * @return The proportion of up time that the process was executing in kernel or
+     *         user mode.
+     * @deprecated Use {@link #getProcessCpuLoadCumulative()}.
+     */
+    @Deprecated
+    public double calculateCpuPercent() {
+<span class="nc" id="L722">        return getProcessCpuLoadCumulative();</span>
+    }
+
+    /**
+     * Gets cumulative CPU usage of this process.
      *
      * @return The proportion of up time that the process was executing in kernel or
      *         user mode.
      */
-    public double calculateCpuPercent() {
-<span class="fc bfc" id="L714" title="All 2 branches covered.">        if (this.cpuPercent &lt; 0d) {</span>
-<span class="fc" id="L715">            this.cpuPercent = (getKernelTime() + getUserTime()) / (double) getUpTime();</span>
-        }
-<span class="fc" id="L717">        return this.cpuPercent;</span>
+    public double getProcessCpuLoadCumulative() {
+<span class="fc" id="L732">        return cumulativeCpuLoad.get();</span>
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-<span class="nc" id="L723">        StringBuilder builder = new StringBuilder(&quot;OSProcess@&quot;);</span>
-<span class="nc" id="L724">        builder.append(Integer.toHexString(hashCode()));</span>
-<span class="nc" id="L725">        builder.append(&quot;[processID=&quot;).append(this.processID);</span>
-<span class="nc" id="L726">        builder.append(&quot;, name=&quot;).append(this.name).append(']');</span>
-<span class="nc" id="L727">        return builder.toString();</span>
+    private double queryCumulativeCpuLoad() {
+<span class="fc" id="L736">        return (this.kernelTime + this.userTime) / (double) this.upTime;</span>
+    }
+
+    /**
+     * Gets CPU usage of this process since a previous snapshot of the same process,
+     * provided as a parameter.
+     * &lt;p&gt;
+     * The accuracy of this calculation is dependent on both the number of threads
+     * on which the process is executing, and the precision of the Operating
+     * System's tick counters. A polling interval of at least a few seconds is
+     * recommended.
+     *
+     * @param priorSnapshot
+     *            An {@link OSProcess} object containing statistics for this same
+     *            process collected at a prior point in time. May be null.
+     *
+     * @return If the prior snapshot is for the same process at a prior point in
+     *         time, the proportion of elapsed up time between the current process
+     *         snapshot and the previous one that the process was executing in
+     *         kernel or user mode. Returns cumulative load otherwise.
+     */
+    public double getProcessCpuLoadBetweenTicks(OSProcess priorSnapshot) {
+<span class="pc bpc" id="L758" title="1 of 6 branches missed.">        if (priorSnapshot != null &amp;&amp; this.processID == priorSnapshot.processID &amp;&amp; this.upTime &gt; priorSnapshot.upTime) {</span>
+<span class="fc" id="L759">            return (this.userTime - priorSnapshot.userTime + this.kernelTime - priorSnapshot.kernelTime)</span>
+                    / (double) (this.upTime - priorSnapshot.upTime);
+        }
+<span class="fc" id="L762">        return getProcessCpuLoadCumulative();</span>
     }
 
     /**
@@ -733,7 +768,7 @@ public class OSProcess {
      * @return The bitness, if able to be determined, 0 otherwise.
      */
     public int getBitness() {
-<span class="fc" id="L736">        return this.bitness;</span>
+<span class="fc" id="L771">        return this.bitness;</span>
     }
 
     /**
@@ -745,42 +780,51 @@ public class OSProcess {
      *            The bitness to set.
      */
     public void setBitness(int bitness) {
-<span class="fc" id="L748">        this.bitness = bitness;</span>
-<span class="fc" id="L749">    }</span>
+<span class="fc" id="L783">        this.bitness = bitness;</span>
+<span class="fc" id="L784">    }</span>
+
+    @Override
+    public String toString() {
+<span class="nc" id="L788">        StringBuilder builder = new StringBuilder(&quot;OSProcess@&quot;);</span>
+<span class="nc" id="L789">        builder.append(Integer.toHexString(hashCode()));</span>
+<span class="nc" id="L790">        builder.append(&quot;[processID=&quot;).append(this.processID);</span>
+<span class="nc" id="L791">        builder.append(&quot;, name=&quot;).append(this.name).append(']');</span>
+<span class="nc" id="L792">        return builder.toString();</span>
+    }
 
     private void copyValuesToThisProcess(OSProcess sourceProcess) {
-<span class="fc" id="L752">        this.name = sourceProcess.name;</span>
-<span class="fc" id="L753">        this.path = sourceProcess.path;</span>
-<span class="pc bpc" id="L754" title="1 of 2 branches missed.">        if (!sourceProcess.commandLine.isEmpty()) {</span>
-<span class="fc" id="L755">            this.commandLine = sourceProcess.commandLine;</span>
+<span class="fc" id="L796">        this.name = sourceProcess.name;</span>
+<span class="fc" id="L797">        this.path = sourceProcess.path;</span>
+<span class="pc bpc" id="L798" title="1 of 2 branches missed.">        if (!sourceProcess.commandLine.isEmpty()) {</span>
+<span class="fc" id="L799">            this.commandLine = sourceProcess.commandLine;</span>
         }
-<span class="fc" id="L757">        this.currentWorkingDirectory = sourceProcess.currentWorkingDirectory;</span>
-<span class="fc" id="L758">        this.user = sourceProcess.user;</span>
-<span class="fc" id="L759">        this.userID = sourceProcess.userID;</span>
-<span class="pc bpc" id="L760" title="1 of 2 branches missed.">        if (!sourceProcess.group.isEmpty()) {</span>
-<span class="fc" id="L761">            this.group = sourceProcess.group;</span>
+<span class="fc" id="L801">        this.currentWorkingDirectory = sourceProcess.currentWorkingDirectory;</span>
+<span class="fc" id="L802">        this.user = sourceProcess.user;</span>
+<span class="fc" id="L803">        this.userID = sourceProcess.userID;</span>
+<span class="pc bpc" id="L804" title="1 of 2 branches missed.">        if (!sourceProcess.group.isEmpty()) {</span>
+<span class="fc" id="L805">            this.group = sourceProcess.group;</span>
         }
-<span class="pc bpc" id="L763" title="1 of 2 branches missed.">        if (!sourceProcess.groupID.isEmpty()) {</span>
-<span class="fc" id="L764">            this.groupID = sourceProcess.groupID;</span>
+<span class="pc bpc" id="L807" title="1 of 2 branches missed.">        if (!sourceProcess.groupID.isEmpty()) {</span>
+<span class="fc" id="L808">            this.groupID = sourceProcess.groupID;</span>
         }
-<span class="fc" id="L766">        this.state = sourceProcess.state;</span>
-<span class="fc" id="L767">        this.processID = sourceProcess.processID;</span>
-<span class="fc" id="L768">        this.parentProcessID = sourceProcess.parentProcessID;</span>
-<span class="fc" id="L769">        this.threadCount = sourceProcess.threadCount;</span>
-<span class="fc" id="L770">        this.priority = sourceProcess.priority;</span>
-<span class="fc" id="L771">        this.virtualSize = sourceProcess.virtualSize;</span>
-<span class="fc" id="L772">        this.residentSetSize = sourceProcess.residentSetSize;</span>
-<span class="fc" id="L773">        this.kernelTime = sourceProcess.kernelTime;</span>
-<span class="fc" id="L774">        this.userTime = sourceProcess.userTime;</span>
-<span class="fc" id="L775">        this.startTime = sourceProcess.startTime;</span>
-<span class="fc" id="L776">        this.upTime = sourceProcess.upTime;</span>
-<span class="fc" id="L777">        this.bytesRead = sourceProcess.bytesRead;</span>
-<span class="fc" id="L778">        this.bytesWritten = sourceProcess.bytesWritten;</span>
-<span class="pc bpc" id="L779" title="1 of 2 branches missed.">        if (sourceProcess.openFiles &gt; 0) {</span>
-<span class="fc" id="L780">            this.openFiles = sourceProcess.openFiles;</span>
+<span class="fc" id="L810">        this.state = sourceProcess.state;</span>
+<span class="fc" id="L811">        this.processID = sourceProcess.processID;</span>
+<span class="fc" id="L812">        this.parentProcessID = sourceProcess.parentProcessID;</span>
+<span class="fc" id="L813">        this.threadCount = sourceProcess.threadCount;</span>
+<span class="fc" id="L814">        this.priority = sourceProcess.priority;</span>
+<span class="fc" id="L815">        this.virtualSize = sourceProcess.virtualSize;</span>
+<span class="fc" id="L816">        this.residentSetSize = sourceProcess.residentSetSize;</span>
+<span class="fc" id="L817">        this.kernelTime = sourceProcess.kernelTime;</span>
+<span class="fc" id="L818">        this.userTime = sourceProcess.userTime;</span>
+<span class="fc" id="L819">        this.startTime = sourceProcess.startTime;</span>
+<span class="fc" id="L820">        this.upTime = sourceProcess.upTime;</span>
+<span class="fc" id="L821">        this.bytesRead = sourceProcess.bytesRead;</span>
+<span class="fc" id="L822">        this.bytesWritten = sourceProcess.bytesWritten;</span>
+<span class="pc bpc" id="L823" title="1 of 2 branches missed.">        if (sourceProcess.openFiles &gt; 0) {</span>
+<span class="fc" id="L824">            this.openFiles = sourceProcess.openFiles;</span>
         }
-<span class="fc" id="L782">        this.bitness = sourceProcess.bitness;</span>
-<span class="fc" id="L783">        this.cpuPercent = sourceProcess.cpuPercent;</span>
-<span class="fc" id="L784">    }</span>
+<span class="fc" id="L826">        this.bitness = sourceProcess.bitness;</span>
+<span class="fc" id="L827">        this.cpuPercent = sourceProcess.cpuPercent;</span>
+<span class="fc" id="L828">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

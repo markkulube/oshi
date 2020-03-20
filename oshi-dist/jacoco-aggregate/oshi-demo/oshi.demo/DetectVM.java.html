@@ -38,21 +38,21 @@ import oshi.hardware.NetworkIF;
 
     // Constant for Mac address OUI portion, the first 24 bits of MAC address
     // https://www.webopedia.com/TERM/O/OUI.html
-<span class="fc" id="L41">    private static final Map&lt;String, String&gt; vmMacAddressOUI = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L41">    private static final Map&lt;String, String&gt; vmMacAddressOUI = new HashMap&lt;&gt;();</span>
 
     static {
-<span class="fc" id="L44">        vmMacAddressOUI.put(&quot;00:50:56&quot;, &quot;VMware ESX 3&quot;);</span>
-<span class="fc" id="L45">        vmMacAddressOUI.put(&quot;00:0C:29&quot;, &quot;VMware ESX 3&quot;);</span>
-<span class="fc" id="L46">        vmMacAddressOUI.put(&quot;00:05:69&quot;, &quot;VMware ESX 3&quot;);</span>
-<span class="fc" id="L47">        vmMacAddressOUI.put(&quot;00:03:FF&quot;, &quot;Microsoft Hyper-V&quot;);</span>
-<span class="fc" id="L48">        vmMacAddressOUI.put(&quot;00:1C:42&quot;, &quot;Parallels Desktop&quot;);</span>
-<span class="fc" id="L49">        vmMacAddressOUI.put(&quot;00:0F:4B&quot;, &quot;Virtual Iron 4&quot;);</span>
-<span class="fc" id="L50">        vmMacAddressOUI.put(&quot;00:16:3E&quot;, &quot;Xen or Oracle VM&quot;);</span>
-<span class="fc" id="L51">        vmMacAddressOUI.put(&quot;08:00:27&quot;, &quot;VirtualBox&quot;);</span>
-<span class="fc" id="L52">        vmMacAddressOUI.put(&quot;02:42:AC&quot;, &quot;Docker Container&quot;);</span>
+<span class="nc" id="L44">        vmMacAddressOUI.put(&quot;00:50:56&quot;, &quot;VMware ESX 3&quot;);</span>
+<span class="nc" id="L45">        vmMacAddressOUI.put(&quot;00:0C:29&quot;, &quot;VMware ESX 3&quot;);</span>
+<span class="nc" id="L46">        vmMacAddressOUI.put(&quot;00:05:69&quot;, &quot;VMware ESX 3&quot;);</span>
+<span class="nc" id="L47">        vmMacAddressOUI.put(&quot;00:03:FF&quot;, &quot;Microsoft Hyper-V&quot;);</span>
+<span class="nc" id="L48">        vmMacAddressOUI.put(&quot;00:1C:42&quot;, &quot;Parallels Desktop&quot;);</span>
+<span class="nc" id="L49">        vmMacAddressOUI.put(&quot;00:0F:4B&quot;, &quot;Virtual Iron 4&quot;);</span>
+<span class="nc" id="L50">        vmMacAddressOUI.put(&quot;00:16:3E&quot;, &quot;Xen or Oracle VM&quot;);</span>
+<span class="nc" id="L51">        vmMacAddressOUI.put(&quot;08:00:27&quot;, &quot;VirtualBox&quot;);</span>
+<span class="nc" id="L52">        vmMacAddressOUI.put(&quot;02:42:AC&quot;, &quot;Docker Container&quot;);</span>
     }
 
-<span class="fc" id="L55">    private static final String[] vmModelArray = new String[] { &quot;Linux KVM&quot;, &quot;Linux lguest&quot;, &quot;OpenVZ&quot;, &quot;Qemu&quot;,</span>
+<span class="nc" id="L55">    private static final String[] vmModelArray = new String[] { &quot;Linux KVM&quot;, &quot;Linux lguest&quot;, &quot;OpenVZ&quot;, &quot;Qemu&quot;,</span>
             &quot;Microsoft Virtual PC&quot;, &quot;VMWare&quot;, &quot;linux-vserver&quot;, &quot;Xen&quot;, &quot;FreeBSD Jail&quot;, &quot;VirtualBox&quot;, &quot;Parallels&quot;,
             &quot;Linux Containers&quot;, &quot;LXC&quot; };
 
@@ -123,8 +123,8 @@ import oshi.hardware.NetworkIF;
      * @return a {@link java.lang.String} object.
      */
     public static String findOuiByMacAddressIfPossible(String mac) {
-<span class="fc" id="L126">        return vmMacAddressOUI.entrySet().stream().filter(entry -&gt; mac.startsWith(entry.getKey()))</span>
-<span class="fc" id="L127">                .map(Map.Entry::getValue).collect(Collectors.joining());</span>
+<span class="nc" id="L126">        return vmMacAddressOUI.entrySet().stream().filter(entry -&gt; mac.startsWith(entry.getKey()))</span>
+<span class="nc" id="L127">                .map(Map.Entry::getValue).collect(Collectors.joining());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
