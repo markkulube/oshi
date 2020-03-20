@@ -53,7 +53,7 @@ import oshi.software.os.OperatingSystemVersion;
      * Comparators for use in processSort().
      */
 <span class="nc" id="L55">    private static final Comparator&lt;OSProcess&gt; CPU_DESC_SORT = Comparator</span>
-<span class="nc" id="L56">            .comparingDouble(OSProcess::calculateCpuPercent).reversed();</span>
+<span class="nc" id="L56">            .comparingDouble(OSProcess::getProcessCpuLoadCumulative).reversed();</span>
 
 <span class="nc" id="L58">    private static final Comparator&lt;OSProcess&gt; RSS_DESC_SORT = Comparator.comparingLong(OSProcess::getResidentSetSize)</span>
 <span class="nc" id="L59">            .reversed();</span>

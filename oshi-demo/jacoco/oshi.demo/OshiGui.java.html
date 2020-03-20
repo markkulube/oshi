@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OshiGui.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">oshi-demo</a> &gt; <a href="index.source.html" class="el_package">oshi.demo</a> &gt; <span class="el_source">OshiGui.java</span></div><h1>OshiGui.java</h1><pre class="source lang-java linenums">/**
+ * MIT License
+ *
+ * Copyright (c) 2010 - 2020 The OSHI Project Contributors: https://github.com/oshi/oshi/graphs/contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the &quot;Software&quot;), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package oshi.demo;
+
+import java.awt.BorderLayout;
+import java.awt.Container;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
+
+import oshi.SystemInfo;
+import oshi.demo.gui.Config;
+import oshi.demo.gui.FileStorePanel;
+import oshi.demo.gui.MemoryPanel;
+import oshi.demo.gui.OsHwTextPanel;
+import oshi.demo.gui.OshiJPanel;
+import oshi.demo.gui.ProcessPanel;
+import oshi.demo.gui.ProcessorPanel;
+import oshi.demo.gui.UsbPanel;
+
+/**
+ * Basic Swing class to demonstrate potential uses for OSHI in a monitoring GUI.
+ * Not ready for production use and intended as inspiration/examples.
+ */
+<span class="nc" id="L48">public class OshiGui {</span>
+
+    private JFrame mainFrame;
+    private JButton jMenu;
+
+<span class="nc" id="L53">    private SystemInfo si = new SystemInfo();</span>
+
+    public static void main(String[] args) {
+<span class="nc" id="L56">        OshiGui gui = new OshiGui();</span>
+<span class="nc" id="L57">        gui.init();</span>
+<span class="nc" id="L58">        SwingUtilities.invokeLater(() -&gt; gui.setVisible());</span>
+<span class="nc" id="L59">    }</span>
+
+    private void setVisible() {
+<span class="nc" id="L62">        mainFrame.setVisible(true);</span>
+<span class="nc" id="L63">        jMenu.doClick();</span>
+<span class="nc" id="L64">    }</span>
+
+    private void init() {
+<span class="nc" id="L67">        mainFrame = new JFrame(Config.GUI_TITLE);</span>
+<span class="nc" id="L68">        mainFrame.setSize(Config.GUI_WIDTH, Config.GUI_HEIGHT);</span>
+<span class="nc" id="L69">        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L70">        mainFrame.setResizable(true);</span>
+<span class="nc" id="L71">        mainFrame.setLocationByPlatform(true);</span>
+<span class="nc" id="L72">        mainFrame.setLayout(new BorderLayout());</span>
+
+<span class="nc" id="L74">        JMenuBar menuBar = new JMenuBar();</span>
+<span class="nc" id="L75">        jMenu = getJMenu(&quot;OS &amp; HW Info&quot;, 'O', &quot;Hardware &amp; OS Summary&quot;, getComputerSystemPanel());</span>
+<span class="nc" id="L76">        menuBar.add(jMenu);</span>
+<span class="nc" id="L77">        menuBar.add(getJMenu(&quot;Memory&quot;, 'M', &quot;Memory Summary&quot;, getMemoryPanel()));</span>
+<span class="nc" id="L78">        menuBar.add(getJMenu(&quot;CPU&quot;, 'C', &quot;CPU Usage&quot;, getProcessorPanel()));</span>
+<span class="nc" id="L79">        menuBar.add(getJMenu(&quot;FileStores&quot;, 'F', &quot;FileStore Usage&quot;, getFileStorePanel()));</span>
+<span class="nc" id="L80">        menuBar.add(getJMenu(&quot;Processes&quot;, 'P', &quot;Processes&quot;, getProcessPanel()));</span>
+<span class="nc" id="L81">        menuBar.add(getJMenu(&quot;USB Devices&quot;, 'U', &quot;USB Device list&quot;, getUsbPanel()));</span>
+
+<span class="nc" id="L83">        mainFrame.setJMenuBar(menuBar);</span>
+<span class="nc" id="L84">    }</span>
+
+    private OsHwTextPanel getComputerSystemPanel() {
+<span class="nc" id="L87">        return new OsHwTextPanel(si);</span>
+    }
+
+    private MemoryPanel getMemoryPanel() {
+<span class="nc" id="L91">        return new MemoryPanel(si.getHardware().getMemory());</span>
+    }
+
+    private ProcessorPanel getProcessorPanel() {
+<span class="nc" id="L95">        return new ProcessorPanel(si.getHardware().getProcessor());</span>
+    }
+
+    private FileStorePanel getFileStorePanel() {
+<span class="nc" id="L99">        return new FileStorePanel(si.getOperatingSystem().getFileSystem());</span>
+    }
+
+    private ProcessPanel getProcessPanel() {
+<span class="nc" id="L103">        return new ProcessPanel(si);</span>
+    }
+
+    private UsbPanel getUsbPanel() {
+<span class="nc" id="L107">        return new UsbPanel(si.getHardware());</span>
+    }
+
+    private JButton getJMenu(String title, char mnemonic, String toolTip, OshiJPanel panel) {
+<span class="nc" id="L111">        JButton button = new JButton(title);</span>
+<span class="nc" id="L112">        button.setMnemonic(mnemonic);</span>
+<span class="nc" id="L113">        button.setToolTipText(toolTip);</span>
+<span class="nc" id="L114">        button.addActionListener(e -&gt; {</span>
+<span class="nc" id="L115">            Container contentPane = mainFrame.getContentPane();</span>
+
+<span class="nc bnc" id="L117" title="All 4 branches missed.">            if (contentPane.getComponents().length &lt;= 0 || contentPane.getComponent(0) != panel) {</span>
+<span class="nc" id="L118">                resetMainGui();</span>
+<span class="nc" id="L119">                mainFrame.getContentPane().add(panel);</span>
+<span class="nc" id="L120">                refreshMainGui();</span>
+            }
+<span class="nc" id="L122">        });</span>
+
+<span class="nc" id="L124">        return button;</span>
+    }
+
+    private void resetMainGui() {
+<span class="nc" id="L128">        mainFrame.getContentPane().removeAll();</span>
+<span class="nc" id="L129">    }</span>
+
+    private void refreshMainGui() {
+<span class="nc" id="L132">        mainFrame.revalidate();</span>
+<span class="nc" id="L133">        mainFrame.repaint();</span>
+<span class="nc" id="L134">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
