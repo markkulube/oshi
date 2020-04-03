@@ -23,53 +23,54 @@
  */
 package oshi.hardware.platform.mac;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 import com.sun.jna.platform.mac.IOKit.IOConnect; // NOSONAR squid:S1191
 
 import oshi.hardware.common.AbstractSensors;
 import oshi.util.platform.mac.SmcUtil;
 
 /**
- * &lt;p&gt;
- * MacSensors class.
- * &lt;/p&gt;
+ * Sensors from SMC
  */
-<span class="nc" id="L36">public class MacSensors extends AbstractSensors {</span>
+@ThreadSafe
+<span class="nc" id="L37">final class MacSensors extends AbstractSensors {</span>
 
     // This shouldn't change once determined
-<span class="nc" id="L39">    private int numFans = 0;</span>
+<span class="nc" id="L40">    private int numFans = 0;</span>
 
     @Override
     public double queryCpuTemperature() {
-<span class="nc" id="L43">        IOConnect conn = SmcUtil.smcOpen();</span>
-<span class="nc" id="L44">        double temp = SmcUtil.smcGetFloat(conn, SmcUtil.SMC_KEY_CPU_TEMP);</span>
-<span class="nc" id="L45">        SmcUtil.smcClose(conn);</span>
-<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (temp &gt; 0d) {</span>
-<span class="nc" id="L47">            return temp;</span>
+<span class="nc" id="L44">        IOConnect conn = SmcUtil.smcOpen();</span>
+<span class="nc" id="L45">        double temp = SmcUtil.smcGetFloat(conn, SmcUtil.SMC_KEY_CPU_TEMP);</span>
+<span class="nc" id="L46">        SmcUtil.smcClose(conn);</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        if (temp &gt; 0d) {</span>
+<span class="nc" id="L48">            return temp;</span>
         }
-<span class="nc" id="L49">        return 0d;</span>
+<span class="nc" id="L50">        return 0d;</span>
     }
 
     @Override
     public int[] queryFanSpeeds() {
         // If we don't have fan # try to get it
-<span class="nc" id="L55">        IOConnect conn = SmcUtil.smcOpen();</span>
-<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (this.numFans == 0) {</span>
-<span class="nc" id="L57">            this.numFans = (int) SmcUtil.smcGetLong(conn, SmcUtil.SMC_KEY_FAN_NUM);</span>
+<span class="nc" id="L56">        IOConnect conn = SmcUtil.smcOpen();</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (this.numFans == 0) {</span>
+<span class="nc" id="L58">            this.numFans = (int) SmcUtil.smcGetLong(conn, SmcUtil.SMC_KEY_FAN_NUM);</span>
         }
-<span class="nc" id="L59">        int[] fanSpeeds = new int[this.numFans];</span>
-<span class="nc bnc" id="L60" title="All 2 branches missed.">        for (int i = 0; i &lt; this.numFans; i++) {</span>
-<span class="nc" id="L61">            fanSpeeds[i] = (int) SmcUtil.smcGetFloat(conn, String.format(SmcUtil.SMC_KEY_FAN_SPEED, i));</span>
+<span class="nc" id="L60">        int[] fanSpeeds = new int[this.numFans];</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        for (int i = 0; i &lt; this.numFans; i++) {</span>
+<span class="nc" id="L62">            fanSpeeds[i] = (int) SmcUtil.smcGetFloat(conn, String.format(SmcUtil.SMC_KEY_FAN_SPEED, i));</span>
         }
-<span class="nc" id="L63">        SmcUtil.smcClose(conn);</span>
-<span class="nc" id="L64">        return fanSpeeds;</span>
+<span class="nc" id="L64">        SmcUtil.smcClose(conn);</span>
+<span class="nc" id="L65">        return fanSpeeds;</span>
     }
 
     @Override
     public double queryCpuVoltage() {
-<span class="nc" id="L69">        IOConnect conn = SmcUtil.smcOpen();</span>
-<span class="nc" id="L70">        double volts = SmcUtil.smcGetFloat(conn, SmcUtil.SMC_KEY_CPU_VOLTAGE) / 1000d;</span>
-<span class="nc" id="L71">        SmcUtil.smcClose(conn);</span>
-<span class="nc" id="L72">        return volts;</span>
+<span class="nc" id="L70">        IOConnect conn = SmcUtil.smcOpen();</span>
+<span class="nc" id="L71">        double volts = SmcUtil.smcGetFloat(conn, SmcUtil.SMC_KEY_CPU_VOLTAGE) / 1000d;</span>
+<span class="nc" id="L72">        SmcUtil.smcClose(conn);</span>
+<span class="nc" id="L73">        return volts;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

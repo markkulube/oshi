@@ -59,9 +59,9 @@ public class FileStorePanel extends OshiJPanel { // NOSONAR squid:S110
     private static final String USED = &quot;Used&quot;;
     private static final String AVAILABLE = &quot;Available&quot;;
 
-    public FileStorePanel(FileSystem fileSystem) {
+    public FileStorePanel(SystemInfo si) {
 <span class="nc" id="L63">        super();</span>
-<span class="nc" id="L64">        init(fileSystem);</span>
+<span class="nc" id="L64">        init(si.getOperatingSystem().getFileSystem());</span>
 <span class="nc" id="L65">    }</span>
 
     private void init(FileSystem fs) {

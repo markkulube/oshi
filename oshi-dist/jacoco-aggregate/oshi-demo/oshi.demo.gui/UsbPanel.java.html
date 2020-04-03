@@ -28,9 +28,11 @@ import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.Timer;
 import javax.swing.text.DefaultCaret;
 
+import oshi.SystemInfo;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.UsbDevice;
 
@@ -43,40 +45,40 @@ public class UsbPanel extends OshiJPanel { // NOSONAR squid:S110
 
     private static final String USB_DEVICES = &quot;USB Devices&quot;;
 
-    public UsbPanel(HardwareAbstractionLayer hal) {
-<span class="nc" id="L47">        super();</span>
-<span class="nc" id="L48">        init(hal);</span>
-<span class="nc" id="L49">    }</span>
+    public UsbPanel(SystemInfo si) {
+<span class="nc" id="L49">        super();</span>
+<span class="nc" id="L50">        init(si.getHardware());</span>
+<span class="nc" id="L51">    }</span>
 
     private void init(HardwareAbstractionLayer hal) {
 
-<span class="nc" id="L53">        JLabel usb = new JLabel(USB_DEVICES);</span>
-<span class="nc" id="L54">        add(usb, BorderLayout.NORTH);</span>
-<span class="nc" id="L55">        JTextArea usbArea = new JTextArea(60, 20);</span>
-<span class="nc" id="L56">        JScrollPane scrollV = new JScrollPane(usbArea);</span>
-<span class="nc" id="L57">        scrollV.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);</span>
-<span class="nc" id="L58">        DefaultCaret caret = (DefaultCaret) usbArea.getCaret();</span>
-<span class="nc" id="L59">        caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);</span>
+<span class="nc" id="L55">        JLabel usb = new JLabel(USB_DEVICES);</span>
+<span class="nc" id="L56">        add(usb, BorderLayout.NORTH);</span>
+<span class="nc" id="L57">        JTextArea usbArea = new JTextArea(60, 20);</span>
+<span class="nc" id="L58">        JScrollPane scrollV = new JScrollPane(usbArea);</span>
+<span class="nc" id="L59">        scrollV.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);</span>
+<span class="nc" id="L60">        DefaultCaret caret = (DefaultCaret) usbArea.getCaret();</span>
+<span class="nc" id="L61">        caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);</span>
 
-<span class="nc" id="L61">        usbArea.setText(getUsbString(hal));</span>
-<span class="nc" id="L62">        add(scrollV, BorderLayout.CENTER);</span>
+<span class="nc" id="L63">        usbArea.setText(getUsbString(hal));</span>
+<span class="nc" id="L64">        add(scrollV, BorderLayout.CENTER);</span>
 
-<span class="nc" id="L64">        Timer timer = new Timer(Config.REFRESH_SLOW, e -&gt; usbArea.setText(getUsbString(hal)));</span>
-<span class="nc" id="L65">        timer.start();</span>
-<span class="nc" id="L66">    }</span>
+<span class="nc" id="L66">        Timer timer = new Timer(Config.REFRESH_SLOW, e -&gt; usbArea.setText(getUsbString(hal)));</span>
+<span class="nc" id="L67">        timer.start();</span>
+<span class="nc" id="L68">    }</span>
 
     private static String getUsbString(HardwareAbstractionLayer hal) {
-<span class="nc" id="L69">        StringBuilder sb = new StringBuilder();</span>
-<span class="nc" id="L70">        boolean first = true;</span>
-<span class="nc bnc" id="L71" title="All 2 branches missed.">        for (UsbDevice usbDevice : hal.getUsbDevices(true)) {</span>
-<span class="nc bnc" id="L72" title="All 2 branches missed.">            if (first) {</span>
-<span class="nc" id="L73">                first = false;</span>
+<span class="nc" id="L71">        StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L72">        boolean first = true;</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        for (UsbDevice usbDevice : hal.getUsbDevices(true)) {</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (first) {</span>
+<span class="nc" id="L75">                first = false;</span>
             } else {
-<span class="nc" id="L75">                sb.append('\n');</span>
+<span class="nc" id="L77">                sb.append('\n');</span>
             }
-<span class="nc" id="L77">            sb.append(String.valueOf(usbDevice));</span>
+<span class="nc" id="L79">            sb.append(String.valueOf(usbDevice));</span>
         }
-<span class="nc" id="L79">        return sb.toString();</span>
+<span class="nc" id="L81">        return sb.toString();</span>
     }
 
 }

@@ -29,6 +29,8 @@ import static oshi.util.Memoizer.memoize;
 import java.util.List;
 import java.util.function.Supplier;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 import oshi.hardware.common.AbstractVirtualMemory;
 import oshi.util.FileUtil;
 import oshi.util.ParseUtil;
@@ -38,77 +40,78 @@ import oshi.util.tuples.Pair;
 /**
  * Memory obtained by /proc/meminfo and /proc/vmstat
  */
-<span class="nc" id="L41">public class LinuxVirtualMemory extends AbstractVirtualMemory {</span>
+@ThreadSafe
+<span class="nc" id="L44">final class LinuxVirtualMemory extends AbstractVirtualMemory {</span>
 
-<span class="nc" id="L43">    private final Supplier&lt;Pair&lt;Long, Long&gt;&gt; usedTotal = memoize(LinuxVirtualMemory::queryMemInfo, defaultExpiration());</span>
+<span class="nc" id="L46">    private final Supplier&lt;Pair&lt;Long, Long&gt;&gt; usedTotal = memoize(LinuxVirtualMemory::queryMemInfo, defaultExpiration());</span>
 
-<span class="nc" id="L45">    private final Supplier&lt;Pair&lt;Long, Long&gt;&gt; inOut = memoize(LinuxVirtualMemory::queryVmStat, defaultExpiration());</span>
+<span class="nc" id="L48">    private final Supplier&lt;Pair&lt;Long, Long&gt;&gt; inOut = memoize(LinuxVirtualMemory::queryVmStat, defaultExpiration());</span>
 
     @Override
     public long getSwapUsed() {
-<span class="nc" id="L49">        return usedTotal.get().getA();</span>
+<span class="nc" id="L52">        return usedTotal.get().getA();</span>
     }
 
     @Override
     public long getSwapTotal() {
-<span class="nc" id="L54">        return usedTotal.get().getB();</span>
+<span class="nc" id="L57">        return usedTotal.get().getB();</span>
     }
 
     @Override
     public long getSwapPagesIn() {
-<span class="nc" id="L59">        return inOut.get().getA();</span>
+<span class="nc" id="L62">        return inOut.get().getA();</span>
     }
 
     @Override
     public long getSwapPagesOut() {
-<span class="nc" id="L64">        return inOut.get().getB();</span>
+<span class="nc" id="L67">        return inOut.get().getB();</span>
     }
 
     private static Pair&lt;Long, Long&gt; queryMemInfo() {
-<span class="nc" id="L68">        long swapFree = 0L;</span>
-<span class="nc" id="L69">        long swapTotal = 0L;</span>
+<span class="nc" id="L71">        long swapFree = 0L;</span>
+<span class="nc" id="L72">        long swapTotal = 0L;</span>
 
-<span class="nc" id="L71">        List&lt;String&gt; procMemInfo = FileUtil.readFile(ProcPath.MEMINFO);</span>
-<span class="nc bnc" id="L72" title="All 2 branches missed.">        for (String checkLine : procMemInfo) {</span>
-<span class="nc" id="L73">            String[] memorySplit = ParseUtil.whitespaces.split(checkLine);</span>
-<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (memorySplit.length &gt; 1) {</span>
-<span class="nc bnc" id="L75" title="All 3 branches missed.">                switch (memorySplit[0]) {</span>
+<span class="nc" id="L74">        List&lt;String&gt; procMemInfo = FileUtil.readFile(ProcPath.MEMINFO);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        for (String checkLine : procMemInfo) {</span>
+<span class="nc" id="L76">            String[] memorySplit = ParseUtil.whitespaces.split(checkLine);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (memorySplit.length &gt; 1) {</span>
+<span class="nc bnc" id="L78" title="All 3 branches missed.">                switch (memorySplit[0]) {</span>
                 case &quot;SwapTotal:&quot;:
-<span class="nc" id="L77">                    swapTotal = parseMeminfo(memorySplit);</span>
-<span class="nc" id="L78">                    break;</span>
-                case &quot;SwapFree:&quot;:
-<span class="nc" id="L80">                    swapFree = parseMeminfo(memorySplit);</span>
+<span class="nc" id="L80">                    swapTotal = parseMeminfo(memorySplit);</span>
 <span class="nc" id="L81">                    break;</span>
+                case &quot;SwapFree:&quot;:
+<span class="nc" id="L83">                    swapFree = parseMeminfo(memorySplit);</span>
+<span class="nc" id="L84">                    break;</span>
                 default:
                     // do nothing with other lines
                     break;
                 }
             }
-<span class="nc" id="L87">        }</span>
-<span class="nc" id="L88">        return new Pair&lt;&gt;(swapTotal - swapFree, swapTotal);</span>
+<span class="nc" id="L90">        }</span>
+<span class="nc" id="L91">        return new Pair&lt;&gt;(swapTotal - swapFree, swapTotal);</span>
     }
 
     private static Pair&lt;Long, Long&gt; queryVmStat() {
-<span class="nc" id="L92">        long swapPagesIn = 0L;</span>
-<span class="nc" id="L93">        long swapPagesOut = 0L;</span>
-<span class="nc" id="L94">        List&lt;String&gt; procVmStat = FileUtil.readFile(ProcPath.VMSTAT);</span>
-<span class="nc bnc" id="L95" title="All 2 branches missed.">        for (String checkLine : procVmStat) {</span>
-<span class="nc" id="L96">            String[] memorySplit = ParseUtil.whitespaces.split(checkLine);</span>
-<span class="nc bnc" id="L97" title="All 2 branches missed.">            if (memorySplit.length &gt; 1) {</span>
-<span class="nc bnc" id="L98" title="All 3 branches missed.">                switch (memorySplit[0]) {</span>
+<span class="nc" id="L95">        long swapPagesIn = 0L;</span>
+<span class="nc" id="L96">        long swapPagesOut = 0L;</span>
+<span class="nc" id="L97">        List&lt;String&gt; procVmStat = FileUtil.readFile(ProcPath.VMSTAT);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        for (String checkLine : procVmStat) {</span>
+<span class="nc" id="L99">            String[] memorySplit = ParseUtil.whitespaces.split(checkLine);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            if (memorySplit.length &gt; 1) {</span>
+<span class="nc bnc" id="L101" title="All 3 branches missed.">                switch (memorySplit[0]) {</span>
                 case &quot;pgpgin&quot;:
-<span class="nc" id="L100">                    swapPagesIn = ParseUtil.parseLongOrDefault(memorySplit[1], 0L);</span>
-<span class="nc" id="L101">                    break;</span>
-                case &quot;pgpgout&quot;:
-<span class="nc" id="L103">                    swapPagesOut = ParseUtil.parseLongOrDefault(memorySplit[1], 0L);</span>
+<span class="nc" id="L103">                    swapPagesIn = ParseUtil.parseLongOrDefault(memorySplit[1], 0L);</span>
 <span class="nc" id="L104">                    break;</span>
+                case &quot;pgpgout&quot;:
+<span class="nc" id="L106">                    swapPagesOut = ParseUtil.parseLongOrDefault(memorySplit[1], 0L);</span>
+<span class="nc" id="L107">                    break;</span>
                 default:
                     // do nothing with other lines
                     break;
                 }
             }
-<span class="nc" id="L110">        }</span>
-<span class="nc" id="L111">        return new Pair&lt;&gt;(swapPagesIn, swapPagesOut);</span>
+<span class="nc" id="L113">        }</span>
+<span class="nc" id="L114">        return new Pair&lt;&gt;(swapPagesIn, swapPagesOut);</span>
     }
 
     /**
@@ -119,14 +122,14 @@ import oshi.util.tuples.Pair;
      * @return value, multiplied by 1024 if kB is specified
      */
     private static long parseMeminfo(String[] memorySplit) {
-<span class="nc bnc" id="L122" title="All 2 branches missed.">        if (memorySplit.length &lt; 2) {</span>
-<span class="nc" id="L123">            return 0L;</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (memorySplit.length &lt; 2) {</span>
+<span class="nc" id="L126">            return 0L;</span>
         }
-<span class="nc" id="L125">        long memory = ParseUtil.parseLongOrDefault(memorySplit[1], 0L);</span>
-<span class="nc bnc" id="L126" title="All 4 branches missed.">        if (memorySplit.length &gt; 2 &amp;&amp; &quot;kB&quot;.equals(memorySplit[2])) {</span>
-<span class="nc" id="L127">            memory *= 1024;</span>
+<span class="nc" id="L128">        long memory = ParseUtil.parseLongOrDefault(memorySplit[1], 0L);</span>
+<span class="nc bnc" id="L129" title="All 4 branches missed.">        if (memorySplit.length &gt; 2 &amp;&amp; &quot;kB&quot;.equals(memorySplit[2])) {</span>
+<span class="nc" id="L130">            memory *= 1024;</span>
         }
-<span class="nc" id="L129">        return memory;</span>
+<span class="nc" id="L132">        return memory;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

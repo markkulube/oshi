@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,19 +41,20 @@ import oshi.util.ParseUtil;
 /**
  * A CPU.
  */
+@ThreadSafe
 public abstract class AbstractCentralProcessor implements CentralProcessor {
 
-<span class="nc" id="L44">    private static final Logger LOG = LoggerFactory.getLogger(AbstractCentralProcessor.class);</span>
+<span class="nc" id="L47">    private static final Logger LOG = LoggerFactory.getLogger(AbstractCentralProcessor.class);</span>
 
-<span class="nc" id="L46">    private final Supplier&lt;ProcessorIdentifier&gt; cpuid = memoize(this::queryProcessorId);</span>
-<span class="nc" id="L47">    private final Supplier&lt;Long&gt; maxFreq = memoize(this::queryMaxFreq);</span>
-<span class="nc" id="L48">    private final Supplier&lt;long[]&gt; currentFreq = memoize(this::queryCurrentFreq, defaultExpiration());</span>
-<span class="nc" id="L49">    private final Supplier&lt;Long&gt; contextSwitches = memoize(this::queryContextSwitches, defaultExpiration());</span>
-<span class="nc" id="L50">    private final Supplier&lt;Long&gt; interrupts = memoize(this::queryInterrupts, defaultExpiration());</span>
+<span class="nc" id="L49">    private final Supplier&lt;ProcessorIdentifier&gt; cpuid = memoize(this::queryProcessorId);</span>
+<span class="nc" id="L50">    private final Supplier&lt;Long&gt; maxFreq = memoize(this::queryMaxFreq);</span>
+<span class="nc" id="L51">    private final Supplier&lt;long[]&gt; currentFreq = memoize(this::queryCurrentFreq, defaultExpiration());</span>
+<span class="nc" id="L52">    private final Supplier&lt;Long&gt; contextSwitches = memoize(this::queryContextSwitches, defaultExpiration());</span>
+<span class="nc" id="L53">    private final Supplier&lt;Long&gt; interrupts = memoize(this::queryInterrupts, defaultExpiration());</span>
 
-<span class="nc" id="L52">    private final Supplier&lt;long[]&gt; systemCpuLoadTicks = memoize(this::querySystemCpuLoadTicks, defaultExpiration());</span>
-<span class="nc" id="L53">    private final Supplier&lt;long[][]&gt; processorCpuLoadTicks = memoize(this::queryProcessorCpuLoadTicks,</span>
-<span class="nc" id="L54">            defaultExpiration());</span>
+<span class="nc" id="L55">    private final Supplier&lt;long[]&gt; systemCpuLoadTicks = memoize(this::querySystemCpuLoadTicks, defaultExpiration());</span>
+<span class="nc" id="L56">    private final Supplier&lt;long[][]&gt; processorCpuLoadTicks = memoize(this::queryProcessorCpuLoadTicks,</span>
+<span class="nc" id="L57">            defaultExpiration());</span>
 
     // Logical and Physical Processor Counts
     private final int physicalPackageCount;
@@ -64,21 +67,21 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
     /**
      * Create a Processor
      */
-<span class="nc" id="L67">    public AbstractCentralProcessor() {</span>
+<span class="nc" id="L70">    public AbstractCentralProcessor() {</span>
         // Populate logical processor array
-<span class="nc" id="L69">        this.logicalProcessors = initProcessorCounts();</span>
+<span class="nc" id="L72">        this.logicalProcessors = initProcessorCounts();</span>
         // Init processor counts
-<span class="nc" id="L71">        Set&lt;String&gt; physProcPkgs = new HashSet&lt;&gt;();</span>
-<span class="nc" id="L72">        Set&lt;Integer&gt; physPkgs = new HashSet&lt;&gt;();</span>
-<span class="nc bnc" id="L73" title="All 2 branches missed.">        for (LogicalProcessor logProc : this.logicalProcessors) {</span>
-<span class="nc" id="L74">            int pkg = logProc.getPhysicalPackageNumber();</span>
-<span class="nc" id="L75">            physProcPkgs.add(logProc.getPhysicalProcessorNumber() + &quot;:&quot; + pkg);</span>
-<span class="nc" id="L76">            physPkgs.add(pkg);</span>
+<span class="nc" id="L74">        Set&lt;String&gt; physProcPkgs = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L75">        Set&lt;Integer&gt; physPkgs = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        for (LogicalProcessor logProc : this.logicalProcessors) {</span>
+<span class="nc" id="L77">            int pkg = logProc.getPhysicalPackageNumber();</span>
+<span class="nc" id="L78">            physProcPkgs.add(logProc.getPhysicalProcessorNumber() + &quot;:&quot; + pkg);</span>
+<span class="nc" id="L79">            physPkgs.add(pkg);</span>
         }
-<span class="nc" id="L78">        this.logicalProcessorCount = this.logicalProcessors.length;</span>
-<span class="nc" id="L79">        this.physicalProcessorCount = physProcPkgs.size();</span>
-<span class="nc" id="L80">        this.physicalPackageCount = physPkgs.size();</span>
-<span class="nc" id="L81">    }</span>
+<span class="nc" id="L81">        this.logicalProcessorCount = this.logicalProcessors.length;</span>
+<span class="nc" id="L82">        this.physicalProcessorCount = physProcPkgs.size();</span>
+<span class="nc" id="L83">        this.physicalPackageCount = physPkgs.size();</span>
+<span class="nc" id="L84">    }</span>
 
     /**
      * Updates logical and physical processor counts and arrays
@@ -96,57 +99,57 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
 
     @Override
     public ProcessorIdentifier getProcessorIdentifier() {
-<span class="nc" id="L99">        return cpuid.get();</span>
+<span class="nc" id="L102">        return cpuid.get();</span>
     }
 
     @Override
     public String getVendor() {
-<span class="nc" id="L104">        return getProcessorIdentifier().getVendor();</span>
+<span class="nc" id="L107">        return getProcessorIdentifier().getVendor();</span>
     }
 
     @Override
     public String getName() {
-<span class="nc" id="L109">        return getProcessorIdentifier().getName();</span>
+<span class="nc" id="L112">        return getProcessorIdentifier().getName();</span>
     }
 
     @Override
     public String getFamily() {
-<span class="nc" id="L114">        return getProcessorIdentifier().getFamily();</span>
+<span class="nc" id="L117">        return getProcessorIdentifier().getFamily();</span>
     }
 
     @Override
     public String getModel() {
-<span class="nc" id="L119">        return getProcessorIdentifier().getModel();</span>
+<span class="nc" id="L122">        return getProcessorIdentifier().getModel();</span>
     }
 
     @Override
     public String getStepping() {
-<span class="nc" id="L124">        return getProcessorIdentifier().getStepping();</span>
+<span class="nc" id="L127">        return getProcessorIdentifier().getStepping();</span>
     }
 
     @Override
     public String getProcessorID() {
-<span class="nc" id="L129">        return getProcessorIdentifier().getProcessorID();</span>
+<span class="nc" id="L132">        return getProcessorIdentifier().getProcessorID();</span>
     }
 
     @Override
     public String getIdentifier() {
-<span class="nc" id="L134">        return getProcessorIdentifier().getIdentifier();</span>
+<span class="nc" id="L137">        return getProcessorIdentifier().getIdentifier();</span>
     }
 
     @Override
     public boolean isCpu64bit() {
-<span class="nc" id="L139">        return getProcessorIdentifier().isCpu64bit();</span>
+<span class="nc" id="L142">        return getProcessorIdentifier().isCpu64bit();</span>
     }
 
     @Override
     public long getVendorFreq() {
-<span class="nc" id="L144">        return getProcessorIdentifier().getVendorFreq();</span>
+<span class="nc" id="L147">        return getProcessorIdentifier().getVendorFreq();</span>
     }
 
     @Override
     public long getMaxFreq() {
-<span class="nc" id="L149">        return maxFreq.get();</span>
+<span class="nc" id="L152">        return maxFreq.get();</span>
     }
 
     /**
@@ -158,7 +161,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
 
     @Override
     public long[] getCurrentFreq() {
-<span class="nc" id="L161">        return currentFreq.get();</span>
+<span class="nc" id="L164">        return currentFreq.get();</span>
     }
 
     /**
@@ -170,7 +173,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
 
     @Override
     public long getContextSwitches() {
-<span class="nc" id="L173">        return contextSwitches.get();</span>
+<span class="nc" id="L176">        return contextSwitches.get();</span>
     }
 
     /**
@@ -182,7 +185,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
 
     @Override
     public long getInterrupts() {
-<span class="nc" id="L185">        return interrupts.get();</span>
+<span class="nc" id="L188">        return interrupts.get();</span>
     }
 
     /**
@@ -194,12 +197,12 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
 
     @Override
     public LogicalProcessor[] getLogicalProcessors() {
-<span class="nc" id="L197">        return this.logicalProcessors;</span>
+<span class="nc" id="L200">        return this.logicalProcessors;</span>
     }
 
     @Override
     public long[] getSystemCpuLoadTicks() {
-<span class="nc" id="L202">        return systemCpuLoadTicks.get();</span>
+<span class="nc" id="L205">        return systemCpuLoadTicks.get();</span>
     }
 
     /**
@@ -211,7 +214,7 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
 
     @Override
     public long[][] getProcessorCpuLoadTicks() {
-<span class="nc" id="L214">        return processorCpuLoadTicks.get();</span>
+<span class="nc" id="L217">        return processorCpuLoadTicks.get();</span>
     }
 
     /**
@@ -223,61 +226,61 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
 
     @Override
     public double getSystemCpuLoadBetweenTicks(long[] oldTicks) {
-<span class="nc bnc" id="L226" title="All 2 branches missed.">        if (oldTicks.length != TickType.values().length) {</span>
-<span class="nc" id="L227">            throw new IllegalArgumentException(</span>
-<span class="nc" id="L228">                    &quot;Tick array &quot; + oldTicks.length + &quot; should have &quot; + TickType.values().length + &quot; elements&quot;);</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        if (oldTicks.length != TickType.values().length) {</span>
+<span class="nc" id="L230">            throw new IllegalArgumentException(</span>
+<span class="nc" id="L231">                    &quot;Tick array &quot; + oldTicks.length + &quot; should have &quot; + TickType.values().length + &quot; elements&quot;);</span>
         }
-<span class="nc" id="L230">        long[] ticks = getSystemCpuLoadTicks();</span>
+<span class="nc" id="L233">        long[] ticks = getSystemCpuLoadTicks();</span>
         // Calculate total
-<span class="nc" id="L232">        long total = 0;</span>
-<span class="nc bnc" id="L233" title="All 2 branches missed.">        for (int i = 0; i &lt; ticks.length; i++) {</span>
-<span class="nc" id="L234">            total += ticks[i] - oldTicks[i];</span>
+<span class="nc" id="L235">        long total = 0;</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        for (int i = 0; i &lt; ticks.length; i++) {</span>
+<span class="nc" id="L237">            total += ticks[i] - oldTicks[i];</span>
         }
         // Calculate idle from difference in idle and IOwait
-<span class="nc" id="L237">        long idle = ticks[TickType.IDLE.getIndex()] + ticks[TickType.IOWAIT.getIndex()]</span>
-<span class="nc" id="L238">                - oldTicks[TickType.IDLE.getIndex()] - oldTicks[TickType.IOWAIT.getIndex()];</span>
-<span class="nc" id="L239">        LOG.trace(&quot;Total ticks: {}  Idle ticks: {}&quot;, total, idle);</span>
+<span class="nc" id="L240">        long idle = ticks[TickType.IDLE.getIndex()] + ticks[TickType.IOWAIT.getIndex()]</span>
+<span class="nc" id="L241">                - oldTicks[TickType.IDLE.getIndex()] - oldTicks[TickType.IOWAIT.getIndex()];</span>
+<span class="nc" id="L242">        LOG.trace(&quot;Total ticks: {}  Idle ticks: {}&quot;, total, idle);</span>
 
-<span class="nc bnc" id="L241" title="All 4 branches missed.">        return total &gt; 0 &amp;&amp; idle &gt;= 0 ? (double) (total - idle) / total : 0d;</span>
+<span class="nc bnc" id="L244" title="All 4 branches missed.">        return total &gt; 0 &amp;&amp; idle &gt;= 0 ? (double) (total - idle) / total : 0d;</span>
     }
 
     @Override
     public double[] getProcessorCpuLoadBetweenTicks(long[][] oldTicks) {
-<span class="nc bnc" id="L246" title="All 4 branches missed.">        if (oldTicks.length != this.logicalProcessorCount || oldTicks[0].length != TickType.values().length) {</span>
-<span class="nc" id="L247">            throw new IllegalArgumentException(</span>
+<span class="nc bnc" id="L249" title="All 4 branches missed.">        if (oldTicks.length != this.logicalProcessorCount || oldTicks[0].length != TickType.values().length) {</span>
+<span class="nc" id="L250">            throw new IllegalArgumentException(</span>
                     &quot;Tick array &quot; + oldTicks.length + &quot; should have &quot; + this.logicalProcessorCount
-<span class="nc" id="L249">                            + &quot; arrays, each of which has &quot; + TickType.values().length + &quot; elements&quot;);</span>
+<span class="nc" id="L252">                            + &quot; arrays, each of which has &quot; + TickType.values().length + &quot; elements&quot;);</span>
         }
-<span class="nc" id="L251">        long[][] ticks = getProcessorCpuLoadTicks();</span>
-<span class="nc" id="L252">        double[] load = new double[this.logicalProcessorCount];</span>
-<span class="nc bnc" id="L253" title="All 2 branches missed.">        for (int cpu = 0; cpu &lt; this.logicalProcessorCount; cpu++) {</span>
-<span class="nc" id="L254">            long total = 0;</span>
-<span class="nc bnc" id="L255" title="All 2 branches missed.">            for (int i = 0; i &lt; ticks[cpu].length; i++) {</span>
-<span class="nc" id="L256">                total += ticks[cpu][i] - oldTicks[cpu][i];</span>
+<span class="nc" id="L254">        long[][] ticks = getProcessorCpuLoadTicks();</span>
+<span class="nc" id="L255">        double[] load = new double[this.logicalProcessorCount];</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        for (int cpu = 0; cpu &lt; this.logicalProcessorCount; cpu++) {</span>
+<span class="nc" id="L257">            long total = 0;</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">            for (int i = 0; i &lt; ticks[cpu].length; i++) {</span>
+<span class="nc" id="L259">                total += ticks[cpu][i] - oldTicks[cpu][i];</span>
             }
             // Calculate idle from difference in idle and IOwait
-<span class="nc" id="L259">            long idle = ticks[cpu][TickType.IDLE.getIndex()] + ticks[cpu][TickType.IOWAIT.getIndex()]</span>
-<span class="nc" id="L260">                    - oldTicks[cpu][TickType.IDLE.getIndex()] - oldTicks[cpu][TickType.IOWAIT.getIndex()];</span>
-<span class="nc" id="L261">            LOG.trace(&quot;CPU: {}  Total ticks: {}  Idle ticks: {}&quot;, cpu, total, idle);</span>
+<span class="nc" id="L262">            long idle = ticks[cpu][TickType.IDLE.getIndex()] + ticks[cpu][TickType.IOWAIT.getIndex()]</span>
+<span class="nc" id="L263">                    - oldTicks[cpu][TickType.IDLE.getIndex()] - oldTicks[cpu][TickType.IOWAIT.getIndex()];</span>
+<span class="nc" id="L264">            LOG.trace(&quot;CPU: {}  Total ticks: {}  Idle ticks: {}&quot;, cpu, total, idle);</span>
             // update
-<span class="nc bnc" id="L263" title="All 4 branches missed.">            load[cpu] = total &gt; 0 &amp;&amp; idle &gt;= 0 ? (double) (total - idle) / total : 0d;</span>
+<span class="nc bnc" id="L266" title="All 4 branches missed.">            load[cpu] = total &gt; 0 &amp;&amp; idle &gt;= 0 ? (double) (total - idle) / total : 0d;</span>
         }
-<span class="nc" id="L265">        return load;</span>
+<span class="nc" id="L268">        return load;</span>
     }
 
     @Override
     public int getLogicalProcessorCount() {
-<span class="nc" id="L270">        return this.logicalProcessorCount;</span>
+<span class="nc" id="L273">        return this.logicalProcessorCount;</span>
     }
 
     @Override
     public int getPhysicalProcessorCount() {
-<span class="nc" id="L275">        return this.physicalProcessorCount;</span>
+<span class="nc" id="L278">        return this.physicalProcessorCount;</span>
     }
 
     @Override
     public int getPhysicalPackageCount() {
-<span class="nc" id="L280">        return this.physicalPackageCount;</span>
+<span class="nc" id="L283">        return this.physicalPackageCount;</span>
     }
 
     /**
@@ -295,128 +298,128 @@ public abstract class AbstractCentralProcessor implements CentralProcessor {
      * @return The Processor ID string
      */
     protected static String createProcessorID(String stepping, String model, String family, String[] flags) {
-<span class="nc" id="L298">        long processorIdBytes = 0L;</span>
-<span class="nc" id="L299">        long steppingL = ParseUtil.parseLongOrDefault(stepping, 0L);</span>
-<span class="nc" id="L300">        long modelL = ParseUtil.parseLongOrDefault(model, 0L);</span>
-<span class="nc" id="L301">        long familyL = ParseUtil.parseLongOrDefault(family, 0L);</span>
+<span class="nc" id="L301">        long processorIdBytes = 0L;</span>
+<span class="nc" id="L302">        long steppingL = ParseUtil.parseLongOrDefault(stepping, 0L);</span>
+<span class="nc" id="L303">        long modelL = ParseUtil.parseLongOrDefault(model, 0L);</span>
+<span class="nc" id="L304">        long familyL = ParseUtil.parseLongOrDefault(family, 0L);</span>
         // 3:0 – Stepping
-<span class="nc" id="L303">        processorIdBytes |= steppingL &amp; 0xf;</span>
+<span class="nc" id="L306">        processorIdBytes |= steppingL &amp; 0xf;</span>
         // 19:16,7:4 – Model
-<span class="nc" id="L305">        processorIdBytes |= (modelL &amp; 0x0f) &lt;&lt; 4;</span>
-<span class="nc" id="L306">        processorIdBytes |= (modelL &amp; 0xf0) &lt;&lt; 16;</span>
+<span class="nc" id="L308">        processorIdBytes |= (modelL &amp; 0x0f) &lt;&lt; 4;</span>
+<span class="nc" id="L309">        processorIdBytes |= (modelL &amp; 0xf0) &lt;&lt; 16;</span>
         // 27:20,11:8 – Family
-<span class="nc" id="L308">        processorIdBytes |= (familyL &amp; 0x0f) &lt;&lt; 8;</span>
-<span class="nc" id="L309">        processorIdBytes |= (familyL &amp; 0xf0) &lt;&lt; 20;</span>
+<span class="nc" id="L311">        processorIdBytes |= (familyL &amp; 0x0f) &lt;&lt; 8;</span>
+<span class="nc" id="L312">        processorIdBytes |= (familyL &amp; 0xf0) &lt;&lt; 20;</span>
         // 13:12 – Processor Type, assume 0
-<span class="nc bnc" id="L311" title="All 2 branches missed.">        for (String flag : flags) {</span>
-<span class="nc bnc" id="L312" title="All 31 branches missed.">            switch (flag) { // NOSONAR squid:S1479</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">        for (String flag : flags) {</span>
+<span class="nc bnc" id="L315" title="All 31 branches missed.">            switch (flag) { // NOSONAR squid:S1479</span>
             case &quot;fpu&quot;:
-<span class="nc" id="L314">                processorIdBytes |= 1L &lt;&lt; 32;</span>
-<span class="nc" id="L315">                break;</span>
-            case &quot;vme&quot;:
-<span class="nc" id="L317">                processorIdBytes |= 1L &lt;&lt; 33;</span>
+<span class="nc" id="L317">                processorIdBytes |= 1L &lt;&lt; 32;</span>
 <span class="nc" id="L318">                break;</span>
-            case &quot;de&quot;:
-<span class="nc" id="L320">                processorIdBytes |= 1L &lt;&lt; 34;</span>
+            case &quot;vme&quot;:
+<span class="nc" id="L320">                processorIdBytes |= 1L &lt;&lt; 33;</span>
 <span class="nc" id="L321">                break;</span>
-            case &quot;pse&quot;:
-<span class="nc" id="L323">                processorIdBytes |= 1L &lt;&lt; 35;</span>
+            case &quot;de&quot;:
+<span class="nc" id="L323">                processorIdBytes |= 1L &lt;&lt; 34;</span>
 <span class="nc" id="L324">                break;</span>
-            case &quot;tsc&quot;:
-<span class="nc" id="L326">                processorIdBytes |= 1L &lt;&lt; 36;</span>
+            case &quot;pse&quot;:
+<span class="nc" id="L326">                processorIdBytes |= 1L &lt;&lt; 35;</span>
 <span class="nc" id="L327">                break;</span>
-            case &quot;msr&quot;:
-<span class="nc" id="L329">                processorIdBytes |= 1L &lt;&lt; 37;</span>
+            case &quot;tsc&quot;:
+<span class="nc" id="L329">                processorIdBytes |= 1L &lt;&lt; 36;</span>
 <span class="nc" id="L330">                break;</span>
-            case &quot;pae&quot;:
-<span class="nc" id="L332">                processorIdBytes |= 1L &lt;&lt; 38;</span>
+            case &quot;msr&quot;:
+<span class="nc" id="L332">                processorIdBytes |= 1L &lt;&lt; 37;</span>
 <span class="nc" id="L333">                break;</span>
-            case &quot;mce&quot;:
-<span class="nc" id="L335">                processorIdBytes |= 1L &lt;&lt; 39;</span>
+            case &quot;pae&quot;:
+<span class="nc" id="L335">                processorIdBytes |= 1L &lt;&lt; 38;</span>
 <span class="nc" id="L336">                break;</span>
-            case &quot;cx8&quot;:
-<span class="nc" id="L338">                processorIdBytes |= 1L &lt;&lt; 40;</span>
+            case &quot;mce&quot;:
+<span class="nc" id="L338">                processorIdBytes |= 1L &lt;&lt; 39;</span>
 <span class="nc" id="L339">                break;</span>
-            case &quot;apic&quot;:
-<span class="nc" id="L341">                processorIdBytes |= 1L &lt;&lt; 41;</span>
+            case &quot;cx8&quot;:
+<span class="nc" id="L341">                processorIdBytes |= 1L &lt;&lt; 40;</span>
 <span class="nc" id="L342">                break;</span>
-            case &quot;sep&quot;:
-<span class="nc" id="L344">                processorIdBytes |= 1L &lt;&lt; 43;</span>
+            case &quot;apic&quot;:
+<span class="nc" id="L344">                processorIdBytes |= 1L &lt;&lt; 41;</span>
 <span class="nc" id="L345">                break;</span>
-            case &quot;mtrr&quot;:
-<span class="nc" id="L347">                processorIdBytes |= 1L &lt;&lt; 44;</span>
+            case &quot;sep&quot;:
+<span class="nc" id="L347">                processorIdBytes |= 1L &lt;&lt; 43;</span>
 <span class="nc" id="L348">                break;</span>
-            case &quot;pge&quot;:
-<span class="nc" id="L350">                processorIdBytes |= 1L &lt;&lt; 45;</span>
+            case &quot;mtrr&quot;:
+<span class="nc" id="L350">                processorIdBytes |= 1L &lt;&lt; 44;</span>
 <span class="nc" id="L351">                break;</span>
-            case &quot;mca&quot;:
-<span class="nc" id="L353">                processorIdBytes |= 1L &lt;&lt; 46;</span>
+            case &quot;pge&quot;:
+<span class="nc" id="L353">                processorIdBytes |= 1L &lt;&lt; 45;</span>
 <span class="nc" id="L354">                break;</span>
-            case &quot;cmov&quot;:
-<span class="nc" id="L356">                processorIdBytes |= 1L &lt;&lt; 47;</span>
+            case &quot;mca&quot;:
+<span class="nc" id="L356">                processorIdBytes |= 1L &lt;&lt; 46;</span>
 <span class="nc" id="L357">                break;</span>
-            case &quot;pat&quot;:
-<span class="nc" id="L359">                processorIdBytes |= 1L &lt;&lt; 48;</span>
+            case &quot;cmov&quot;:
+<span class="nc" id="L359">                processorIdBytes |= 1L &lt;&lt; 47;</span>
 <span class="nc" id="L360">                break;</span>
-            case &quot;pse-36&quot;:
-<span class="nc" id="L362">                processorIdBytes |= 1L &lt;&lt; 49;</span>
+            case &quot;pat&quot;:
+<span class="nc" id="L362">                processorIdBytes |= 1L &lt;&lt; 48;</span>
 <span class="nc" id="L363">                break;</span>
-            case &quot;psn&quot;:
-<span class="nc" id="L365">                processorIdBytes |= 1L &lt;&lt; 50;</span>
+            case &quot;pse-36&quot;:
+<span class="nc" id="L365">                processorIdBytes |= 1L &lt;&lt; 49;</span>
 <span class="nc" id="L366">                break;</span>
-            case &quot;clfsh&quot;:
-<span class="nc" id="L368">                processorIdBytes |= 1L &lt;&lt; 51;</span>
+            case &quot;psn&quot;:
+<span class="nc" id="L368">                processorIdBytes |= 1L &lt;&lt; 50;</span>
 <span class="nc" id="L369">                break;</span>
-            case &quot;ds&quot;:
-<span class="nc" id="L371">                processorIdBytes |= 1L &lt;&lt; 53;</span>
+            case &quot;clfsh&quot;:
+<span class="nc" id="L371">                processorIdBytes |= 1L &lt;&lt; 51;</span>
 <span class="nc" id="L372">                break;</span>
-            case &quot;acpi&quot;:
-<span class="nc" id="L374">                processorIdBytes |= 1L &lt;&lt; 54;</span>
+            case &quot;ds&quot;:
+<span class="nc" id="L374">                processorIdBytes |= 1L &lt;&lt; 53;</span>
 <span class="nc" id="L375">                break;</span>
-            case &quot;mmx&quot;:
-<span class="nc" id="L377">                processorIdBytes |= 1L &lt;&lt; 55;</span>
+            case &quot;acpi&quot;:
+<span class="nc" id="L377">                processorIdBytes |= 1L &lt;&lt; 54;</span>
 <span class="nc" id="L378">                break;</span>
-            case &quot;fxsr&quot;:
-<span class="nc" id="L380">                processorIdBytes |= 1L &lt;&lt; 56;</span>
+            case &quot;mmx&quot;:
+<span class="nc" id="L380">                processorIdBytes |= 1L &lt;&lt; 55;</span>
 <span class="nc" id="L381">                break;</span>
-            case &quot;sse&quot;:
-<span class="nc" id="L383">                processorIdBytes |= 1L &lt;&lt; 57;</span>
+            case &quot;fxsr&quot;:
+<span class="nc" id="L383">                processorIdBytes |= 1L &lt;&lt; 56;</span>
 <span class="nc" id="L384">                break;</span>
-            case &quot;sse2&quot;:
-<span class="nc" id="L386">                processorIdBytes |= 1L &lt;&lt; 58;</span>
+            case &quot;sse&quot;:
+<span class="nc" id="L386">                processorIdBytes |= 1L &lt;&lt; 57;</span>
 <span class="nc" id="L387">                break;</span>
-            case &quot;ss&quot;:
-<span class="nc" id="L389">                processorIdBytes |= 1L &lt;&lt; 59;</span>
+            case &quot;sse2&quot;:
+<span class="nc" id="L389">                processorIdBytes |= 1L &lt;&lt; 58;</span>
 <span class="nc" id="L390">                break;</span>
-            case &quot;htt&quot;:
-<span class="nc" id="L392">                processorIdBytes |= 1L &lt;&lt; 60;</span>
+            case &quot;ss&quot;:
+<span class="nc" id="L392">                processorIdBytes |= 1L &lt;&lt; 59;</span>
 <span class="nc" id="L393">                break;</span>
-            case &quot;tm&quot;:
-<span class="nc" id="L395">                processorIdBytes |= 1L &lt;&lt; 61;</span>
+            case &quot;htt&quot;:
+<span class="nc" id="L395">                processorIdBytes |= 1L &lt;&lt; 60;</span>
 <span class="nc" id="L396">                break;</span>
-            case &quot;ia64&quot;:
-<span class="nc" id="L398">                processorIdBytes |= 1L &lt;&lt; 62;</span>
+            case &quot;tm&quot;:
+<span class="nc" id="L398">                processorIdBytes |= 1L &lt;&lt; 61;</span>
 <span class="nc" id="L399">                break;</span>
-            case &quot;pbe&quot;:
-<span class="nc" id="L401">                processorIdBytes |= 1L &lt;&lt; 63;</span>
+            case &quot;ia64&quot;:
+<span class="nc" id="L401">                processorIdBytes |= 1L &lt;&lt; 62;</span>
 <span class="nc" id="L402">                break;</span>
+            case &quot;pbe&quot;:
+<span class="nc" id="L404">                processorIdBytes |= 1L &lt;&lt; 63;</span>
+<span class="nc" id="L405">                break;</span>
             default:
                 break;
             }
         }
-<span class="nc" id="L407">        return String.format(&quot;%016X&quot;, processorIdBytes);</span>
+<span class="nc" id="L410">        return String.format(&quot;%016X&quot;, processorIdBytes);</span>
     }
 
     @Override
     public String toString() {
-<span class="nc" id="L412">        StringBuilder sb = new StringBuilder(getName());</span>
-<span class="nc" id="L413">        sb.append(&quot;\n &quot;).append(getPhysicalPackageCount()).append(&quot; physical CPU package(s)&quot;);</span>
-<span class="nc" id="L414">        sb.append(&quot;\n &quot;).append(getPhysicalProcessorCount()).append(&quot; physical CPU core(s)&quot;);</span>
-<span class="nc" id="L415">        sb.append(&quot;\n &quot;).append(getLogicalProcessorCount()).append(&quot; logical CPU(s)&quot;);</span>
-<span class="nc" id="L416">        sb.append('\n').append(&quot;Identifier: &quot;).append(getProcessorIdentifier().getIdentifier());</span>
-<span class="nc" id="L417">        sb.append('\n').append(&quot;ProcessorID: &quot;).append(getProcessorIdentifier().getProcessorID());</span>
-<span class="nc" id="L418">        return sb.toString();</span>
+<span class="nc" id="L415">        StringBuilder sb = new StringBuilder(getName());</span>
+<span class="nc" id="L416">        sb.append(&quot;\n &quot;).append(getPhysicalPackageCount()).append(&quot; physical CPU package(s)&quot;);</span>
+<span class="nc" id="L417">        sb.append(&quot;\n &quot;).append(getPhysicalProcessorCount()).append(&quot; physical CPU core(s)&quot;);</span>
+<span class="nc" id="L418">        sb.append(&quot;\n &quot;).append(getLogicalProcessorCount()).append(&quot; logical CPU(s)&quot;);</span>
+<span class="nc" id="L419">        sb.append('\n').append(&quot;Identifier: &quot;).append(getProcessorIdentifier().getIdentifier());</span>
+<span class="nc" id="L420">        sb.append('\n').append(&quot;ProcessorID: &quot;).append(getProcessorIdentifier().getProcessorID());</span>
+<span class="nc" id="L421">        sb.append('\n').append(&quot;Microarchitecture: &quot;).append(getProcessorIdentifier().getMicroarchitecture());</span>
+<span class="nc" id="L422">        return sb.toString();</span>
     }
-
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
