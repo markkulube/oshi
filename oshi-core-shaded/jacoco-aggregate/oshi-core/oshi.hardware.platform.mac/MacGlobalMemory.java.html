@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,111 +52,112 @@ import oshi.util.platform.mac.SysctlUtil;
 /**
  * Memory obtained by host_statistics (vm_stat) and sysctl.
  */
-<span class="nc" id="L53">public class MacGlobalMemory extends AbstractGlobalMemory {</span>
+@ThreadSafe
+<span class="nc" id="L56">final class MacGlobalMemory extends AbstractGlobalMemory {</span>
 
-<span class="nc" id="L55">    private static final Logger LOG = LoggerFactory.getLogger(MacGlobalMemory.class);</span>
+<span class="nc" id="L58">    private static final Logger LOG = LoggerFactory.getLogger(MacGlobalMemory.class);</span>
 
-<span class="nc" id="L57">    private final Supplier&lt;Long&gt; available = memoize(this::queryVmStats, defaultExpiration());</span>
+<span class="nc" id="L60">    private final Supplier&lt;Long&gt; available = memoize(this::queryVmStats, defaultExpiration());</span>
 
-<span class="nc" id="L59">    private final Supplier&lt;Long&gt; total = memoize(MacGlobalMemory::queryPhysMem);</span>
+<span class="nc" id="L62">    private final Supplier&lt;Long&gt; total = memoize(MacGlobalMemory::queryPhysMem);</span>
 
-<span class="nc" id="L61">    private final Supplier&lt;Long&gt; pageSize = memoize(MacGlobalMemory::queryPageSize);</span>
+<span class="nc" id="L64">    private final Supplier&lt;Long&gt; pageSize = memoize(MacGlobalMemory::queryPageSize);</span>
 
-<span class="nc" id="L63">    private final Supplier&lt;VirtualMemory&gt; vm = memoize(MacGlobalMemory::createVirtualMemory);</span>
+<span class="nc" id="L66">    private final Supplier&lt;VirtualMemory&gt; vm = memoize(MacGlobalMemory::createVirtualMemory);</span>
 
     @Override
     public long getAvailable() {
-<span class="nc" id="L67">        return available.get();</span>
+<span class="nc" id="L70">        return available.get();</span>
     }
 
     @Override
     public long getTotal() {
-<span class="nc" id="L72">        return total.get();</span>
+<span class="nc" id="L75">        return total.get();</span>
     }
 
     @Override
     public long getPageSize() {
-<span class="nc" id="L77">        return pageSize.get();</span>
+<span class="nc" id="L80">        return pageSize.get();</span>
     }
 
     @Override
     public VirtualMemory getVirtualMemory() {
-<span class="nc" id="L82">        return vm.get();</span>
+<span class="nc" id="L85">        return vm.get();</span>
     }
 
     @Override
     public PhysicalMemory[] getPhysicalMemory() {
-<span class="nc" id="L87">        List&lt;PhysicalMemory&gt; pmList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L88">        List&lt;String&gt; sp = ExecutingCommand.runNative(&quot;system_profiler SPMemoryDataType&quot;);</span>
-<span class="nc" id="L89">        int bank = 0;</span>
-<span class="nc" id="L90">        String bankLabel = Constants.UNKNOWN;</span>
-<span class="nc" id="L91">        long capacity = 0L;</span>
-<span class="nc" id="L92">        long speed = 0L;</span>
-<span class="nc" id="L93">        String manufacturer = Constants.UNKNOWN;</span>
-<span class="nc" id="L94">        String memoryType = Constants.UNKNOWN;</span>
-<span class="nc bnc" id="L95" title="All 2 branches missed.">        for (String line : sp) {</span>
-<span class="nc bnc" id="L96" title="All 2 branches missed.">            if (line.trim().startsWith(&quot;BANK&quot;)) {</span>
+<span class="nc" id="L90">        List&lt;PhysicalMemory&gt; pmList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L91">        List&lt;String&gt; sp = ExecutingCommand.runNative(&quot;system_profiler SPMemoryDataType&quot;);</span>
+<span class="nc" id="L92">        int bank = 0;</span>
+<span class="nc" id="L93">        String bankLabel = Constants.UNKNOWN;</span>
+<span class="nc" id="L94">        long capacity = 0L;</span>
+<span class="nc" id="L95">        long speed = 0L;</span>
+<span class="nc" id="L96">        String manufacturer = Constants.UNKNOWN;</span>
+<span class="nc" id="L97">        String memoryType = Constants.UNKNOWN;</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        for (String line : sp) {</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">            if (line.trim().startsWith(&quot;BANK&quot;)) {</span>
                 // Save previous bank
-<span class="nc bnc" id="L98" title="All 2 branches missed.">                if (bank++ &gt; 0) {</span>
-<span class="nc" id="L99">                    pmList.add(new PhysicalMemory(bankLabel, capacity, speed, manufacturer, memoryType));</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">                if (bank++ &gt; 0) {</span>
+<span class="nc" id="L102">                    pmList.add(new PhysicalMemory(bankLabel, capacity, speed, manufacturer, memoryType));</span>
                 }
-<span class="nc" id="L101">                bankLabel = line.trim();</span>
-<span class="nc" id="L102">                int colon = bankLabel.lastIndexOf(':');</span>
-<span class="nc bnc" id="L103" title="All 2 branches missed.">                if (colon &gt; 0) {</span>
-<span class="nc" id="L104">                    bankLabel = bankLabel.substring(0, colon - 1);</span>
+<span class="nc" id="L104">                bankLabel = line.trim();</span>
+<span class="nc" id="L105">                int colon = bankLabel.lastIndexOf(':');</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">                if (colon &gt; 0) {</span>
+<span class="nc" id="L107">                    bankLabel = bankLabel.substring(0, colon - 1);</span>
                 }
-<span class="nc bnc" id="L106" title="All 2 branches missed.">            } else if (bank &gt; 0) {</span>
-<span class="nc" id="L107">                String[] split = line.trim().split(&quot;:&quot;);</span>
-<span class="nc bnc" id="L108" title="All 2 branches missed.">                if (split.length == 2) {</span>
-<span class="nc bnc" id="L109" title="All 5 branches missed.">                    switch (split[0]) {</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            } else if (bank &gt; 0) {</span>
+<span class="nc" id="L110">                String[] split = line.trim().split(&quot;:&quot;);</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                if (split.length == 2) {</span>
+<span class="nc bnc" id="L112" title="All 5 branches missed.">                    switch (split[0]) {</span>
                     case &quot;Size&quot;:
-<span class="nc" id="L111">                        capacity = parsePhysicalMemorySize(split[1].trim());</span>
-<span class="nc" id="L112">                        break;</span>
-                    case &quot;Type&quot;:
-<span class="nc" id="L114">                        memoryType = split[1].trim();</span>
+<span class="nc" id="L114">                        capacity = ParseUtil.parseDecimalMemorySizeToBinary(split[1].trim());</span>
 <span class="nc" id="L115">                        break;</span>
-                    case &quot;Speed&quot;:
-<span class="nc" id="L117">                        speed = ParseUtil.parseHertz(split[1]);</span>
+                    case &quot;Type&quot;:
+<span class="nc" id="L117">                        memoryType = split[1].trim();</span>
 <span class="nc" id="L118">                        break;</span>
-                    case &quot;Manufacturer&quot;:
-<span class="nc" id="L120">                        manufacturer = split[1].trim();</span>
+                    case &quot;Speed&quot;:
+<span class="nc" id="L120">                        speed = ParseUtil.parseHertz(split[1]);</span>
 <span class="nc" id="L121">                        break;</span>
+                    case &quot;Manufacturer&quot;:
+<span class="nc" id="L123">                        manufacturer = split[1].trim();</span>
+<span class="nc" id="L124">                        break;</span>
                     default:
                         break;
                     }
                 }
             }
-<span class="nc" id="L127">        }</span>
-<span class="nc" id="L128">        pmList.add(new PhysicalMemory(bankLabel, capacity, speed, manufacturer, memoryType));</span>
+<span class="nc" id="L130">        }</span>
+<span class="nc" id="L131">        pmList.add(new PhysicalMemory(bankLabel, capacity, speed, manufacturer, memoryType));</span>
 
-<span class="nc" id="L130">        return pmList.toArray(new PhysicalMemory[0]);</span>
+<span class="nc" id="L133">        return pmList.toArray(new PhysicalMemory[0]);</span>
     }
 
     private long queryVmStats() {
-<span class="nc" id="L134">        VMStatistics vmStats = new VMStatistics();</span>
-<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (0 != SystemB.INSTANCE.host_statistics(SystemB.INSTANCE.mach_host_self(), SystemB.HOST_VM_INFO, vmStats,</span>
-<span class="nc" id="L136">                new IntByReference(vmStats.size() / SystemB.INT_SIZE))) {</span>
-<span class="nc" id="L137">            LOG.error(&quot;Failed to get host VM info. Error code: {}&quot;, Native.getLastError());</span>
-<span class="nc" id="L138">            return 0L;</span>
+<span class="nc" id="L137">        VMStatistics vmStats = new VMStatistics();</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        if (0 != SystemB.INSTANCE.host_statistics(SystemB.INSTANCE.mach_host_self(), SystemB.HOST_VM_INFO, vmStats,</span>
+<span class="nc" id="L139">                new IntByReference(vmStats.size() / SystemB.INT_SIZE))) {</span>
+<span class="nc" id="L140">            LOG.error(&quot;Failed to get host VM info. Error code: {}&quot;, Native.getLastError());</span>
+<span class="nc" id="L141">            return 0L;</span>
         }
-<span class="nc" id="L140">        return (vmStats.free_count + vmStats.inactive_count) * getPageSize();</span>
+<span class="nc" id="L143">        return (vmStats.free_count + vmStats.inactive_count) * getPageSize();</span>
     }
 
     private static long queryPhysMem() {
-<span class="nc" id="L144">        return SysctlUtil.sysctl(&quot;hw.memsize&quot;, 0L);</span>
+<span class="nc" id="L147">        return SysctlUtil.sysctl(&quot;hw.memsize&quot;, 0L);</span>
     }
 
     private static long queryPageSize() {
-<span class="nc" id="L148">        LongByReference pPageSize = new LongByReference();</span>
-<span class="nc bnc" id="L149" title="All 2 branches missed.">        if (0 == SystemB.INSTANCE.host_page_size(SystemB.INSTANCE.mach_host_self(), pPageSize)) {</span>
-<span class="nc" id="L150">            return pPageSize.getValue();</span>
+<span class="nc" id="L151">        LongByReference pPageSize = new LongByReference();</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        if (0 == SystemB.INSTANCE.host_page_size(SystemB.INSTANCE.mach_host_self(), pPageSize)) {</span>
+<span class="nc" id="L153">            return pPageSize.getValue();</span>
         }
-<span class="nc" id="L152">        LOG.error(&quot;Failed to get host page size. Error code: {}&quot;, Native.getLastError());</span>
-<span class="nc" id="L153">        return 4098L;</span>
+<span class="nc" id="L155">        LOG.error(&quot;Failed to get host page size. Error code: {}&quot;, Native.getLastError());</span>
+<span class="nc" id="L156">        return 4098L;</span>
     }
 
     private static VirtualMemory createVirtualMemory() {
-<span class="nc" id="L157">        return new MacVirtualMemory();</span>
+<span class="nc" id="L160">        return new MacVirtualMemory();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

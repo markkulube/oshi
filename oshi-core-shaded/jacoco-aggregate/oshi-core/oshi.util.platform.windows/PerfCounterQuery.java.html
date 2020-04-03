@@ -26,6 +26,8 @@ package oshi.util.platform.windows;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.annotation.concurrent.NotThreadSafe;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,13 +38,15 @@ import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiResult;
 import oshi.util.platform.windows.PerfDataUtil.PerfCounter;
 
 /**
+ * Encapsulates information for a Performance Counter query.
  * &lt;p&gt;
- * PerfCounterQuery class.
- * &lt;/p&gt;
+ * An instance of this class should only be instantiated and used within the
+ * context of a single thread.
  */
+@NotThreadSafe
 public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
 
-<span class="nc" id="L45">    private static final Logger LOG = LoggerFactory.getLogger(PerfCounterQuery.class);</span>
+<span class="nc" id="L49">    private static final Logger LOG = LoggerFactory.getLogger(PerfCounterQuery.class);</span>
 
     /*
      * Set on instantiation
@@ -57,8 +61,8 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
     /*
      * Only one will be non-null depending on source
      */
-<span class="nc" id="L60">    private EnumMap&lt;T, PerfCounter&gt; counterMap = null;</span>
-<span class="nc" id="L61">    protected WmiQuery&lt;T&gt; counterQuery = null;</span>
+<span class="nc" id="L64">    private EnumMap&lt;T, PerfCounter&gt; counterMap = null;</span>
+<span class="nc" id="L65">    protected WmiQuery&lt;T&gt; counterQuery = null;</span>
 
     /*
      * Multiple classes use these constants
@@ -87,8 +91,8 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
      *            The WMI PerfData_RawData_* class corresponding to the PDH object
      */
     public PerfCounterQuery(Class&lt;T&gt; propertyEnum, String perfObject, String perfWmiClass) {
-<span class="nc" id="L90">        this(propertyEnum, perfObject, perfWmiClass, perfObject);</span>
-<span class="nc" id="L91">    }</span>
+<span class="nc" id="L94">        this(propertyEnum, perfObject, perfWmiClass, perfObject);</span>
+<span class="nc" id="L95">    }</span>
 
     /**
      * Construct a new object to hold performance counter data source and results
@@ -107,16 +111,16 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
      *            An optional key for PDH counter updates; defaults to the PDH
      *            object name
      */
-<span class="nc" id="L110">    public PerfCounterQuery(Class&lt;T&gt; propertyEnum, String perfObject, String perfWmiClass, String queryKey) {</span>
-<span class="nc" id="L111">        this.propertyEnum = propertyEnum;</span>
-<span class="nc" id="L112">        this.perfObject = perfObject;</span>
-<span class="nc" id="L113">        this.perfWmiClass = perfWmiClass;</span>
-<span class="nc" id="L114">        this.queryKey = queryKey;</span>
-<span class="nc" id="L115">        this.pdhQueryHandler = PerfCounterQueryHandler.getInstance();</span>
+<span class="nc" id="L114">    public PerfCounterQuery(Class&lt;T&gt; propertyEnum, String perfObject, String perfWmiClass, String queryKey) {</span>
+<span class="nc" id="L115">        this.propertyEnum = propertyEnum;</span>
+<span class="nc" id="L116">        this.perfObject = perfObject;</span>
+<span class="nc" id="L117">        this.perfWmiClass = perfWmiClass;</span>
+<span class="nc" id="L118">        this.queryKey = queryKey;</span>
+<span class="nc" id="L119">        this.pdhQueryHandler = new PerfCounterQueryHandler();</span>
         // Start off with PDH as source; if query here fails we will permanently
         // fall back to WMI
-<span class="nc" id="L118">        this.source = CounterDataSource.PDH;</span>
-<span class="nc" id="L119">    }</span>
+<span class="nc" id="L122">        this.source = CounterDataSource.PDH;</span>
+<span class="nc" id="L123">    }</span>
 
     /**
      * Set the Data Source for these counters
@@ -126,21 +130,21 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
      * @return Whether the data source was successfully set
      */
     public boolean setDataSource(CounterDataSource source) {
-<span class="nc" id="L129">        this.source = source;</span>
-<span class="nc bnc" id="L130" title="All 3 branches missed.">        switch (source) {</span>
+<span class="nc" id="L133">        this.source = source;</span>
+<span class="nc bnc" id="L134" title="All 3 branches missed.">        switch (source) {</span>
         case PDH:
-<span class="nc" id="L132">            LOG.debug(&quot;Attempting to set PDH Data Source.&quot;);</span>
-<span class="nc" id="L133">            unInitWmiCounters();</span>
-<span class="nc" id="L134">            return initPdhCounters();</span>
+<span class="nc" id="L136">            LOG.debug(&quot;Attempting to set PDH Data Source.&quot;);</span>
+<span class="nc" id="L137">            unInitWmiCounters();</span>
+<span class="nc" id="L138">            return initPdhCounters();</span>
         case WMI:
-<span class="nc" id="L136">            LOG.debug(&quot;Attempting to set WMI Data Source.&quot;);</span>
-<span class="nc" id="L137">            unInitPdhCounters();</span>
-<span class="nc" id="L138">            initWmiCounters();</span>
-<span class="nc" id="L139">            return true;</span>
+<span class="nc" id="L140">            LOG.debug(&quot;Attempting to set WMI Data Source.&quot;);</span>
+<span class="nc" id="L141">            unInitPdhCounters();</span>
+<span class="nc" id="L142">            initWmiCounters();</span>
+<span class="nc" id="L143">            return true;</span>
         default:
             // This should never happen unless you've added a new source and
             // forgot to add a case for it
-<span class="nc" id="L143">            throw new IllegalArgumentException(&quot;Invalid Data Source specified.&quot;);</span>
+<span class="nc" id="L147">            throw new IllegalArgumentException(&quot;Invalid Data Source specified.&quot;);</span>
         }
     }
 
@@ -151,17 +155,17 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
      * @return True if the counters were successfully added.
      */
     protected boolean initPdhCounters() {
-<span class="nc" id="L154">        this.counterMap = new EnumMap&lt;&gt;(propertyEnum);</span>
-<span class="nc bnc" id="L155" title="All 2 branches missed.">        for (T prop : propertyEnum.getEnumConstants()) {</span>
-<span class="nc" id="L156">            PerfCounter counter = PerfDataUtil.createCounter(perfObject, ((PdhCounterProperty) prop).getInstance(),</span>
-<span class="nc" id="L157">                    ((PdhCounterProperty) prop).getCounter());</span>
-<span class="nc" id="L158">            counterMap.put(prop, counter);</span>
-<span class="nc bnc" id="L159" title="All 2 branches missed.">            if (!pdhQueryHandler.addCounterToQuery(counter, this.queryKey)) {</span>
-<span class="nc" id="L160">                unInitPdhCounters();</span>
-<span class="nc" id="L161">                return false;</span>
+<span class="nc" id="L158">        this.counterMap = new EnumMap&lt;&gt;(propertyEnum);</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        for (T prop : propertyEnum.getEnumConstants()) {</span>
+<span class="nc" id="L160">            PerfCounter counter = PerfDataUtil.createCounter(perfObject, ((PdhCounterProperty) prop).getInstance(),</span>
+<span class="nc" id="L161">                    ((PdhCounterProperty) prop).getCounter());</span>
+<span class="nc" id="L162">            counterMap.put(prop, counter);</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">            if (!pdhQueryHandler.addCounterToQuery(counter, this.queryKey)) {</span>
+<span class="nc" id="L164">                unInitPdhCounters();</span>
+<span class="nc" id="L165">                return false;</span>
             }
         }
-<span class="nc" id="L164">        return true;</span>
+<span class="nc" id="L168">        return true;</span>
     }
 
     /**
@@ -169,25 +173,25 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
      * from the PDH Query, releasing their handles.
      */
     protected void unInitPdhCounters() {
-<span class="nc" id="L172">        pdhQueryHandler.removeAllCountersFromQuery(this.queryKey);</span>
-<span class="nc" id="L173">        this.counterMap = null;</span>
-<span class="nc" id="L174">    }</span>
+<span class="nc" id="L176">        pdhQueryHandler.removeAllCountersFromQuery(this.queryKey);</span>
+<span class="nc" id="L177">        this.counterMap = null;</span>
+<span class="nc" id="L178">    }</span>
 
     /**
      * Initialize the WMI query object needed to retrieve counters for this data
      * source.
      */
     protected void initWmiCounters() {
-<span class="nc" id="L181">        this.counterQuery = new WmiQuery&lt;&gt;(perfWmiClass, propertyEnum);</span>
-<span class="nc" id="L182">    }</span>
+<span class="nc" id="L185">        this.counterQuery = new WmiQuery&lt;&gt;(perfWmiClass, propertyEnum);</span>
+<span class="nc" id="L186">    }</span>
 
     /**
      * Uninitializes the WMI query object needed to retrieve counters for this data
      * source, allowing it to be garbage collected.
      */
     protected void unInitWmiCounters() {
-<span class="nc" id="L189">        this.counterQuery = null;</span>
-<span class="nc" id="L190">    }</span>
+<span class="nc" id="L193">        this.counterQuery = null;</span>
+<span class="nc" id="L194">    }</span>
 
     /**
      * Query the current data source (PDH or WMI) for the Performance Counter values
@@ -196,70 +200,70 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
      * @return A map of the values by the counter enum.
      */
     public Map&lt;T, Long&gt; queryValues() {
-<span class="nc" id="L199">        EnumMap&lt;T, Long&gt; valueMap = new EnumMap&lt;&gt;(propertyEnum);</span>
-<span class="nc" id="L200">        T[] props = this.propertyEnum.getEnumConstants();</span>
-<span class="nc bnc" id="L201" title="All 2 branches missed.">        if (source.equals(CounterDataSource.PDH)) {</span>
+<span class="nc" id="L203">        EnumMap&lt;T, Long&gt; valueMap = new EnumMap&lt;&gt;(propertyEnum);</span>
+<span class="nc" id="L204">        T[] props = this.propertyEnum.getEnumConstants();</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">        if (source.equals(CounterDataSource.PDH)) {</span>
             // Set up the query and counter handles, and query
-<span class="nc bnc" id="L203" title="All 4 branches missed.">            if (initPdhCounters() &amp;&amp; queryPdh(valueMap, props)) {</span>
+<span class="nc bnc" id="L207" title="All 4 branches missed.">            if (initPdhCounters() &amp;&amp; queryPdh(valueMap, props)) {</span>
                 // If both init and query return true, then valueMap contains
                 // the results. Release the handles.
-<span class="nc" id="L206">                unInitPdhCounters();</span>
+<span class="nc" id="L210">                unInitPdhCounters();</span>
             } else {
                 // If either init or query failed, switch to WMI
-<span class="nc" id="L209">                setDataSource(CounterDataSource.WMI);</span>
+<span class="nc" id="L213">                setDataSource(CounterDataSource.WMI);</span>
             }
         }
-<span class="nc bnc" id="L212" title="All 2 branches missed.">        if (source.equals(CounterDataSource.WMI)) {</span>
-<span class="nc" id="L213">            queryWmi(valueMap, props);</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (source.equals(CounterDataSource.WMI)) {</span>
+<span class="nc" id="L217">            queryWmi(valueMap, props);</span>
         }
-<span class="nc" id="L215">        return valueMap;</span>
+<span class="nc" id="L219">        return valueMap;</span>
     }
 
     private boolean queryPdh(Map&lt;T, Long&gt; valueMap, T[] props) {
-<span class="nc bnc" id="L219" title="All 4 branches missed.">        if (counterMap != null &amp;&amp; 0 &lt; pdhQueryHandler.updateQuery(this.queryKey)) {</span>
-<span class="nc bnc" id="L220" title="All 2 branches missed.">            for (T prop : props) {</span>
-<span class="nc" id="L221">                valueMap.put(prop, pdhQueryHandler.queryCounter(counterMap.get(prop)));</span>
+<span class="nc bnc" id="L223" title="All 4 branches missed.">        if (counterMap != null &amp;&amp; 0 &lt; pdhQueryHandler.updateQuery(this.queryKey)) {</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">            for (T prop : props) {</span>
+<span class="nc" id="L225">                valueMap.put(prop, pdhQueryHandler.queryCounter(counterMap.get(prop)));</span>
             }
-<span class="nc" id="L223">            return true;</span>
+<span class="nc" id="L227">            return true;</span>
         }
         // Zero timestamp means update failed after muliple
         // attempts; fallback to WMI
-<span class="nc" id="L227">        return false;</span>
+<span class="nc" id="L231">        return false;</span>
     }
 
     private void queryWmi(Map&lt;T, Long&gt; valueMap, T[] props) {
-<span class="nc" id="L231">        WmiResult&lt;T&gt; result = WmiQueryHandler.createInstance().queryWMI(this.counterQuery);</span>
-<span class="nc bnc" id="L232" title="All 2 branches missed.">        if (result.getResultCount() &gt; 0) {</span>
-<span class="nc bnc" id="L233" title="All 2 branches missed.">            for (T prop : props) {</span>
-<span class="nc bnc" id="L234" title="All 4 branches missed.">                switch (result.getCIMType(prop)) {</span>
+<span class="nc" id="L235">        WmiResult&lt;T&gt; result = WmiQueryHandler.createInstance().queryWMI(this.counterQuery);</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        if (result.getResultCount() &gt; 0) {</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">            for (T prop : props) {</span>
+<span class="nc bnc" id="L238" title="All 4 branches missed.">                switch (result.getCIMType(prop)) {</span>
                 case Wbemcli.CIM_UINT16:
-<span class="nc" id="L236">                    valueMap.put(prop, Long.valueOf(WmiUtil.getUint16(result, prop, 0)));</span>
-<span class="nc" id="L237">                    break;</span>
+<span class="nc" id="L240">                    valueMap.put(prop, Long.valueOf(WmiUtil.getUint16(result, prop, 0)));</span>
+<span class="nc" id="L241">                    break;</span>
                 case Wbemcli.CIM_UINT32:
-<span class="nc" id="L239">                    valueMap.put(prop, WmiUtil.getUint32asLong(result, prop, 0));</span>
-<span class="nc" id="L240">                    break;</span>
+<span class="nc" id="L243">                    valueMap.put(prop, WmiUtil.getUint32asLong(result, prop, 0));</span>
+<span class="nc" id="L244">                    break;</span>
                 case Wbemcli.CIM_UINT64:
-<span class="nc" id="L242">                    valueMap.put(prop, WmiUtil.getUint64(result, prop, 0));</span>
-<span class="nc" id="L243">                    break;</span>
+<span class="nc" id="L246">                    valueMap.put(prop, WmiUtil.getUint64(result, prop, 0));</span>
+<span class="nc" id="L247">                    break;</span>
                 default:
-<span class="nc" id="L245">                    throw new ClassCastException(&quot;Unimplemented CIM Type Mapping.&quot;);</span>
+<span class="nc" id="L249">                    throw new ClassCastException(&quot;Unimplemented CIM Type Mapping.&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L249">    }</span>
+<span class="nc" id="L253">    }</span>
 
     /**
      * Source of performance counter data.
      */
-<span class="nc" id="L254">    public enum CounterDataSource {</span>
+<span class="nc" id="L258">    public enum CounterDataSource {</span>
         /**
          * Performance Counter data will be pulled from a PDH Counter
          */
-<span class="nc" id="L258">        PDH,</span>
+<span class="nc" id="L262">        PDH,</span>
         /**
          * Performance Counter data will be pulled from a WMI PerfData_RawData_* table
          */
-<span class="nc" id="L262">        WMI;</span>
+<span class="nc" id="L266">        WMI;</span>
     }
 
     /**

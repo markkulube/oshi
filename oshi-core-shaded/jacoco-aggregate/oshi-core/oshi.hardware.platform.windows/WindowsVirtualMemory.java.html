@@ -29,6 +29,8 @@ import static oshi.util.Memoizer.memoize;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,68 +48,67 @@ import oshi.util.tuples.Pair;
 /**
  * Memory obtained from WMI
  */
-public class WindowsVirtualMemory extends AbstractVirtualMemory {
+@ThreadSafe
+final class WindowsVirtualMemory extends AbstractVirtualMemory {
 
-<span class="nc" id="L51">    private static final Logger LOG = LoggerFactory.getLogger(WindowsVirtualMemory.class);</span>
+<span class="nc" id="L54">    private static final Logger LOG = LoggerFactory.getLogger(WindowsVirtualMemory.class);</span>
 
     private final long pageSize;
 
-<span class="nc" id="L55">    private final Supplier&lt;Long&gt; used = memoize(this::querySwapUsed, defaultExpiration());</span>
+<span class="nc" id="L58">    private final Supplier&lt;Long&gt; used = memoize(this::querySwapUsed, defaultExpiration());</span>
 
-<span class="nc" id="L57">    private final Supplier&lt;Long&gt; total = memoize(this::querySwapTotal, defaultExpiration());</span>
+<span class="nc" id="L60">    private final Supplier&lt;Long&gt; total = memoize(this::querySwapTotal, defaultExpiration());</span>
 
-<span class="nc" id="L59">    private final Supplier&lt;Pair&lt;Long, Long&gt;&gt; swapInOut = memoize(WindowsVirtualMemory::queryPageSwaps,</span>
-<span class="nc" id="L60">            defaultExpiration());</span>
+<span class="nc" id="L62">    private final Supplier&lt;Pair&lt;Long, Long&gt;&gt; swapInOut = memoize(WindowsVirtualMemory::queryPageSwaps,</span>
+<span class="nc" id="L63">            defaultExpiration());</span>
 
     /**
-     * &lt;p&gt;
      * Constructor for WindowsVirtualMemory.
-     * &lt;/p&gt;
      *
      * @param pageSize
-     *            The size in bites of memory pages
+     *            The size in bytes of memory pages
      */
-<span class="nc" id="L70">    public WindowsVirtualMemory(long pageSize) {</span>
-<span class="nc" id="L71">        this.pageSize = pageSize;</span>
-<span class="nc" id="L72">    }</span>
+<span class="nc" id="L71">    WindowsVirtualMemory(long pageSize) {</span>
+<span class="nc" id="L72">        this.pageSize = pageSize;</span>
+<span class="nc" id="L73">    }</span>
 
     @Override
     public long getSwapUsed() {
-<span class="nc" id="L76">        return used.get();</span>
+<span class="nc" id="L77">        return used.get();</span>
     }
 
     @Override
     public long getSwapTotal() {
-<span class="nc" id="L81">        return total.get();</span>
+<span class="nc" id="L82">        return total.get();</span>
     }
 
     @Override
     public long getSwapPagesIn() {
-<span class="nc" id="L86">        return swapInOut.get().getA();</span>
+<span class="nc" id="L87">        return swapInOut.get().getA();</span>
     }
 
     @Override
     public long getSwapPagesOut() {
-<span class="nc" id="L91">        return swapInOut.get().getB();</span>
+<span class="nc" id="L92">        return swapInOut.get().getB();</span>
     }
 
     private long querySwapUsed() {
-<span class="nc" id="L95">        return PagingFile.querySwapUsed().getOrDefault(PagingPercentProperty.PERCENTUSAGE, 0L) * this.pageSize;</span>
+<span class="nc" id="L96">        return PagingFile.querySwapUsed().getOrDefault(PagingPercentProperty.PERCENTUSAGE, 0L) * this.pageSize;</span>
     }
 
     private long querySwapTotal() {
-<span class="nc" id="L99">        PERFORMANCE_INFORMATION perfInfo = new PERFORMANCE_INFORMATION();</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (!Psapi.INSTANCE.GetPerformanceInfo(perfInfo, perfInfo.size())) {</span>
-<span class="nc" id="L101">            LOG.error(&quot;Failed to get Performance Info. Error code: {}&quot;, Kernel32.INSTANCE.GetLastError());</span>
-<span class="nc" id="L102">            return 0L;</span>
+<span class="nc" id="L100">        PERFORMANCE_INFORMATION perfInfo = new PERFORMANCE_INFORMATION();</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (!Psapi.INSTANCE.GetPerformanceInfo(perfInfo, perfInfo.size())) {</span>
+<span class="nc" id="L102">            LOG.error(&quot;Failed to get Performance Info. Error code: {}&quot;, Kernel32.INSTANCE.GetLastError());</span>
+<span class="nc" id="L103">            return 0L;</span>
         }
-<span class="nc" id="L104">        return this.pageSize * (perfInfo.CommitLimit.longValue() - perfInfo.PhysicalTotal.longValue());</span>
+<span class="nc" id="L105">        return this.pageSize * (perfInfo.CommitLimit.longValue() - perfInfo.PhysicalTotal.longValue());</span>
     }
 
     private static Pair&lt;Long, Long&gt; queryPageSwaps() {
-<span class="nc" id="L108">        Map&lt;PageSwapProperty, Long&gt; valueMap = MemoryInformation.queryPageSwaps();</span>
-<span class="nc" id="L109">        return new Pair&lt;&gt;(valueMap.getOrDefault(PageSwapProperty.PAGESINPUTPERSEC, 0L),</span>
-<span class="nc" id="L110">                valueMap.getOrDefault(PageSwapProperty.PAGESOUTPUTPERSEC, 0L));</span>
+<span class="nc" id="L109">        Map&lt;PageSwapProperty, Long&gt; valueMap = MemoryInformation.queryPageSwaps();</span>
+<span class="nc" id="L110">        return new Pair&lt;&gt;(valueMap.getOrDefault(PageSwapProperty.PAGESINPUTPERSEC, 0L),</span>
+<span class="nc" id="L111">                valueMap.getOrDefault(PageSwapProperty.PAGESOUTPUTPERSEC, 0L));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
