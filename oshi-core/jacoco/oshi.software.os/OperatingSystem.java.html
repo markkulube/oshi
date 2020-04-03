@@ -26,6 +26,8 @@ package oshi.software.os;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 import oshi.util.Constants;
 import oshi.util.Util;
 
@@ -34,13 +36,14 @@ import oshi.util.Util;
  * different programs use its hardware, and regulates the ways that a user
  * controls the computer.
  */
+@ThreadSafe
 public interface OperatingSystem {
 
     /**
      * Controls sorting of Process output
      */
-<span class="fc" id="L42">    enum ProcessSort {</span>
-<span class="fc" id="L43">    CPU, MEMORY, OLDEST, NEWEST, PID, PARENTPID, NAME</span>
+<span class="fc" id="L45">    enum ProcessSort {</span>
+<span class="fc" id="L46">        CPU, MEMORY, OLDEST, NEWEST, PID, PARENTPID, NAME</span>
     }
 
     /**
@@ -304,20 +307,20 @@ public interface OperatingSystem {
         private final String buildNumber;
         private final String versionStr;
 
-<span class="fc" id="L307">        public OSVersionInfo(String version, String codeName, String buildNumber) {</span>
-<span class="fc" id="L308">            this.version = version;</span>
-<span class="fc" id="L309">            this.codeName = codeName;</span>
-<span class="fc" id="L310">            this.buildNumber = buildNumber;</span>
+<span class="fc" id="L310">        public OSVersionInfo(String version, String codeName, String buildNumber) {</span>
+<span class="fc" id="L311">            this.version = version;</span>
+<span class="fc" id="L312">            this.codeName = codeName;</span>
+<span class="fc" id="L313">            this.buildNumber = buildNumber;</span>
 
-<span class="pc bpc" id="L312" title="1 of 2 branches missed.">            StringBuilder sb = new StringBuilder(getVersion() != null ? getVersion() : Constants.UNKNOWN);</span>
-<span class="pc bpc" id="L313" title="1 of 2 branches missed.">            if (!Util.isBlank(getCodeName())) {</span>
-<span class="fc" id="L314">                sb.append(&quot; (&quot;).append(getCodeName()).append(')');</span>
+<span class="pc bpc" id="L315" title="1 of 2 branches missed.">            StringBuilder sb = new StringBuilder(getVersion() != null ? getVersion() : Constants.UNKNOWN);</span>
+<span class="pc bpc" id="L316" title="1 of 2 branches missed.">            if (!Util.isBlank(getCodeName())) {</span>
+<span class="fc" id="L317">                sb.append(&quot; (&quot;).append(getCodeName()).append(')');</span>
             }
-<span class="pc bpc" id="L316" title="1 of 2 branches missed.">            if (!Util.isBlank(getBuildNumber())) {</span>
-<span class="fc" id="L317">                sb.append(&quot; build &quot;).append(getBuildNumber());</span>
+<span class="pc bpc" id="L319" title="1 of 2 branches missed.">            if (!Util.isBlank(getBuildNumber())) {</span>
+<span class="fc" id="L320">                sb.append(&quot; build &quot;).append(getBuildNumber());</span>
             }
-<span class="fc" id="L319">            this.versionStr = sb.toString();</span>
-<span class="fc" id="L320">        }</span>
+<span class="fc" id="L322">            this.versionStr = sb.toString();</span>
+<span class="fc" id="L323">        }</span>
 
         /**
          * Gets the operating system version.
@@ -325,7 +328,7 @@ public interface OperatingSystem {
          * @return The version, if any. May be {@code null}.
          */
         public String getVersion() {
-<span class="fc" id="L328">            return version;</span>
+<span class="fc" id="L331">            return version;</span>
         }
 
         /**
@@ -334,7 +337,7 @@ public interface OperatingSystem {
          * @return The code name, if any. May be {@code null}.
          */
         public String getCodeName() {
-<span class="fc" id="L337">            return codeName;</span>
+<span class="fc" id="L340">            return codeName;</span>
         }
 
         /**
@@ -343,12 +346,12 @@ public interface OperatingSystem {
          * @return The build number, if any. May be {@code null}.
          */
         public String getBuildNumber() {
-<span class="fc" id="L346">            return buildNumber;</span>
+<span class="fc" id="L349">            return buildNumber;</span>
         }
 
         @Override
         public String toString() {
-<span class="nc" id="L351">            return this.versionStr;</span>
+<span class="nc" id="L354">            return this.versionStr;</span>
         }
     }
 }
