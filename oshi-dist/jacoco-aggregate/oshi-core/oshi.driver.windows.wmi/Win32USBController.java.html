@@ -23,11 +23,10 @@
  */
 package oshi.driver.windows.wmi;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiQuery; //NOSONAR squid:S1191
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiResult;
 
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.util.platform.windows.WmiQueryHandler;
 
 /**
@@ -41,8 +40,8 @@ public final class Win32USBController {
     /**
      * USB Controller properties
      */
-<span class="nc" id="L44">    public enum USBControllerProperty {</span>
-<span class="nc" id="L45">        PNPDEVICEID;</span>
+<span class="nc" id="L43">    public enum USBControllerProperty {</span>
+<span class="nc" id="L44">        PNPDEVICEID;</span>
     }
 
     private Win32USBController() {
@@ -54,9 +53,9 @@ public final class Win32USBController {
      * @return Information regarding each disk drive.
      */
     public static WmiResult&lt;USBControllerProperty&gt; queryUSBControllers() {
-<span class="nc" id="L57">        WmiQuery&lt;USBControllerProperty&gt; usbControllerQuery = new WmiQuery&lt;&gt;(WIN32_USB_CONTROLLER,</span>
+<span class="nc" id="L56">        WmiQuery&lt;USBControllerProperty&gt; usbControllerQuery = new WmiQuery&lt;&gt;(WIN32_USB_CONTROLLER,</span>
                 USBControllerProperty.class);
-<span class="nc" id="L59">        return WmiQueryHandler.createInstance().queryWMI(usbControllerQuery);</span>
+<span class="nc" id="L58">        return WmiQueryHandler.createInstance().queryWMI(usbControllerQuery);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

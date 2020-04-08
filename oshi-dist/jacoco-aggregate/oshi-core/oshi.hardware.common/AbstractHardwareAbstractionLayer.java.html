@@ -27,8 +27,7 @@ import static oshi.util.Memoizer.memoize;
 
 import java.util.function.Supplier;
 
-import javax.annotation.concurrent.ThreadSafe;
-
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.ComputerSystem;
 import oshi.hardware.GlobalMemory;
@@ -40,19 +39,19 @@ import oshi.hardware.Sensors;
  * HardwareAbstractionLayer
  */
 @ThreadSafe
-<span class="nc" id="L43">public abstract class AbstractHardwareAbstractionLayer implements HardwareAbstractionLayer {</span>
+<span class="nc" id="L42">public abstract class AbstractHardwareAbstractionLayer implements HardwareAbstractionLayer {</span>
 
-<span class="nc" id="L45">    private final Supplier&lt;ComputerSystem&gt; computerSystem = memoize(this::createComputerSystem);</span>
+<span class="nc" id="L44">    private final Supplier&lt;ComputerSystem&gt; computerSystem = memoize(this::createComputerSystem);</span>
 
-<span class="nc" id="L47">    private final Supplier&lt;CentralProcessor&gt; processor = memoize(this::createProcessor);</span>
+<span class="nc" id="L46">    private final Supplier&lt;CentralProcessor&gt; processor = memoize(this::createProcessor);</span>
 
-<span class="nc" id="L49">    private final Supplier&lt;GlobalMemory&gt; memory = memoize(this::createMemory);</span>
+<span class="nc" id="L48">    private final Supplier&lt;GlobalMemory&gt; memory = memoize(this::createMemory);</span>
 
-<span class="nc" id="L51">    private final Supplier&lt;Sensors&gt; sensors = memoize(this::createSensors);</span>
+<span class="nc" id="L50">    private final Supplier&lt;Sensors&gt; sensors = memoize(this::createSensors);</span>
 
     @Override
     public ComputerSystem getComputerSystem() {
-<span class="nc" id="L55">        return computerSystem.get();</span>
+<span class="nc" id="L54">        return computerSystem.get();</span>
     }
 
     /**
@@ -64,7 +63,7 @@ import oshi.hardware.Sensors;
 
     @Override
     public CentralProcessor getProcessor() {
-<span class="nc" id="L67">        return processor.get();</span>
+<span class="nc" id="L66">        return processor.get();</span>
     }
 
     /**
@@ -76,7 +75,7 @@ import oshi.hardware.Sensors;
 
     @Override
     public GlobalMemory getMemory() {
-<span class="nc" id="L79">        return memory.get();</span>
+<span class="nc" id="L78">        return memory.get();</span>
     }
 
     /**
@@ -88,7 +87,7 @@ import oshi.hardware.Sensors;
 
     @Override
     public Sensors getSensors() {
-<span class="nc" id="L91">        return sensors.get();</span>
+<span class="nc" id="L90">        return sensors.get();</span>
     }
 
     /**
