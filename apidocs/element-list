@@ -1,4 +1,5 @@
 oshi
+oshi.annotation.concurrent
 oshi.demo
 oshi.demo.gui
 oshi.driver.linux.proc
