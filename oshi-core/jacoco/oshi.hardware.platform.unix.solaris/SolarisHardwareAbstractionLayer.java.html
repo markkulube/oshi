@@ -23,8 +23,7 @@
  */
 package oshi.hardware.platform.unix.solaris;
 
-import javax.annotation.concurrent.ThreadSafe;
-
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.ComputerSystem;
 import oshi.hardware.Display;
@@ -42,61 +41,61 @@ import oshi.hardware.common.AbstractHardwareAbstractionLayer;
  * SolarisHardwareAbstractionLayer class.
  */
 @ThreadSafe
-<span class="nc" id="L45">public final class SolarisHardwareAbstractionLayer extends AbstractHardwareAbstractionLayer {</span>
+<span class="nc" id="L44">public final class SolarisHardwareAbstractionLayer extends AbstractHardwareAbstractionLayer {</span>
 
     @Override
     public ComputerSystem createComputerSystem() {
-<span class="nc" id="L49">        return new SolarisComputerSystem();</span>
+<span class="nc" id="L48">        return new SolarisComputerSystem();</span>
     }
 
     @Override
     public GlobalMemory createMemory() {
-<span class="nc" id="L54">        return new SolarisGlobalMemory();</span>
+<span class="nc" id="L53">        return new SolarisGlobalMemory();</span>
     }
 
     @Override
     public CentralProcessor createProcessor() {
-<span class="nc" id="L59">        return new SolarisCentralProcessor();</span>
+<span class="nc" id="L58">        return new SolarisCentralProcessor();</span>
     }
 
     @Override
     public Sensors createSensors() {
-<span class="nc" id="L64">        return new SolarisSensors();</span>
+<span class="nc" id="L63">        return new SolarisSensors();</span>
     }
 
     @Override
     public PowerSource[] getPowerSources() {
-<span class="nc" id="L69">        return SolarisPowerSource.getPowerSources();</span>
+<span class="nc" id="L68">        return SolarisPowerSource.getPowerSources();</span>
     }
 
     @Override
     public HWDiskStore[] getDiskStores() {
-<span class="nc" id="L74">        return SolarisDisks.getDisks();</span>
+<span class="nc" id="L73">        return SolarisDisks.getDisks();</span>
     }
 
     @Override
     public Display[] getDisplays() {
-<span class="nc" id="L79">        return SolarisDisplay.getDisplays();</span>
+<span class="nc" id="L78">        return SolarisDisplay.getDisplays();</span>
     }
 
     @Override
     public NetworkIF[] getNetworkIFs() {
-<span class="nc" id="L84">        return new SolarisNetworks().getNetworks();</span>
+<span class="nc" id="L83">        return new SolarisNetworks().getNetworks();</span>
     }
 
     @Override
     public UsbDevice[] getUsbDevices(boolean tree) {
-<span class="nc" id="L89">        return SolarisUsbDevice.getUsbDevices(tree);</span>
+<span class="nc" id="L88">        return SolarisUsbDevice.getUsbDevices(tree);</span>
     }
 
     @Override
     public SoundCard[] getSoundCards() {
-<span class="nc" id="L94">        return SolarisSoundCard.getSoundCards().toArray(new SoundCard[0]);</span>
+<span class="nc" id="L93">        return SolarisSoundCard.getSoundCards().toArray(new SoundCard[0]);</span>
     }
 
     @Override
     public GraphicsCard[] getGraphicsCards() {
-<span class="nc" id="L99">        return SolarisGraphicsCard.getGraphicsCards().toArray(new GraphicsCard[0]);</span>
+<span class="nc" id="L98">        return SolarisGraphicsCard.getGraphicsCards().toArray(new GraphicsCard[0]);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

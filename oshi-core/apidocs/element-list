@@ -1,4 +1,5 @@
 oshi
+oshi.annotation.concurrent
 oshi.driver.linux.proc
 oshi.driver.windows.perfmon
 oshi.driver.windows.registry

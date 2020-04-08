@@ -25,8 +25,8 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2010 - 2020 oshi</copyright>
     <item>
-      <title>File: 242,
-             Errors: 6880,
+      <title>File: 245,
+             Errors: 6890,
              Warnings: 0,
              Infos: 0
       </title>
@@ -452,6 +452,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/oshi/oshi/oshi-core/checkstyle.html#oshi.annotation.concurrent.Immutable.java">oshi/annotation/concurrent/Immutable.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/oshi/oshi/oshi-core/checkstyle.html#oshi.util.tuples.Quintet.java">oshi/util/tuples/Quintet.java</a>
                 </td>
                 <td>
@@ -489,7 +503,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  49
+                  50
                 </td>
               </tr>
                           <tr>
@@ -522,6 +536,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/oshi/oshi/oshi-core/checkstyle.html#oshi.annotation.concurrent.NotThreadSafe.java">oshi/annotation/concurrent/NotThreadSafe.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  2
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/oshi/oshi/oshi-core/checkstyle.html#oshi.hardware.UsbDevice.java">oshi/hardware/UsbDevice.java</a>
                 </td>
                 <td>
@@ -532,6 +560,20 @@ under the License.
                 </td>
                 <td>
                   11
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/oshi/oshi/oshi-core/checkstyle.html#oshi.annotation.concurrent.ThreadSafe.java">oshi/annotation/concurrent/ThreadSafe.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
                 </td>
               </tr>
                           <tr>
@@ -2785,7 +2827,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  50
+                  52
                 </td>
               </tr>
                           <tr>
