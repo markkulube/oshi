@@ -23,11 +23,10 @@
  */
 package oshi.driver.windows.wmi;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiQuery; //NOSONAR squid:S1191
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiResult;
 
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.util.platform.windows.WmiQueryHandler;
 
 /**
@@ -41,8 +40,8 @@ public final class Win32VideoController {
     /**
      * Video Controller properties
      */
-<span class="nc" id="L44">    public enum VideoControllerProperty {</span>
-<span class="nc" id="L45">        ADAPTERCOMPATIBILITY, ADAPTERRAM, DRIVERVERSION, NAME, PNPDEVICEID;</span>
+<span class="nc" id="L43">    public enum VideoControllerProperty {</span>
+<span class="nc" id="L44">        ADAPTERCOMPATIBILITY, ADAPTERRAM, DRIVERVERSION, NAME, PNPDEVICEID;</span>
     }
 
     private Win32VideoController() {
@@ -54,9 +53,9 @@ public final class Win32VideoController {
      * @return Information regarding video controllers
      */
     public static WmiResult&lt;VideoControllerProperty&gt; queryVideoController() {
-<span class="nc" id="L57">        WmiQuery&lt;VideoControllerProperty&gt; videoControllerQuery = new WmiQuery&lt;&gt;(WIN32_VIDEO_CONTROLLER,</span>
+<span class="nc" id="L56">        WmiQuery&lt;VideoControllerProperty&gt; videoControllerQuery = new WmiQuery&lt;&gt;(WIN32_VIDEO_CONTROLLER,</span>
                 VideoControllerProperty.class);
-<span class="nc" id="L59">        return WmiQueryHandler.createInstance().queryWMI(videoControllerQuery);</span>
+<span class="nc" id="L58">        return WmiQueryHandler.createInstance().queryWMI(videoControllerQuery);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -23,8 +23,7 @@
  */
 package oshi.hardware.common;
 
-import javax.annotation.concurrent.Immutable;
-
+import oshi.annotation.concurrent.Immutable;
 import oshi.hardware.SoundCard;
 
 /**
@@ -47,40 +46,40 @@ public abstract class AbstractSoundCard implements SoundCard {
      * @param codec
      *            The codec
      */
-<span class="nc" id="L50">    public AbstractSoundCard(String kernelVersion, String name, String codec) {</span>
-<span class="nc" id="L51">        this.kernelVersion = kernelVersion;</span>
-<span class="nc" id="L52">        this.name = name;</span>
-<span class="nc" id="L53">        this.codec = codec;</span>
-<span class="nc" id="L54">    }</span>
+<span class="nc" id="L49">    public AbstractSoundCard(String kernelVersion, String name, String codec) {</span>
+<span class="nc" id="L50">        this.kernelVersion = kernelVersion;</span>
+<span class="nc" id="L51">        this.name = name;</span>
+<span class="nc" id="L52">        this.codec = codec;</span>
+<span class="nc" id="L53">    }</span>
 
     @Override
     public String getDriverVersion() {
-<span class="nc" id="L58">        return this.kernelVersion;</span>
+<span class="nc" id="L57">        return this.kernelVersion;</span>
     }
 
     @Override
     public String getName() {
-<span class="nc" id="L63">        return this.name;</span>
+<span class="nc" id="L62">        return this.name;</span>
     }
 
     @Override
     public String getCodec() {
-<span class="nc" id="L68">        return this.codec;</span>
+<span class="nc" id="L67">        return this.codec;</span>
     }
 
     @Override
     public String toString() {
-<span class="nc" id="L73">        StringBuilder builder = new StringBuilder();</span>
-<span class="nc" id="L74">        builder.append(&quot;SoundCard@&quot;);</span>
-<span class="nc" id="L75">        builder.append(Integer.toHexString(hashCode()));</span>
-<span class="nc" id="L76">        builder.append(&quot; [kernelVersion=&quot;);</span>
-<span class="nc" id="L77">        builder.append(this.kernelVersion);</span>
-<span class="nc" id="L78">        builder.append(&quot;, name=&quot;);</span>
-<span class="nc" id="L79">        builder.append(this.name);</span>
-<span class="nc" id="L80">        builder.append(&quot;, codec=&quot;);</span>
-<span class="nc" id="L81">        builder.append(this.codec);</span>
-<span class="nc" id="L82">        builder.append(']');</span>
-<span class="nc" id="L83">        return builder.toString();</span>
+<span class="nc" id="L72">        StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L73">        builder.append(&quot;SoundCard@&quot;);</span>
+<span class="nc" id="L74">        builder.append(Integer.toHexString(hashCode()));</span>
+<span class="nc" id="L75">        builder.append(&quot; [kernelVersion=&quot;);</span>
+<span class="nc" id="L76">        builder.append(this.kernelVersion);</span>
+<span class="nc" id="L77">        builder.append(&quot;, name=&quot;);</span>
+<span class="nc" id="L78">        builder.append(this.name);</span>
+<span class="nc" id="L79">        builder.append(&quot;, codec=&quot;);</span>
+<span class="nc" id="L80">        builder.append(this.codec);</span>
+<span class="nc" id="L81">        builder.append(']');</span>
+<span class="nc" id="L82">        return builder.toString();</span>
     }
 
 }

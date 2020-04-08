@@ -23,11 +23,10 @@
  */
 package oshi.driver.windows.wmi;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiQuery; //NOSONAR squid:S1191
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiResult;
 
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.util.platform.windows.WmiQueryHandler;
 
 /**
@@ -41,8 +40,8 @@ public final class Win32LogicalDisk {
     /**
      * Logical disk properties.
      */
-<span class="nc" id="L44">    public enum LogicalDiskProperty {</span>
-<span class="nc" id="L45">        DESCRIPTION, DRIVETYPE, FILESYSTEM, FREESPACE, NAME, PROVIDERNAME, SIZE, VOLUMENAME;</span>
+<span class="nc" id="L43">    public enum LogicalDiskProperty {</span>
+<span class="nc" id="L44">        DESCRIPTION, DRIVETYPE, FILESYSTEM, FREESPACE, NAME, PROVIDERNAME, SIZE, VOLUMENAME;</span>
     }
 
     private Win32LogicalDisk() {
@@ -58,18 +57,18 @@ public final class Win32LogicalDisk {
      * @return Logical Disk Information
      */
     public static WmiResult&lt;LogicalDiskProperty&gt; queryLogicalDisk(String nameToMatch, boolean localOnly) {
-<span class="nc" id="L61">        StringBuilder wmiClassName = new StringBuilder(WIN32_LOGICAL_DISK);</span>
-<span class="nc" id="L62">        boolean where = false;</span>
-<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (localOnly) {</span>
-<span class="nc" id="L64">            wmiClassName.append(&quot; WHERE DriveType != 4&quot;);</span>
-<span class="nc" id="L65">            where = true;</span>
+<span class="nc" id="L60">        StringBuilder wmiClassName = new StringBuilder(WIN32_LOGICAL_DISK);</span>
+<span class="nc" id="L61">        boolean where = false;</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (localOnly) {</span>
+<span class="nc" id="L63">            wmiClassName.append(&quot; WHERE DriveType != 4&quot;);</span>
+<span class="nc" id="L64">            where = true;</span>
         }
-<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (nameToMatch != null) {</span>
-<span class="nc bnc" id="L68" title="All 2 branches missed.">            wmiClassName.append(where ? &quot; AND&quot; : &quot; WHERE&quot;).append(&quot; Name=\&quot;&quot;).append(nameToMatch).append('\&quot;');</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (nameToMatch != null) {</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            wmiClassName.append(where ? &quot; AND&quot; : &quot; WHERE&quot;).append(&quot; Name=\&quot;&quot;).append(nameToMatch).append('\&quot;');</span>
         }
-<span class="nc" id="L70">        WmiQuery&lt;LogicalDiskProperty&gt; logicalDiskQuery = new WmiQuery&lt;&gt;(wmiClassName.toString(),</span>
+<span class="nc" id="L69">        WmiQuery&lt;LogicalDiskProperty&gt; logicalDiskQuery = new WmiQuery&lt;&gt;(wmiClassName.toString(),</span>
                 LogicalDiskProperty.class);
-<span class="nc" id="L72">        return WmiQueryHandler.createInstance().queryWMI(logicalDiskQuery);</span>
+<span class="nc" id="L71">        return WmiQueryHandler.createInstance().queryWMI(logicalDiskQuery);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

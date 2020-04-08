@@ -29,20 +29,19 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.hardware.NetworkIF;
 
 /**
  * Network interfaces implementation.
  */
 @ThreadSafe
-<span class="nc" id="L43">public class Networks {</span>
+<span class="nc" id="L42">public class Networks {</span>
 
-<span class="nc" id="L45">    private static final Logger LOG = LoggerFactory.getLogger(Networks.class);</span>
+<span class="nc" id="L44">    private static final Logger LOG = LoggerFactory.getLogger(Networks.class);</span>
 
     /**
      * Gets the network interfaces on this machine
@@ -50,16 +49,16 @@ import oshi.hardware.NetworkIF;
      * @return An array of {@link NetworkIF} objects representing the interfaces
      */
     public NetworkIF[] getNetworks() {
-<span class="nc" id="L53">        List&lt;NetworkIF&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L52">        List&lt;NetworkIF&gt; result = new ArrayList&lt;&gt;();</span>
 
-<span class="nc bnc" id="L55" title="All 2 branches missed.">        for (NetworkInterface netint : getNetworkInterfaces()) {</span>
-<span class="nc" id="L56">            NetworkIF netIF = new NetworkIF();</span>
-<span class="nc" id="L57">            netIF.setNetworkInterface(netint);</span>
-<span class="nc" id="L58">            netIF.updateAttributes();</span>
-<span class="nc" id="L59">            result.add(netIF);</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        for (NetworkInterface netint : getNetworkInterfaces()) {</span>
+<span class="nc" id="L55">            NetworkIF netIF = new NetworkIF();</span>
+<span class="nc" id="L56">            netIF.setNetworkInterface(netint);</span>
+<span class="nc" id="L57">            netIF.updateAttributes();</span>
+<span class="nc" id="L58">            result.add(netIF);</span>
         }
 
-<span class="nc" id="L62">        return result.toArray(new NetworkIF[0]);</span>
+<span class="nc" id="L61">        return result.toArray(new NetworkIF[0]);</span>
     }
 
     /**
@@ -69,28 +68,28 @@ import oshi.hardware.NetworkIF;
      * @return An array of network interfaces
      */
     protected NetworkInterface[] getNetworkInterfaces() {
-<span class="nc" id="L72">        List&lt;NetworkInterface&gt; result = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L73">        Enumeration&lt;NetworkInterface&gt; interfaces = null;</span>
+<span class="nc" id="L71">        List&lt;NetworkInterface&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L72">        Enumeration&lt;NetworkInterface&gt; interfaces = null;</span>
 
         try {
-<span class="nc" id="L76">            interfaces = NetworkInterface.getNetworkInterfaces(); // can return null</span>
-<span class="nc" id="L77">        } catch (SocketException ex) {</span>
-<span class="nc" id="L78">            LOG.error(&quot;Socket exception when retrieving interfaces: {}&quot;, ex.getMessage());</span>
-<span class="nc" id="L79">        }</span>
-<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (interfaces != null) {</span>
-<span class="nc bnc" id="L81" title="All 2 branches missed.">            while (interfaces.hasMoreElements()) {</span>
-<span class="nc" id="L82">                NetworkInterface netint = interfaces.nextElement();</span>
+<span class="nc" id="L75">            interfaces = NetworkInterface.getNetworkInterfaces(); // can return null</span>
+<span class="nc" id="L76">        } catch (SocketException ex) {</span>
+<span class="nc" id="L77">            LOG.error(&quot;Socket exception when retrieving interfaces: {}&quot;, ex.getMessage());</span>
+<span class="nc" id="L78">        }</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (interfaces != null) {</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            while (interfaces.hasMoreElements()) {</span>
+<span class="nc" id="L81">                NetworkInterface netint = interfaces.nextElement();</span>
                 try {
-<span class="nc bnc" id="L84" title="All 4 branches missed.">                    if (!netint.isLoopback() &amp;&amp; netint.getHardwareAddress() != null) {</span>
-<span class="nc" id="L85">                        result.add(netint);</span>
+<span class="nc bnc" id="L83" title="All 4 branches missed.">                    if (!netint.isLoopback() &amp;&amp; netint.getHardwareAddress() != null) {</span>
+<span class="nc" id="L84">                        result.add(netint);</span>
                     }
-<span class="nc" id="L87">                } catch (SocketException ex) {</span>
-<span class="nc" id="L88">                    LOG.error(&quot;Socket exception when retrieving interface \&quot;{}\&quot;: {}&quot;, netint.getName(),</span>
-<span class="nc" id="L89">                            ex.getMessage());</span>
-<span class="nc" id="L90">                }</span>
-<span class="nc" id="L91">            }</span>
+<span class="nc" id="L86">                } catch (SocketException ex) {</span>
+<span class="nc" id="L87">                    LOG.error(&quot;Socket exception when retrieving interface \&quot;{}\&quot;: {}&quot;, netint.getName(),</span>
+<span class="nc" id="L88">                            ex.getMessage());</span>
+<span class="nc" id="L89">                }</span>
+<span class="nc" id="L90">            }</span>
         }
-<span class="nc" id="L93">        return result.toArray(new NetworkInterface[0]);</span>
+<span class="nc" id="L92">        return result.toArray(new NetworkInterface[0]);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
