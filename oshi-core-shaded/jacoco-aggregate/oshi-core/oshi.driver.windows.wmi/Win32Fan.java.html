@@ -23,11 +23,10 @@
  */
 package oshi.driver.windows.wmi;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiQuery; //NOSONAR squid:S1191
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiResult;
 
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.util.platform.windows.WmiQueryHandler;
 
 /**
@@ -41,8 +40,8 @@ public final class Win32Fan {
     /**
      * Fan speed property.
      */
-<span class="nc" id="L44">    public enum SpeedProperty {</span>
-<span class="nc" id="L45">        DESIREDSPEED;</span>
+<span class="nc" id="L43">    public enum SpeedProperty {</span>
+<span class="nc" id="L44">        DESIREDSPEED;</span>
     }
 
     private Win32Fan() {
@@ -55,8 +54,8 @@ public final class Win32Fan {
      *         when a variable speed fan is supported.
      */
     public static WmiResult&lt;SpeedProperty&gt; querySpeed() {
-<span class="nc" id="L58">        WmiQuery&lt;SpeedProperty&gt; fanQuery = new WmiQuery&lt;&gt;(WIN32_FAN, SpeedProperty.class);</span>
-<span class="nc" id="L59">        return WmiQueryHandler.createInstance().queryWMI(fanQuery);</span>
+<span class="nc" id="L57">        WmiQuery&lt;SpeedProperty&gt; fanQuery = new WmiQuery&lt;&gt;(WIN32_FAN, SpeedProperty.class);</span>
+<span class="nc" id="L58">        return WmiQueryHandler.createInstance().queryWMI(fanQuery);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

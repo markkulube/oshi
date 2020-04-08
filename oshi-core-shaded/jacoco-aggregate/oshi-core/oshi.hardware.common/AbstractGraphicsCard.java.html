@@ -23,8 +23,7 @@
  */
 package oshi.hardware.common;
 
-import javax.annotation.concurrent.Immutable;
-
+import oshi.annotation.concurrent.Immutable;
 import oshi.hardware.GraphicsCard;
 
 /**
@@ -53,56 +52,56 @@ public abstract class AbstractGraphicsCard implements GraphicsCard {
      * @param vram
      *            The VRAM
      */
-<span class="nc" id="L56">    protected AbstractGraphicsCard(String name, String deviceId, String vendor, String versionInfo, long vram) {</span>
-<span class="nc" id="L57">        this.name = name;</span>
-<span class="nc" id="L58">        this.deviceId = deviceId;</span>
-<span class="nc" id="L59">        this.vendor = vendor;</span>
-<span class="nc" id="L60">        this.versionInfo = versionInfo;</span>
-<span class="nc" id="L61">        this.vram = vram;</span>
-<span class="nc" id="L62">    }</span>
+<span class="nc" id="L55">    protected AbstractGraphicsCard(String name, String deviceId, String vendor, String versionInfo, long vram) {</span>
+<span class="nc" id="L56">        this.name = name;</span>
+<span class="nc" id="L57">        this.deviceId = deviceId;</span>
+<span class="nc" id="L58">        this.vendor = vendor;</span>
+<span class="nc" id="L59">        this.versionInfo = versionInfo;</span>
+<span class="nc" id="L60">        this.vram = vram;</span>
+<span class="nc" id="L61">    }</span>
 
     @Override
     public String getName() {
-<span class="nc" id="L66">        return name;</span>
+<span class="nc" id="L65">        return name;</span>
     }
 
     @Override
     public String getDeviceId() {
-<span class="nc" id="L71">        return deviceId;</span>
+<span class="nc" id="L70">        return deviceId;</span>
     }
 
     @Override
     public String getVendor() {
-<span class="nc" id="L76">        return vendor;</span>
+<span class="nc" id="L75">        return vendor;</span>
     }
 
     @Override
     public String getVersionInfo() {
-<span class="nc" id="L81">        return versionInfo;</span>
+<span class="nc" id="L80">        return versionInfo;</span>
     }
 
     @Override
     public long getVRam() {
-<span class="nc" id="L86">        return vram;</span>
+<span class="nc" id="L85">        return vram;</span>
     }
 
     @Override
     public String toString() {
-<span class="nc" id="L91">        StringBuilder builder = new StringBuilder();</span>
-<span class="nc" id="L92">        builder.append(&quot;GraphicsCard@&quot;);</span>
-<span class="nc" id="L93">        builder.append(Integer.toHexString(hashCode()));</span>
-<span class="nc" id="L94">        builder.append(&quot; [name=&quot;);</span>
-<span class="nc" id="L95">        builder.append(this.name);</span>
-<span class="nc" id="L96">        builder.append(&quot;, deviceId=&quot;);</span>
-<span class="nc" id="L97">        builder.append(this.deviceId);</span>
-<span class="nc" id="L98">        builder.append(&quot;, vendor=&quot;);</span>
-<span class="nc" id="L99">        builder.append(this.vendor);</span>
-<span class="nc" id="L100">        builder.append(&quot;, vRam=&quot;);</span>
-<span class="nc" id="L101">        builder.append(this.vram);</span>
-<span class="nc" id="L102">        builder.append(&quot;, versionInfo=[&quot;);</span>
-<span class="nc" id="L103">        builder.append(this.versionInfo);</span>
-<span class="nc" id="L104">        builder.append(&quot;]]&quot;);</span>
-<span class="nc" id="L105">        return builder.toString();</span>
+<span class="nc" id="L90">        StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L91">        builder.append(&quot;GraphicsCard@&quot;);</span>
+<span class="nc" id="L92">        builder.append(Integer.toHexString(hashCode()));</span>
+<span class="nc" id="L93">        builder.append(&quot; [name=&quot;);</span>
+<span class="nc" id="L94">        builder.append(this.name);</span>
+<span class="nc" id="L95">        builder.append(&quot;, deviceId=&quot;);</span>
+<span class="nc" id="L96">        builder.append(this.deviceId);</span>
+<span class="nc" id="L97">        builder.append(&quot;, vendor=&quot;);</span>
+<span class="nc" id="L98">        builder.append(this.vendor);</span>
+<span class="nc" id="L99">        builder.append(&quot;, vRam=&quot;);</span>
+<span class="nc" id="L100">        builder.append(this.vram);</span>
+<span class="nc" id="L101">        builder.append(&quot;, versionInfo=[&quot;);</span>
+<span class="nc" id="L102">        builder.append(this.versionInfo);</span>
+<span class="nc" id="L103">        builder.append(&quot;]]&quot;);</span>
+<span class="nc" id="L104">        return builder.toString();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

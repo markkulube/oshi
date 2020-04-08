@@ -25,8 +25,7 @@ package oshi.hardware.common;
 
 import java.util.Arrays;
 
-import javax.annotation.concurrent.Immutable;
-
+import oshi.annotation.concurrent.Immutable;
 import oshi.hardware.Display;
 import oshi.util.EdidUtil;
 
@@ -44,18 +43,18 @@ public abstract class AbstractDisplay implements Display {
      * @param edid
      *            a byte array representing a display EDID
      */
-<span class="nc" id="L47">    protected AbstractDisplay(byte[] edid) {</span>
-<span class="nc" id="L48">        this.edid = Arrays.copyOf(edid, edid.length);</span>
-<span class="nc" id="L49">    }</span>
+<span class="nc" id="L46">    protected AbstractDisplay(byte[] edid) {</span>
+<span class="nc" id="L47">        this.edid = Arrays.copyOf(edid, edid.length);</span>
+<span class="nc" id="L48">    }</span>
 
     @Override
     public byte[] getEdid() {
-<span class="nc" id="L53">        return Arrays.copyOf(this.edid, this.edid.length);</span>
+<span class="nc" id="L52">        return Arrays.copyOf(this.edid, this.edid.length);</span>
     }
 
     @Override
     public String toString() {
-<span class="nc" id="L58">        return EdidUtil.toString(this.edid);</span>
+<span class="nc" id="L57">        return EdidUtil.toString(this.edid);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

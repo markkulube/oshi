@@ -205,7 +205,7 @@ oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxFirmware,369,0,40,0
 oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxComputerSystem,336,0,70,0,91,0,58,0,18,0
 oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxCentralProcessor,828,0,109,0,166,0,71,0,13,0
 oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxHardwareAbstractionLayer,45,0,0,0,12,0,12,0,12,0
-oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxDisks,389,0,38,0,81,0,25,0,6,0
+oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxDisks,392,0,38,0,82,0,25,0,6,0
 oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxBaseboard.ProcCpuStrings,35,0,8,0,6,0,5,0,1,0
 oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxVirtualMemory,185,0,20,0,39,0,19,0,8,0
 oshi-core-shaded/oshi-core,oshi.hardware.platform.linux,LinuxGlobalMemory,167,0,17,0,40,0,20,0,9,0

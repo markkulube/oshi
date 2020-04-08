@@ -23,11 +23,10 @@
  */
 package oshi.driver.windows.wmi;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiQuery; //NOSONAR squid:S1191
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiResult;
 
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.util.platform.windows.WmiQueryHandler;
 
 /**
@@ -42,8 +41,8 @@ public final class MSAcpiThermalZoneTemperature {
     /**
      * Current temperature property.
      */
-<span class="nc" id="L45">    public enum TemperatureProperty {</span>
-<span class="nc" id="L46">        CURRENTTEMPERATURE;</span>
+<span class="nc" id="L44">    public enum TemperatureProperty {</span>
+<span class="nc" id="L45">        CURRENTTEMPERATURE;</span>
     }
 
     private MSAcpiThermalZoneTemperature() {
@@ -55,9 +54,9 @@ public final class MSAcpiThermalZoneTemperature {
      * @return Temperature at thermal zone in tenths of degrees Kelvin.
      */
     public static WmiResult&lt;TemperatureProperty&gt; queryCurrentTemperature() {
-<span class="nc" id="L58">        WmiQuery&lt;TemperatureProperty&gt; curTempQuery = new WmiQuery&lt;&gt;(WMI_NAMESPACE, MS_ACPI_THERMAL_ZONE_TEMPERATURE,</span>
+<span class="nc" id="L57">        WmiQuery&lt;TemperatureProperty&gt; curTempQuery = new WmiQuery&lt;&gt;(WMI_NAMESPACE, MS_ACPI_THERMAL_ZONE_TEMPERATURE,</span>
                 TemperatureProperty.class);
-<span class="nc" id="L60">        return WmiQueryHandler.createInstance().queryWMI(curTempQuery);</span>
+<span class="nc" id="L59">        return WmiQueryHandler.createInstance().queryWMI(curTempQuery);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

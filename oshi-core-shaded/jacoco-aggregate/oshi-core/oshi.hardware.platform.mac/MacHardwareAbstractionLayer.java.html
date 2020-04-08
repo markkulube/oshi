@@ -23,8 +23,7 @@
  */
 package oshi.hardware.platform.mac;
 
-import javax.annotation.concurrent.ThreadSafe;
-
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.ComputerSystem;
 import oshi.hardware.Display;
@@ -42,61 +41,61 @@ import oshi.hardware.common.AbstractHardwareAbstractionLayer;
  * MacHardwareAbstractionLayer class.
  */
 @ThreadSafe
-<span class="nc" id="L45">public final class MacHardwareAbstractionLayer extends AbstractHardwareAbstractionLayer {</span>
+<span class="nc" id="L44">public final class MacHardwareAbstractionLayer extends AbstractHardwareAbstractionLayer {</span>
 
     @Override
     public ComputerSystem createComputerSystem() {
-<span class="nc" id="L49">        return new MacComputerSystem();</span>
+<span class="nc" id="L48">        return new MacComputerSystem();</span>
     }
 
     @Override
     public GlobalMemory createMemory() {
-<span class="nc" id="L54">        return new MacGlobalMemory();</span>
+<span class="nc" id="L53">        return new MacGlobalMemory();</span>
     }
 
     @Override
     public CentralProcessor createProcessor() {
-<span class="nc" id="L59">        return new MacCentralProcessor();</span>
+<span class="nc" id="L58">        return new MacCentralProcessor();</span>
     }
 
     @Override
     public Sensors createSensors() {
-<span class="nc" id="L64">        return new MacSensors();</span>
+<span class="nc" id="L63">        return new MacSensors();</span>
     }
 
     @Override
     public PowerSource[] getPowerSources() {
-<span class="nc" id="L69">        return MacPowerSource.getPowerSources();</span>
+<span class="nc" id="L68">        return MacPowerSource.getPowerSources();</span>
     }
 
     @Override
     public HWDiskStore[] getDiskStores() {
-<span class="nc" id="L74">        return MacDisks.getDisks();</span>
+<span class="nc" id="L73">        return MacDisks.getDisks();</span>
     }
 
     @Override
     public Display[] getDisplays() {
-<span class="nc" id="L79">        return MacDisplay.getDisplays();</span>
+<span class="nc" id="L78">        return MacDisplay.getDisplays();</span>
     }
 
     @Override
     public NetworkIF[] getNetworkIFs() {
-<span class="nc" id="L84">        return new MacNetworks().getNetworks();</span>
+<span class="nc" id="L83">        return new MacNetworks().getNetworks();</span>
     }
 
     @Override
     public UsbDevice[] getUsbDevices(boolean tree) {
-<span class="nc" id="L89">        return MacUsbDevice.getUsbDevices(tree);</span>
+<span class="nc" id="L88">        return MacUsbDevice.getUsbDevices(tree);</span>
     }
 
     @Override
     public SoundCard[] getSoundCards() {
-<span class="nc" id="L94">        return MacSoundCard.getSoundCards().toArray(new SoundCard[0]);</span>
+<span class="nc" id="L93">        return MacSoundCard.getSoundCards().toArray(new SoundCard[0]);</span>
     }
 
     @Override
     public GraphicsCard[] getGraphicsCards() {
-<span class="nc" id="L99">        return MacGraphicsCard.getGraphicsCards().toArray(new GraphicsCard[0]);</span>
+<span class="nc" id="L98">        return MacGraphicsCard.getGraphicsCards().toArray(new GraphicsCard[0]);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

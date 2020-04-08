@@ -23,8 +23,7 @@
  */
 package oshi.driver.linux.proc;
 
-import javax.annotation.concurrent.ThreadSafe;
-
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.util.FileUtil;
 import oshi.util.platform.linux.ProcPath;
 
@@ -43,17 +42,17 @@ public final class UpTime {
      * @return Seconds since boot
      */
     public static double getSystemUptimeSeconds() {
-<span class="nc" id="L46">        String uptime = FileUtil.getStringFromFile(ProcPath.UPTIME);</span>
-<span class="nc" id="L47">        int spaceIndex = uptime.indexOf(' ');</span>
+<span class="nc" id="L45">        String uptime = FileUtil.getStringFromFile(ProcPath.UPTIME);</span>
+<span class="nc" id="L46">        int spaceIndex = uptime.indexOf(' ');</span>
         try {
-<span class="nc bnc" id="L49" title="All 2 branches missed.">            if (spaceIndex &lt; 0) {</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">            if (spaceIndex &lt; 0) {</span>
                 // No space, error
-<span class="nc" id="L51">                return 0d;</span>
+<span class="nc" id="L50">                return 0d;</span>
             } else {
-<span class="nc" id="L53">                return Double.parseDouble(uptime.substring(0, spaceIndex));</span>
+<span class="nc" id="L52">                return Double.parseDouble(uptime.substring(0, spaceIndex));</span>
             }
-<span class="nc" id="L55">        } catch (NumberFormatException nfe) {</span>
-<span class="nc" id="L56">            return 0d;</span>
+<span class="nc" id="L54">        } catch (NumberFormatException nfe) {</span>
+<span class="nc" id="L55">            return 0d;</span>
         }
     }
 }
