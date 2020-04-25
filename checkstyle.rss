@@ -25,8 +25,8 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2010 - 2020 oshi</copyright>
     <item>
-      <title>File: 260,
-             Errors: 7186,
+      <title>File: 267,
+             Errors: 8613,
              Warnings: 0,
              Infos: 0
       </title>
@@ -252,6 +252,20 @@ under the License.
                 </td>
                 <td>
                   5
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.software.os.mac.MacInternetProtocolStats.java">oshi/software/os/mac/MacInternetProtocolStats.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  35
                 </td>
               </tr>
                           <tr>
@@ -853,7 +867,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  52
+                  1202
                 </td>
               </tr>
                           <tr>
@@ -1026,6 +1040,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.software.os.InternetProtocolStats.java">oshi/software/os/InternetProtocolStats.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  76
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.util.tuples.Quartet.java">oshi/util/tuples/Quartet.java</a>
                 </td>
                 <td>
@@ -1078,6 +1106,20 @@ under the License.
                 </td>
                 <td>
                   5
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.jna.platform.windows.IPHlpAPI.java">oshi/jna/platform/windows/IPHlpAPI.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  77
                 </td>
               </tr>
                           <tr>
@@ -1147,7 +1189,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  78
+                  79
                 </td>
               </tr>
                           <tr>
@@ -1204,6 +1246,20 @@ under the License.
                 </td>
                 <td>
                   23
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.software.os.unix.freebsd.FreeBsdInternetProtocolStats.java">oshi/software/os/unix/freebsd/FreeBsdInternetProtocolStats.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  21
                 </td>
               </tr>
                           <tr>
@@ -1656,6 +1712,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.software.os.unix.solaris.SolarisInternetProtocolStats.java">oshi/software/os/unix/solaris/SolarisInternetProtocolStats.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  25
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.driver.windows.perfmon.SystemInformation.java">oshi/driver/windows/perfmon/SystemInformation.java</a>
                 </td>
                 <td>
@@ -1922,6 +1992,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.software.os.windows.WindowsInternetProtocolStats.java">oshi/software/os/windows/WindowsInternetProtocolStats.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  13
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.software.os.linux.package-info.java">oshi/software/os/linux/package-info.java</a>
                 </td>
                 <td>
@@ -1932,6 +2016,20 @@ under the License.
                 </td>
                 <td>
                   5
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="https://github.com/oshi/oshi/checkstyle.html#oshi.software.os.linux.LinuxInternetProtocolStats.java">oshi/software/os/linux/LinuxInternetProtocolStats.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  21
                 </td>
               </tr>
                           <tr>
@@ -2043,7 +2141,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  60
+                  63
                 </td>
               </tr>
                           <tr>
@@ -2407,7 +2505,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  86
+                  87
                 </td>
               </tr>
                           <tr>
@@ -2505,7 +2603,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  159
+                  160
                 </td>
               </tr>
                           <tr>
@@ -2897,7 +2995,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  249
+                  253
                 </td>
               </tr>
                           <tr>
@@ -3107,7 +3205,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  28
+                  26
                 </td>
               </tr>
                           <tr>
@@ -3191,7 +3289,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  112
+                  113
                 </td>
               </tr>
                           <tr>
@@ -3219,7 +3317,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  184
+                  185
                 </td>
               </tr>
                           <tr>
@@ -3247,7 +3345,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  58
+                  57
                 </td>
               </tr>
                           <tr>
