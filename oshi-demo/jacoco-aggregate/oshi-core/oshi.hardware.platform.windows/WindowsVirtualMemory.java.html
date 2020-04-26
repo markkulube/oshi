@@ -54,9 +54,9 @@ final class WindowsVirtualMemory extends AbstractVirtualMemory {
 
     private final long pageSize;
 
-<span class="nc" id="L57">    private final Supplier&lt;Long&gt; used = memoize(this::querySwapUsed, defaultExpiration());</span>
+<span class="nc" id="L57">    private final Supplier&lt;Long&gt; used = memoize(WindowsVirtualMemory::querySwapUsed, defaultExpiration());</span>
 
-<span class="nc" id="L59">    private final Supplier&lt;Long&gt; total = memoize(this::querySwapTotal, defaultExpiration());</span>
+<span class="nc" id="L59">    private final Supplier&lt;Long&gt; total = memoize(WindowsVirtualMemory::querySwapTotal, defaultExpiration());</span>
 
 <span class="nc" id="L61">    private final Supplier&lt;Pair&lt;Long, Long&gt;&gt; swapInOut = memoize(WindowsVirtualMemory::queryPageSwaps,</span>
 <span class="nc" id="L62">            defaultExpiration());</span>
@@ -73,12 +73,12 @@ final class WindowsVirtualMemory extends AbstractVirtualMemory {
 
     @Override
     public long getSwapUsed() {
-<span class="nc" id="L76">        return used.get();</span>
+<span class="nc" id="L76">        return this.pageSize * used.get();</span>
     }
 
     @Override
     public long getSwapTotal() {
-<span class="nc" id="L81">        return total.get();</span>
+<span class="nc" id="L81">        return this.pageSize * total.get();</span>
     }
 
     @Override
@@ -91,17 +91,17 @@ final class WindowsVirtualMemory extends AbstractVirtualMemory {
 <span class="nc" id="L91">        return swapInOut.get().getB();</span>
     }
 
-    private long querySwapUsed() {
-<span class="nc" id="L95">        return PagingFile.querySwapUsed().getOrDefault(PagingPercentProperty.PERCENTUSAGE, 0L) * this.pageSize;</span>
+    private static long querySwapUsed() {
+<span class="nc" id="L95">        return PagingFile.querySwapUsed().getOrDefault(PagingPercentProperty.PERCENTUSAGE, 0L);</span>
     }
 
-    private long querySwapTotal() {
+    private static long querySwapTotal() {
 <span class="nc" id="L99">        PERFORMANCE_INFORMATION perfInfo = new PERFORMANCE_INFORMATION();</span>
 <span class="nc bnc" id="L100" title="All 2 branches missed.">        if (!Psapi.INSTANCE.GetPerformanceInfo(perfInfo, perfInfo.size())) {</span>
 <span class="nc" id="L101">            LOG.error(&quot;Failed to get Performance Info. Error code: {}&quot;, Kernel32.INSTANCE.GetLastError());</span>
 <span class="nc" id="L102">            return 0L;</span>
         }
-<span class="nc" id="L104">        return this.pageSize * (perfInfo.CommitLimit.longValue() - perfInfo.PhysicalTotal.longValue());</span>
+<span class="nc" id="L104">        return perfInfo.CommitLimit.longValue() - perfInfo.PhysicalTotal.longValue();</span>
     }
 
     private static Pair&lt;Long, Long&gt; queryPageSwaps() {
