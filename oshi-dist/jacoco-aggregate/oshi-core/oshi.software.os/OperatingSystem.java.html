@@ -82,6 +82,13 @@ public interface OperatingSystem {
      */
     FileSystem getFileSystem();
 
+    /** 
+     * Instantiates a {@link oshi.software.os.InternetProtocolStats} object.
+     * 
+     * @return a {@link oshi.software.os.InternetProtocolStats} object.
+     */
+    InternetProtocolStats getInternetProtocolStats();
+    
     /**
      * Gets currently running processes. No order is guaranteed.
      *
@@ -306,20 +313,20 @@ public interface OperatingSystem {
         private final String buildNumber;
         private final String versionStr;
 
-<span class="fc" id="L309">        public OSVersionInfo(String version, String codeName, String buildNumber) {</span>
-<span class="fc" id="L310">            this.version = version;</span>
-<span class="fc" id="L311">            this.codeName = codeName;</span>
-<span class="fc" id="L312">            this.buildNumber = buildNumber;</span>
+<span class="fc" id="L316">        public OSVersionInfo(String version, String codeName, String buildNumber) {</span>
+<span class="fc" id="L317">            this.version = version;</span>
+<span class="fc" id="L318">            this.codeName = codeName;</span>
+<span class="fc" id="L319">            this.buildNumber = buildNumber;</span>
 
-<span class="pc bpc" id="L314" title="1 of 2 branches missed.">            StringBuilder sb = new StringBuilder(getVersion() != null ? getVersion() : Constants.UNKNOWN);</span>
-<span class="pc bpc" id="L315" title="1 of 2 branches missed.">            if (!Util.isBlank(getCodeName())) {</span>
-<span class="fc" id="L316">                sb.append(&quot; (&quot;).append(getCodeName()).append(')');</span>
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">            StringBuilder sb = new StringBuilder(getVersion() != null ? getVersion() : Constants.UNKNOWN);</span>
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">            if (!Util.isBlank(getCodeName())) {</span>
+<span class="fc" id="L323">                sb.append(&quot; (&quot;).append(getCodeName()).append(')');</span>
             }
-<span class="pc bpc" id="L318" title="1 of 2 branches missed.">            if (!Util.isBlank(getBuildNumber())) {</span>
-<span class="fc" id="L319">                sb.append(&quot; build &quot;).append(getBuildNumber());</span>
+<span class="pc bpc" id="L325" title="1 of 2 branches missed.">            if (!Util.isBlank(getBuildNumber())) {</span>
+<span class="fc" id="L326">                sb.append(&quot; build &quot;).append(getBuildNumber());</span>
             }
-<span class="fc" id="L321">            this.versionStr = sb.toString();</span>
-<span class="fc" id="L322">        }</span>
+<span class="fc" id="L328">            this.versionStr = sb.toString();</span>
+<span class="fc" id="L329">        }</span>
 
         /**
          * Gets the operating system version.
@@ -327,7 +334,7 @@ public interface OperatingSystem {
          * @return The version, if any. May be {@code null}.
          */
         public String getVersion() {
-<span class="fc" id="L330">            return version;</span>
+<span class="fc" id="L337">            return version;</span>
         }
 
         /**
@@ -336,7 +343,7 @@ public interface OperatingSystem {
          * @return The code name, if any. May be {@code null}.
          */
         public String getCodeName() {
-<span class="fc" id="L339">            return codeName;</span>
+<span class="fc" id="L346">            return codeName;</span>
         }
 
         /**
@@ -345,12 +352,12 @@ public interface OperatingSystem {
          * @return The build number, if any. May be {@code null}.
          */
         public String getBuildNumber() {
-<span class="fc" id="L348">            return buildNumber;</span>
+<span class="fc" id="L355">            return buildNumber;</span>
         }
 
         @Override
         public String toString() {
-<span class="nc" id="L353">            return this.versionStr;</span>
+<span class="nc" id="L360">            return this.versionStr;</span>
         }
     }
 }
