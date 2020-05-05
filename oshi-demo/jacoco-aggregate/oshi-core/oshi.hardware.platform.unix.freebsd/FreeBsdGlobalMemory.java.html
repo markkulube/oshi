@@ -45,7 +45,7 @@ import oshi.util.platform.unix.freebsd.BsdSysctlUtil;
 
 <span class="nc" id="L46">    private final Supplier&lt;Long&gt; pageSize = memoize(FreeBsdGlobalMemory::queryPageSize);</span>
 
-<span class="nc" id="L48">    private final Supplier&lt;VirtualMemory&gt; vm = memoize(FreeBsdGlobalMemory::createVirtualMemory);</span>
+<span class="nc" id="L48">    private final Supplier&lt;VirtualMemory&gt; vm = memoize(this::createVirtualMemory);</span>
 
     @Override
     public long getAvailable() {
@@ -82,8 +82,8 @@ import oshi.util.platform.unix.freebsd.BsdSysctlUtil;
 <span class="nc" id="L82">        return BsdSysctlUtil.sysctl(&quot;hw.pagesize&quot;, 4096L);</span>
     }
 
-    private static VirtualMemory createVirtualMemory() {
-<span class="nc" id="L86">        return new FreeBsdVirtualMemory();</span>
+    private VirtualMemory createVirtualMemory() {
+<span class="nc" id="L86">        return new FreeBsdVirtualMemory(this);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
