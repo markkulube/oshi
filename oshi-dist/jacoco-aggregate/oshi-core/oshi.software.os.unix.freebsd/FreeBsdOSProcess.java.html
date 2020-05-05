@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>FreeBsdOSProcess.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">oshi-dist</a> &gt; <a href="../index.html" class="el_bundle">oshi-core</a> &gt; <a href="index.source.html" class="el_package">oshi.software.os.unix.freebsd</a> &gt; <span class="el_source">FreeBsdOSProcess.java</span></div><h1>FreeBsdOSProcess.java</h1><pre class="source lang-java linenums">/**
+ * MIT License
+ *
+ * Copyright (c) 2010 - 2020 The OSHI Project Contributors: https://github.com/oshi/oshi/graphs/contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the &quot;Software&quot;), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package oshi.software.os.unix.freebsd;
+
+import static oshi.util.Memoizer.memoize;
+
+import java.util.List;
+import java.util.function.Supplier;
+
+import com.sun.jna.Memory; // NOSONAR squid:S1191
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
+
+import oshi.annotation.concurrent.ThreadSafe;
+import oshi.jna.platform.unix.freebsd.FreeBsdLibc;
+import oshi.software.common.AbstractOSProcess;
+import oshi.util.ExecutingCommand;
+import oshi.util.LsofUtil;
+import oshi.util.ParseUtil;
+
+@ThreadSafe
+public class FreeBsdOSProcess extends AbstractOSProcess {
+
+<span class="nc" id="L45">    private Supplier&lt;Integer&gt; bitness = memoize(this::queryBitness);</span>
+
+    private String name;
+<span class="nc" id="L48">    private String path = &quot;&quot;;</span>
+    private String commandLine;
+    private String user;
+    private String userID;
+    private String group;
+    private String groupID;
+<span class="nc" id="L54">    private State state = State.INVALID;</span>
+    private int parentProcessID;
+    private int threadCount;
+    private int priority;
+    private long virtualSize;
+    private long residentSetSize;
+    private long kernelTime;
+    private long userTime;
+    private long startTime;
+    private long upTime;
+    private long bytesRead;
+    private long bytesWritten;
+
+    public FreeBsdOSProcess(int pid, String[] split) {
+<span class="nc" id="L68">        super(pid);</span>
+<span class="nc" id="L69">        updateAttributes(split);</span>
+<span class="nc" id="L70">    }</span>
+
+    @Override
+    public String getName() {
+<span class="nc" id="L74">        return this.name;</span>
+    }
+
+    @Override
+    public String getPath() {
+<span class="nc" id="L79">        return this.path;</span>
+    }
+
+    @Override
+    public String getCommandLine() {
+<span class="nc" id="L84">        return this.commandLine;</span>
+    }
+
+    @Override
+    public String getCurrentWorkingDirectory() {
+<span class="nc" id="L89">        return LsofUtil.getCwd(getProcessID());</span>
+    }
+
+    @Override
+    public String getUser() {
+<span class="nc" id="L94">        return this.user;</span>
+    }
+
+    @Override
+    public String getUserID() {
+<span class="nc" id="L99">        return this.userID;</span>
+    }
+
+    @Override
+    public String getGroup() {
+<span class="nc" id="L104">        return this.group;</span>
+    }
+
+    @Override
+    public String getGroupID() {
+<span class="nc" id="L109">        return this.groupID;</span>
+    }
+
+    @Override
+    public State getState() {
+<span class="nc" id="L114">        return this.state;</span>
+    }
+
+    @Override
+    public int getParentProcessID() {
+<span class="nc" id="L119">        return this.parentProcessID;</span>
+    }
+
+    @Override
+    public int getThreadCount() {
+<span class="nc" id="L124">        return this.threadCount;</span>
+    }
+
+    @Override
+    public int getPriority() {
+<span class="nc" id="L129">        return this.priority;</span>
+    }
+
+    @Override
+    public long getVirtualSize() {
+<span class="nc" id="L134">        return this.virtualSize;</span>
+    }
+
+    @Override
+    public long getResidentSetSize() {
+<span class="nc" id="L139">        return this.residentSetSize;</span>
+    }
+
+    @Override
+    public long getKernelTime() {
+<span class="nc" id="L144">        return this.kernelTime;</span>
+    }
+
+    @Override
+    public long getUserTime() {
+<span class="nc" id="L149">        return this.userTime;</span>
+    }
+
+    @Override
+    public long getUpTime() {
+<span class="nc" id="L154">        return this.upTime;</span>
+    }
+
+    @Override
+    public long getStartTime() {
+<span class="nc" id="L159">        return this.startTime;</span>
+    }
+
+    @Override
+    public long getBytesRead() {
+<span class="nc" id="L164">        return this.bytesRead;</span>
+    }
+
+    @Override
+    public long getBytesWritten() {
+<span class="nc" id="L169">        return this.bytesWritten;</span>
+    }
+
+    @Override
+    public long getOpenFiles() {
+<span class="nc" id="L174">        return LsofUtil.getOpenFiles(getProcessID());</span>
+    }
+
+    @Override
+    public int getBitness() {
+<span class="nc" id="L179">        return this.bitness.get();</span>
+    }
+
+    @Override
+    public long getAffinityMask() {
+<span class="nc" id="L184">        long bitMask = 0L;</span>
+        // Would prefer to use native cpuset_getaffinity call but variable sizing is
+        // kernel-dependent and requires C macros, so we use commandline instead.
+<span class="nc" id="L187">        String cpuset = ExecutingCommand.getFirstAnswer(&quot;cpuset -gp &quot; + getProcessID());</span>
+        // Sample output:
+        // pid 8 mask: 0, 1
+        // cpuset: getaffinity: No such process
+<span class="nc" id="L191">        String[] split = cpuset.split(&quot;:&quot;);</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        if (split.length &gt; 1) {</span>
+<span class="nc" id="L193">            String[] bits = split[1].split(&quot;,&quot;);</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">            for (String bit : bits) {</span>
+<span class="nc" id="L195">                int bitToSet = ParseUtil.parseIntOrDefault(bit.trim(), -1);</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">                if (bitToSet &gt;= 0) {</span>
+<span class="nc" id="L197">                    bitMask |= 1L &lt;&lt; bitToSet;</span>
+                }
+            }
+        }
+<span class="nc" id="L201">        return bitMask;</span>
+    }
+
+    private int queryBitness() {
+        // Get process abi vector
+<span class="nc" id="L206">        int[] mib = new int[4];</span>
+<span class="nc" id="L207">        mib[0] = 1; // CTL_KERN</span>
+<span class="nc" id="L208">        mib[1] = 14; // KERN_PROC</span>
+<span class="nc" id="L209">        mib[2] = 9; // KERN_PROC_SV_NAME</span>
+<span class="nc" id="L210">        mib[3] = getProcessID();</span>
+        // Allocate memory for arguments
+<span class="nc" id="L212">        Pointer abi = new Memory(32);</span>
+<span class="nc" id="L213">        IntByReference size = new IntByReference(32);</span>
+        // Fetch abi vector
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        if (0 == FreeBsdLibc.INSTANCE.sysctl(mib, mib.length, abi, size, null, 0)) {</span>
+<span class="nc" id="L216">            String elf = abi.getString(0);</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">            if (elf.contains(&quot;ELF32&quot;)) {</span>
+<span class="nc" id="L218">                return 32;</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">            } else if (elf.contains(&quot;ELF64&quot;)) {</span>
+<span class="nc" id="L220">                return 64;</span>
+            }
+        }
+<span class="nc" id="L223">        return 0;</span>
+    }
+
+    @Override
+    public boolean updateAttributes() {
+<span class="nc" id="L228">        String psCommand = &quot;ps -awwxo state,pid,ppid,user,uid,group,gid,nlwp,pri,vsz,rss,etimes,systime,time,comm,args -p &quot;</span>
+<span class="nc" id="L229">                + getProcessID();</span>
+<span class="nc" id="L230">        List&lt;String&gt; procList = ExecutingCommand.runNative(psCommand);</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (procList.size() &gt; 1) {</span>
+            // skip header row
+<span class="nc" id="L233">            String[] split = ParseUtil.whitespaces.split(procList.get(1).trim(), 16);</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">            if (split.length == 16) {</span>
+<span class="nc" id="L235">                return updateAttributes(split);</span>
+            }
+        }
+<span class="nc" id="L238">        this.state = State.INVALID;</span>
+<span class="nc" id="L239">        return false;</span>
+    }
+
+    private boolean updateAttributes(String[] split) {
+<span class="nc" id="L243">        long now = System.currentTimeMillis();</span>
+<span class="nc bnc" id="L244" title="All 6 branches missed.">        switch (split[0].charAt(0)) {</span>
+        case 'R':
+<span class="nc" id="L246">            this.state = State.RUNNING;</span>
+<span class="nc" id="L247">            break;</span>
+        case 'I':
+        case 'S':
+<span class="nc" id="L250">            this.state = State.SLEEPING;</span>
+<span class="nc" id="L251">            break;</span>
+        case 'D':
+        case 'L':
+        case 'U':
+<span class="nc" id="L255">            this.state = State.WAITING;</span>
+<span class="nc" id="L256">            break;</span>
+        case 'Z':
+<span class="nc" id="L258">            this.state = State.ZOMBIE;</span>
+<span class="nc" id="L259">            break;</span>
+        case 'T':
+<span class="nc" id="L261">            this.state = State.STOPPED;</span>
+<span class="nc" id="L262">            break;</span>
+        default:
+<span class="nc" id="L264">            this.state = State.OTHER;</span>
+            break;
+        }
+<span class="nc" id="L267">        this.parentProcessID = ParseUtil.parseIntOrDefault(split[2], 0);</span>
+<span class="nc" id="L268">        this.user = split[3];</span>
+<span class="nc" id="L269">        this.userID = split[4];</span>
+<span class="nc" id="L270">        this.group = split[5];</span>
+<span class="nc" id="L271">        this.groupID = split[6];</span>
+<span class="nc" id="L272">        this.threadCount = ParseUtil.parseIntOrDefault(split[7], 0);</span>
+<span class="nc" id="L273">        this.priority = ParseUtil.parseIntOrDefault(split[8], 0);</span>
+        // These are in KB, multiply
+<span class="nc" id="L275">        this.virtualSize = ParseUtil.parseLongOrDefault(split[9], 0) * 1024;</span>
+<span class="nc" id="L276">        this.residentSetSize = ParseUtil.parseLongOrDefault(split[10], 0) * 1024;</span>
+        // Avoid divide by zero for processes up less than a second
+<span class="nc" id="L278">        long elapsedTime = ParseUtil.parseDHMSOrDefault(split[11], 0L);</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        this.upTime = elapsedTime &lt; 1L ? 1L : elapsedTime;</span>
+<span class="nc" id="L280">        this.startTime = now - this.upTime;</span>
+<span class="nc" id="L281">        this.kernelTime = ParseUtil.parseDHMSOrDefault(split[12], 0L);</span>
+<span class="nc" id="L282">        this.userTime = ParseUtil.parseDHMSOrDefault(split[13], 0L) - this.kernelTime;</span>
+<span class="nc" id="L283">        this.path = split[14];</span>
+<span class="nc" id="L284">        this.name = this.path.substring(this.path.lastIndexOf('/') + 1);</span>
+<span class="nc" id="L285">        this.commandLine = split[15];</span>
+
+<span class="nc" id="L287">        return true;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
