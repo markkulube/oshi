@@ -104,20 +104,20 @@ import oshi.util.platform.unix.freebsd.BsdSysctlUtil;
     }
 
     @Override
-    protected LogicalProcessor[] initProcessorCounts() {
+    protected List&lt;LogicalProcessor&gt; initProcessorCounts() {
 <span class="nc" id="L108">        List&lt;LogicalProcessor&gt; logProcs = parseTopology();</span>
         // Force at least one processor
 <span class="nc bnc" id="L110" title="All 2 branches missed.">        if (logProcs.isEmpty()) {</span>
 <span class="nc" id="L111">            logProcs.add(new LogicalProcessor(0, 0, 0));</span>
         }
-<span class="nc" id="L113">        return logProcs.toArray(new LogicalProcessor[0]);</span>
+<span class="nc" id="L113">        return logProcs;</span>
     }
 
     private static List&lt;LogicalProcessor&gt; parseTopology() {
 <span class="nc" id="L117">        String[] topology = BsdSysctlUtil.sysctl(&quot;kern.sched.topology_spec&quot;, &quot;&quot;).split(&quot;\\n|\\r&quot;);</span>
         /*-
          * Sample output:
-        
+
         &lt;groups&gt;
         &lt;group level=&quot;1&quot; cache-level=&quot;0&quot;&gt;
          &lt;cpu count=&quot;24&quot; mask=&quot;ffffff&quot;&gt;0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23&lt;/cpu&gt;
@@ -129,7 +129,7 @@ import oshi.util.platform.unix.freebsd.BsdSysctlUtil;
              &lt;cpu count=&quot;2&quot; mask=&quot;3&quot;&gt;0, 1&lt;/cpu&gt;
              &lt;flags&gt;&lt;flag name=&quot;THREAD&quot;&gt;THREAD group&lt;/flag&gt;&lt;flag name=&quot;SMT&quot;&gt;SMT group&lt;/flag&gt;&lt;/flags&gt;
             &lt;/group&gt;
-        
+
         * Opens with &lt;groups&gt;
         * &lt;group&gt; level 1 identifies all the processors via bitmask, should only be one
         * &lt;group&gt; level 2 separates by physical package
@@ -295,7 +295,7 @@ import oshi.util.platform.unix.freebsd.BsdSysctlUtil;
      * @param processorID
      * @return The ProcessorID string
      */
-    private String getProcessorIDfromDmiDecode(long processorID) {
+    private static String getProcessorIDfromDmiDecode(long processorID) {
 <span class="nc" id="L299">        boolean procInfo = false;</span>
 <span class="nc" id="L300">        String marker = &quot;Processor Information&quot;;</span>
 <span class="nc bnc" id="L301" title="All 2 branches missed.">        for (String checkLine : ExecutingCommand.runNative(&quot;dmidecode -t system&quot;)) {</span>

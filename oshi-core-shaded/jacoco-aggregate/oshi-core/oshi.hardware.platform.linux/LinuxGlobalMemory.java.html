@@ -48,7 +48,7 @@ import oshi.util.tuples.Pair;
 
 <span class="nc" id="L49">    private final Supplier&lt;Long&gt; pageSize = memoize(LinuxGlobalMemory::queryPageSize);</span>
 
-<span class="nc" id="L51">    private final Supplier&lt;VirtualMemory&gt; vm = memoize(LinuxGlobalMemory::createVirtualMemory);</span>
+<span class="nc" id="L51">    private final Supplier&lt;VirtualMemory&gt; vm = memoize(this::createVirtualMemory);</span>
 
     @Override
     public long getAvailable() {
@@ -150,8 +150,8 @@ import oshi.util.tuples.Pair;
 <span class="nc" id="L150">        return memory;</span>
     }
 
-    private static VirtualMemory createVirtualMemory() {
-<span class="nc" id="L154">        return new LinuxVirtualMemory();</span>
+    private VirtualMemory createVirtualMemory() {
+<span class="nc" id="L154">        return new LinuxVirtualMemory(this);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
