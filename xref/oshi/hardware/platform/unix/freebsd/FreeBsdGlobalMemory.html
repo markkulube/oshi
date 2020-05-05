@@ -53,7 +53,7 @@
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>  
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Supplier&lt;Long&gt; pageSize = memoize(FreeBsdGlobalMemory::queryPageSize);
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>  
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Supplier&lt;VirtualMemory&gt; vm = memoize(FreeBsdGlobalMemory::createVirtualMemory);
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Supplier&lt;VirtualMemory&gt; vm = memoize(<strong class="jxr_keyword">this</strong>::createVirtualMemory);
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>  
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>      @Override
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">long</strong> getAvailable() {
@@ -90,8 +90,8 @@
 <a class="jxr_linenumber" name="L82" href="#L82">82</a>          <strong class="jxr_keyword">return</strong> BsdSysctlUtil.sysctl(<span class="jxr_string">"hw.pagesize"</span>, 4096L);
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>      }
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>  
-<a class="jxr_linenumber" name="L85" href="#L85">85</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <a name="VirtualMemory" href="../../../../../oshi/hardware/VirtualMemory.html#VirtualMemory">VirtualMemory</a> createVirtualMemory() {
-<a class="jxr_linenumber" name="L86" href="#L86">86</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a name="FreeBsdVirtualMemory" href="../../../../../oshi/hardware/platform/unix/freebsd/FreeBsdVirtualMemory.html#FreeBsdVirtualMemory">FreeBsdVirtualMemory</a>();
+<a class="jxr_linenumber" name="L85" href="#L85">85</a>      <strong class="jxr_keyword">private</strong> <a name="VirtualMemory" href="../../../../../oshi/hardware/VirtualMemory.html#VirtualMemory">VirtualMemory</a> createVirtualMemory() {
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a name="FreeBsdVirtualMemory" href="../../../../../oshi/hardware/platform/unix/freebsd/FreeBsdVirtualMemory.html#FreeBsdVirtualMemory">FreeBsdVirtualMemory</a>(<strong class="jxr_keyword">this</strong>);
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>      }
 <a class="jxr_linenumber" name="L88" href="#L88">88</a>  }
 </pre>
