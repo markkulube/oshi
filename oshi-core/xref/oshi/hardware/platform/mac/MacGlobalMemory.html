@@ -70,7 +70,7 @@
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>  
 <a class="jxr_linenumber" name="L63" href="#L63">63</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Supplier&lt;Long&gt; pageSize = memoize(MacGlobalMemory::queryPageSize);
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>  
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Supplier&lt;VirtualMemory&gt; vm = memoize(MacGlobalMemory::createVirtualMemory);
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>      <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Supplier&lt;VirtualMemory&gt; vm = memoize(<strong class="jxr_keyword">this</strong>::createVirtualMemory);
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>  
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>      @Override
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">long</strong> getAvailable() {
@@ -93,7 +93,7 @@
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>      }
 <a class="jxr_linenumber" name="L86" href="#L86">86</a>  
 <a class="jxr_linenumber" name="L87" href="#L87">87</a>      @Override
-<a class="jxr_linenumber" name="L88" href="#L88">88</a>      <strong class="jxr_keyword">public</strong> <a name="PhysicalMemory" href="../../../../oshi/hardware/PhysicalMemory.html#PhysicalMemory">PhysicalMemory</a>[] getPhysicalMemory() {
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>      <strong class="jxr_keyword">public</strong> List&lt;PhysicalMemory&gt; getPhysicalMemory() {
 <a class="jxr_linenumber" name="L89" href="#L89">89</a>          List&lt;PhysicalMemory&gt; pmList = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a class="jxr_linenumber" name="L90" href="#L90">90</a>          List&lt;String&gt; sp = ExecutingCommand.runNative(<span class="jxr_string">"system_profiler SPMemoryDataType"</span>);
 <a class="jxr_linenumber" name="L91" href="#L91">91</a>          <strong class="jxr_keyword">int</strong> bank = 0;
@@ -137,7 +137,7 @@
 <a class="jxr_linenumber" name="L129" href="#L129">129</a>         }
 <a class="jxr_linenumber" name="L130" href="#L130">130</a>         pmList.add(<strong class="jxr_keyword">new</strong> <a name="PhysicalMemory" href="../../../../oshi/hardware/PhysicalMemory.html#PhysicalMemory">PhysicalMemory</a>(bankLabel, capacity, speed, manufacturer, memoryType));
 <a class="jxr_linenumber" name="L131" href="#L131">131</a> 
-<a class="jxr_linenumber" name="L132" href="#L132">132</a>         <strong class="jxr_keyword">return</strong> pmList.toArray(<strong class="jxr_keyword">new</strong> <a name="PhysicalMemory" href="../../../../oshi/hardware/PhysicalMemory.html#PhysicalMemory">PhysicalMemory</a>[0]);
+<a class="jxr_linenumber" name="L132" href="#L132">132</a>         <strong class="jxr_keyword">return</strong> pmList;
 <a class="jxr_linenumber" name="L133" href="#L133">133</a>     }
 <a class="jxr_linenumber" name="L134" href="#L134">134</a> 
 <a class="jxr_linenumber" name="L135" href="#L135">135</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">long</strong> queryVmStats() {
@@ -163,8 +163,8 @@
 <a class="jxr_linenumber" name="L155" href="#L155">155</a>         <strong class="jxr_keyword">return</strong> 4098L;
 <a class="jxr_linenumber" name="L156" href="#L156">156</a>     }
 <a class="jxr_linenumber" name="L157" href="#L157">157</a> 
-<a class="jxr_linenumber" name="L158" href="#L158">158</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <a name="VirtualMemory" href="../../../../oshi/hardware/VirtualMemory.html#VirtualMemory">VirtualMemory</a> createVirtualMemory() {
-<a class="jxr_linenumber" name="L159" href="#L159">159</a>         <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a name="MacVirtualMemory" href="../../../../oshi/hardware/platform/mac/MacVirtualMemory.html#MacVirtualMemory">MacVirtualMemory</a>();
+<a class="jxr_linenumber" name="L158" href="#L158">158</a>     <strong class="jxr_keyword">private</strong> <a name="VirtualMemory" href="../../../../oshi/hardware/VirtualMemory.html#VirtualMemory">VirtualMemory</a> createVirtualMemory() {
+<a class="jxr_linenumber" name="L159" href="#L159">159</a>         <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a name="MacVirtualMemory" href="../../../../oshi/hardware/platform/mac/MacVirtualMemory.html#MacVirtualMemory">MacVirtualMemory</a>(<strong class="jxr_keyword">this</strong>);
 <a class="jxr_linenumber" name="L160" href="#L160">160</a>     }
 <a class="jxr_linenumber" name="L161" href="#L161">161</a> }
 </pre>
