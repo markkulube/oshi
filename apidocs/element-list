@@ -3,10 +3,6 @@ oshi.annotation.concurrent
 oshi.demo
 oshi.demo.gui
 oshi.driver.linux.proc
-oshi.driver.mac.disk
-oshi.driver.mac.net
-oshi.driver.unix.freebsd.disk
-oshi.driver.unix.solaris.disk
 oshi.driver.unix.solaris.kstat
 oshi.driver.windows.perfmon
 oshi.driver.windows.registry
