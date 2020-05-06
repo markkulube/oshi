@@ -114,7 +114,7 @@ final class WindowsVirtualMemory extends AbstractVirtualMemory {
 <span class="nc" id="L114">            return new Triplet&lt;&gt;(0L, 0L, 0L);</span>
         }
 <span class="nc" id="L116">        return new Triplet&lt;&gt;(perfInfo.CommitLimit.longValue() - perfInfo.PhysicalTotal.longValue(),</span>
-<span class="nc" id="L117">                perfInfo.CommitLimit.longValue(), perfInfo.CommitLimit.longValue() - perfInfo.CommitTotal.longValue());</span>
+<span class="nc" id="L117">                perfInfo.CommitLimit.longValue(), perfInfo.CommitTotal.longValue());</span>
     }
 
     private static Pair&lt;Long, Long&gt; queryPageSwaps() {
