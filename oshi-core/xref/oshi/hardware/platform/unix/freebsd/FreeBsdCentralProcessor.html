@@ -112,13 +112,13 @@
 <a class="jxr_linenumber" name="L104" href="#L104">104</a>     }
 <a class="jxr_linenumber" name="L105" href="#L105">105</a> 
 <a class="jxr_linenumber" name="L106" href="#L106">106</a>     @Override
-<a class="jxr_linenumber" name="L107" href="#L107">107</a>     <strong class="jxr_keyword">protected</strong> LogicalProcessor[] initProcessorCounts() {
+<a class="jxr_linenumber" name="L107" href="#L107">107</a>     <strong class="jxr_keyword">protected</strong> List&lt;LogicalProcessor&gt; initProcessorCounts() {
 <a class="jxr_linenumber" name="L108" href="#L108">108</a>         List&lt;LogicalProcessor&gt; logProcs = parseTopology();
 <a class="jxr_linenumber" name="L109" href="#L109">109</a>         <em class="jxr_comment">// Force at least one processor</em>
 <a class="jxr_linenumber" name="L110" href="#L110">110</a>         <strong class="jxr_keyword">if</strong> (logProcs.isEmpty()) {
 <a class="jxr_linenumber" name="L111" href="#L111">111</a>             logProcs.add(<strong class="jxr_keyword">new</strong> LogicalProcessor(0, 0, 0));
 <a class="jxr_linenumber" name="L112" href="#L112">112</a>         }
-<a class="jxr_linenumber" name="L113" href="#L113">113</a>         <strong class="jxr_keyword">return</strong> logProcs.toArray(<strong class="jxr_keyword">new</strong> LogicalProcessor[0]);
+<a class="jxr_linenumber" name="L113" href="#L113">113</a>         <strong class="jxr_keyword">return</strong> logProcs;
 <a class="jxr_linenumber" name="L114" href="#L114">114</a>     }
 <a class="jxr_linenumber" name="L115" href="#L115">115</a> 
 <a class="jxr_linenumber" name="L116" href="#L116">116</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> List&lt;LogicalProcessor&gt; parseTopology() {
@@ -303,7 +303,7 @@
 <a class="jxr_linenumber" name="L295" href="#L295">295</a> <em class="jxr_javadoccomment">     * @param processorID</em>
 <a class="jxr_linenumber" name="L296" href="#L296">296</a> <em class="jxr_javadoccomment">     * @return The ProcessorID string</em>
 <a class="jxr_linenumber" name="L297" href="#L297">297</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L298" href="#L298">298</a>     <strong class="jxr_keyword">private</strong> String getProcessorIDfromDmiDecode(<strong class="jxr_keyword">long</strong> processorID) {
+<a class="jxr_linenumber" name="L298" href="#L298">298</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> String getProcessorIDfromDmiDecode(<strong class="jxr_keyword">long</strong> processorID) {
 <a class="jxr_linenumber" name="L299" href="#L299">299</a>         <strong class="jxr_keyword">boolean</strong> procInfo = false;
 <a class="jxr_linenumber" name="L300" href="#L300">300</a>         String marker = <span class="jxr_string">"Processor Information"</span>;
 <a class="jxr_linenumber" name="L301" href="#L301">301</a>         <strong class="jxr_keyword">for</strong> (String checkLine : ExecutingCommand.runNative(<span class="jxr_string">"dmidecode -t system"</span>)) {

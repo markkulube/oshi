@@ -55,28 +55,34 @@ import oshi.driver.windows.registry.ProcessPerformanceData.PerfCounterBlock;
 import oshi.driver.windows.registry.ProcessWtsData.WtsInfo;
 import oshi.driver.windows.wmi.Win32Process;
 import oshi.driver.windows.wmi.Win32Process.CommandLineProperty;
+import oshi.driver.windows.wmi.Win32ProcessCached;
 import oshi.jna.platform.windows.Kernel32;
 import oshi.software.common.AbstractOSProcess;
 import oshi.util.Constants;
+import oshi.util.GlobalConfig;
 import oshi.util.platform.windows.WmiUtil;
 import oshi.util.tuples.Pair;
 
 @ThreadSafe
 public class WindowsOSProcess extends AbstractOSProcess {
 
-<span class="nc" id="L67">    private static final Logger LOG = LoggerFactory.getLogger(WindowsOSProcess.class);</span>
+<span class="nc" id="L69">    private static final Logger LOG = LoggerFactory.getLogger(WindowsOSProcess.class);</span>
 
-<span class="nc" id="L69">    private static final boolean IS_VISTA_OR_GREATER = VersionHelpers.IsWindowsVistaOrGreater();</span>
-<span class="nc" id="L70">    private static final boolean IS_WINDOWS7_OR_GREATER = VersionHelpers.IsWindows7OrGreater();</span>
+    // Config param to enable cache
+    public static final String OSHI_OS_WINDOWS_COMMANDLINE_BATCH = &quot;oshi.os.windows.commandline.batch&quot;;
+<span class="nc" id="L73">    private static final boolean USE_BATCH_COMMANDLINE = GlobalConfig.get(OSHI_OS_WINDOWS_COMMANDLINE_BATCH, false);</span>
 
-<span class="nc" id="L72">    private Supplier&lt;Pair&lt;String, String&gt;&gt; userInfo = memoize(this::queryUserInfo);</span>
-<span class="nc" id="L73">    private Supplier&lt;Pair&lt;String, String&gt;&gt; groupInfo = memoize(this::queryGroupInfo);</span>
-<span class="nc" id="L74">    private Supplier&lt;String&gt; commandLine = memoize(this::queryCommandLine);</span>
+<span class="nc" id="L75">    private static final boolean IS_VISTA_OR_GREATER = VersionHelpers.IsWindowsVistaOrGreater();</span>
+<span class="nc" id="L76">    private static final boolean IS_WINDOWS7_OR_GREATER = VersionHelpers.IsWindows7OrGreater();</span>
+
+<span class="nc" id="L78">    private Supplier&lt;Pair&lt;String, String&gt;&gt; userInfo = memoize(this::queryUserInfo);</span>
+<span class="nc" id="L79">    private Supplier&lt;Pair&lt;String, String&gt;&gt; groupInfo = memoize(this::queryGroupInfo);</span>
+<span class="nc" id="L80">    private Supplier&lt;String&gt; commandLine = memoize(this::queryCommandLine);</span>
 
     private String name;
     private String path;
     private String currentWorkingDirectory;
-<span class="nc" id="L79">    private State state = State.INVALID;</span>
+<span class="nc" id="L85">    private State state = State.INVALID;</span>
     private int parentProcessID;
     private int threadCount;
     private int priority;
@@ -93,268 +99,273 @@ public class WindowsOSProcess extends AbstractOSProcess {
 
     public WindowsOSProcess(int pid, int myPid, int osBitness, Map&lt;Integer, PerfCounterBlock&gt; processMap,
             Map&lt;Integer, WtsInfo&gt; processWtsMap) {
-<span class="nc" id="L96">        super(pid);</span>
+<span class="nc" id="L102">        super(pid);</span>
         // For executing process, set CWD
-<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (pid == myPid) {</span>
-<span class="nc" id="L99">            String cwd = new File(&quot;.&quot;).getAbsolutePath();</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if (pid == myPid) {</span>
+<span class="nc" id="L105">            String cwd = new File(&quot;.&quot;).getAbsolutePath();</span>
             // trim off trailing &quot;.&quot;
-<span class="nc bnc" id="L101" title="All 2 branches missed.">            this.currentWorkingDirectory = cwd.isEmpty() ? &quot;&quot; : cwd.substring(0, cwd.length() - 1);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            this.currentWorkingDirectory = cwd.isEmpty() ? &quot;&quot; : cwd.substring(0, cwd.length() - 1);</span>
         }
         // There is no easy way to get ExecutuionState for a process.
         // The WMI value is null. It's possible to get thread Execution
         // State and possibly roll up.
-<span class="nc" id="L106">        this.state = State.RUNNING;</span>
+<span class="nc" id="L112">        this.state = State.RUNNING;</span>
         // Initially set to match OS bitness. If 64 will check later for 32-bit process
-<span class="nc" id="L108">        this.bitness = osBitness;</span>
-<span class="nc" id="L109">        updateAttributes(processMap.get(pid), processWtsMap.get(pid));</span>
-<span class="nc" id="L110">    }</span>
+<span class="nc" id="L114">        this.bitness = osBitness;</span>
+<span class="nc" id="L115">        updateAttributes(processMap.get(pid), processWtsMap.get(pid));</span>
+<span class="nc" id="L116">    }</span>
 
     @Override
     public String getName() {
-<span class="nc" id="L114">        return this.name;</span>
+<span class="nc" id="L120">        return this.name;</span>
     }
 
     @Override
     public String getPath() {
-<span class="nc" id="L119">        return this.path;</span>
+<span class="nc" id="L125">        return this.path;</span>
     }
 
     @Override
     public String getCommandLine() {
-<span class="nc" id="L124">        return this.commandLine.get();</span>
+<span class="nc" id="L130">        return this.commandLine.get();</span>
     }
 
     @Override
     public String getCurrentWorkingDirectory() {
-<span class="nc" id="L129">        return this.currentWorkingDirectory;</span>
+<span class="nc" id="L135">        return this.currentWorkingDirectory;</span>
     }
 
     @Override
     public String getUser() {
-<span class="nc" id="L134">        return userInfo.get().getA();</span>
+<span class="nc" id="L140">        return userInfo.get().getA();</span>
     }
 
     @Override
     public String getUserID() {
-<span class="nc" id="L139">        return userInfo.get().getB();</span>
+<span class="nc" id="L145">        return userInfo.get().getB();</span>
     }
 
     @Override
     public String getGroup() {
-<span class="nc" id="L144">        return groupInfo.get().getA();</span>
+<span class="nc" id="L150">        return groupInfo.get().getA();</span>
     }
 
     @Override
     public String getGroupID() {
-<span class="nc" id="L149">        return groupInfo.get().getB();</span>
+<span class="nc" id="L155">        return groupInfo.get().getB();</span>
     }
 
     @Override
     public State getState() {
-<span class="nc" id="L154">        return this.state;</span>
+<span class="nc" id="L160">        return this.state;</span>
     }
 
     @Override
     public int getParentProcessID() {
-<span class="nc" id="L159">        return this.parentProcessID;</span>
+<span class="nc" id="L165">        return this.parentProcessID;</span>
     }
 
     @Override
     public int getThreadCount() {
-<span class="nc" id="L164">        return this.threadCount;</span>
+<span class="nc" id="L170">        return this.threadCount;</span>
     }
 
     @Override
     public int getPriority() {
-<span class="nc" id="L169">        return this.priority;</span>
+<span class="nc" id="L175">        return this.priority;</span>
     }
 
     @Override
     public long getVirtualSize() {
-<span class="nc" id="L174">        return this.virtualSize;</span>
+<span class="nc" id="L180">        return this.virtualSize;</span>
     }
 
     @Override
     public long getResidentSetSize() {
-<span class="nc" id="L179">        return this.residentSetSize;</span>
+<span class="nc" id="L185">        return this.residentSetSize;</span>
     }
 
     @Override
     public long getKernelTime() {
-<span class="nc" id="L184">        return this.kernelTime;</span>
+<span class="nc" id="L190">        return this.kernelTime;</span>
     }
 
     @Override
     public long getUserTime() {
-<span class="nc" id="L189">        return this.userTime;</span>
+<span class="nc" id="L195">        return this.userTime;</span>
     }
 
     @Override
     public long getUpTime() {
-<span class="nc" id="L194">        return this.upTime;</span>
+<span class="nc" id="L200">        return this.upTime;</span>
     }
 
     @Override
     public long getStartTime() {
-<span class="nc" id="L199">        return this.startTime;</span>
+<span class="nc" id="L205">        return this.startTime;</span>
     }
 
     @Override
     public long getBytesRead() {
-<span class="nc" id="L204">        return this.bytesRead;</span>
+<span class="nc" id="L210">        return this.bytesRead;</span>
     }
 
     @Override
     public long getBytesWritten() {
-<span class="nc" id="L209">        return this.bytesWritten;</span>
+<span class="nc" id="L215">        return this.bytesWritten;</span>
     }
 
     @Override
     public long getOpenFiles() {
-<span class="nc" id="L214">        return this.openFiles;</span>
+<span class="nc" id="L220">        return this.openFiles;</span>
     }
 
     @Override
     public int getBitness() {
-<span class="nc" id="L219">        return this.bitness;</span>
+<span class="nc" id="L225">        return this.bitness;</span>
     }
 
     @Override
     public long getAffinityMask() {
-<span class="nc" id="L224">        final HANDLE pHandle = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_QUERY_INFORMATION, false, getProcessID());</span>
-<span class="nc bnc" id="L225" title="All 2 branches missed.">        if (pHandle != null) {</span>
-<span class="nc" id="L226">            ULONG_PTRByReference processAffinity = new ULONG_PTRByReference();</span>
-<span class="nc" id="L227">            ULONG_PTRByReference systemAffinity = new ULONG_PTRByReference();</span>
-<span class="nc bnc" id="L228" title="All 2 branches missed.">            if (Kernel32.INSTANCE.GetProcessAffinityMask(pHandle, processAffinity, systemAffinity)) {</span>
-<span class="nc" id="L229">                return Pointer.nativeValue(processAffinity.getValue().toPointer());</span>
+<span class="nc" id="L230">        final HANDLE pHandle = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_QUERY_INFORMATION, false, getProcessID());</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (pHandle != null) {</span>
+<span class="nc" id="L232">            ULONG_PTRByReference processAffinity = new ULONG_PTRByReference();</span>
+<span class="nc" id="L233">            ULONG_PTRByReference systemAffinity = new ULONG_PTRByReference();</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">            if (Kernel32.INSTANCE.GetProcessAffinityMask(pHandle, processAffinity, systemAffinity)) {</span>
+<span class="nc" id="L235">                return Pointer.nativeValue(processAffinity.getValue().toPointer());</span>
             }
         }
-<span class="nc" id="L232">        return 0L;</span>
+<span class="nc" id="L238">        return 0L;</span>
     }
 
     @Override
     public boolean updateAttributes() {
-<span class="nc" id="L237">        return true;</span>
+<span class="nc" id="L243">        return true;</span>
     }
 
     private boolean updateAttributes(PerfCounterBlock pcb, WtsInfo wts) {
-<span class="nc" id="L241">        this.name = pcb.getName();</span>
-<span class="nc" id="L242">        this.path = wts.getPath(); // Empty string for Win7+</span>
-<span class="nc" id="L243">        this.parentProcessID = pcb.getParentProcessID();</span>
-<span class="nc" id="L244">        this.threadCount = wts.getThreadCount();</span>
-<span class="nc" id="L245">        this.priority = pcb.getPriority();</span>
-<span class="nc" id="L246">        this.virtualSize = wts.getVirtualSize();</span>
-<span class="nc" id="L247">        this.residentSetSize = pcb.getResidentSetSize();</span>
-<span class="nc" id="L248">        this.kernelTime = wts.getKernelTime();</span>
-<span class="nc" id="L249">        this.userTime = wts.getUserTime();</span>
-<span class="nc" id="L250">        this.startTime = pcb.getStartTime();</span>
-<span class="nc" id="L251">        this.upTime = pcb.getUpTime();</span>
-<span class="nc" id="L252">        this.bytesRead = pcb.getBytesRead();</span>
-<span class="nc" id="L253">        this.bytesWritten = pcb.getBytesWritten();</span>
-<span class="nc" id="L254">        this.openFiles = wts.getOpenFiles();</span>
+<span class="nc" id="L247">        this.name = pcb.getName();</span>
+<span class="nc" id="L248">        this.path = wts.getPath(); // Empty string for Win7+</span>
+<span class="nc" id="L249">        this.parentProcessID = pcb.getParentProcessID();</span>
+<span class="nc" id="L250">        this.threadCount = wts.getThreadCount();</span>
+<span class="nc" id="L251">        this.priority = pcb.getPriority();</span>
+<span class="nc" id="L252">        this.virtualSize = wts.getVirtualSize();</span>
+<span class="nc" id="L253">        this.residentSetSize = pcb.getResidentSetSize();</span>
+<span class="nc" id="L254">        this.kernelTime = wts.getKernelTime();</span>
+<span class="nc" id="L255">        this.userTime = wts.getUserTime();</span>
+<span class="nc" id="L256">        this.startTime = pcb.getStartTime();</span>
+<span class="nc" id="L257">        this.upTime = pcb.getUpTime();</span>
+<span class="nc" id="L258">        this.bytesRead = pcb.getBytesRead();</span>
+<span class="nc" id="L259">        this.bytesWritten = pcb.getBytesWritten();</span>
+<span class="nc" id="L260">        this.openFiles = wts.getOpenFiles();</span>
 
         // Get a handle to the process for various extended info. Only gets
         // current user unless running as administrator
-<span class="nc" id="L258">        final HANDLE pHandle = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_QUERY_INFORMATION, false, getProcessID());</span>
-<span class="nc bnc" id="L259" title="All 2 branches missed.">        if (pHandle != null) {</span>
+<span class="nc" id="L264">        final HANDLE pHandle = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_QUERY_INFORMATION, false, getProcessID());</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">        if (pHandle != null) {</span>
             // Test for 32-bit process on 64-bit windows
-<span class="nc bnc" id="L261" title="All 4 branches missed.">            if (IS_VISTA_OR_GREATER &amp;&amp; this.bitness == 64) {</span>
-<span class="nc" id="L262">                IntByReference wow64 = new IntByReference(0);</span>
-<span class="nc bnc" id="L263" title="All 4 branches missed.">                if (Kernel32.INSTANCE.IsWow64Process(pHandle, wow64) &amp;&amp; wow64.getValue() &gt; 0) {</span>
-<span class="nc" id="L264">                    this.bitness = 32;</span>
+<span class="nc bnc" id="L267" title="All 4 branches missed.">            if (IS_VISTA_OR_GREATER &amp;&amp; this.bitness == 64) {</span>
+<span class="nc" id="L268">                IntByReference wow64 = new IntByReference(0);</span>
+<span class="nc bnc" id="L269" title="All 4 branches missed.">                if (Kernel32.INSTANCE.IsWow64Process(pHandle, wow64) &amp;&amp; wow64.getValue() &gt; 0) {</span>
+<span class="nc" id="L270">                    this.bitness = 32;</span>
                 }
             }
             // Full path
-<span class="nc" id="L268">            final HANDLEByReference phToken = new HANDLEByReference();</span>
+<span class="nc" id="L274">            final HANDLEByReference phToken = new HANDLEByReference();</span>
             try {// EXECUTABLEPATH
-<span class="nc bnc" id="L270" title="All 2 branches missed.">                if (IS_WINDOWS7_OR_GREATER) {</span>
-<span class="nc" id="L271">                    this.path = Kernel32Util.QueryFullProcessImageName(pHandle, 0);</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">                if (IS_WINDOWS7_OR_GREATER) {</span>
+<span class="nc" id="L277">                    this.path = Kernel32Util.QueryFullProcessImageName(pHandle, 0);</span>
                 }
-<span class="nc" id="L273">            } catch (Win32Exception e) {</span>
-<span class="nc" id="L274">                this.state = State.INVALID;</span>
+<span class="nc" id="L279">            } catch (Win32Exception e) {</span>
+<span class="nc" id="L280">                this.state = State.INVALID;</span>
             } finally {
-<span class="nc" id="L276">                final HANDLE token = phToken.getValue();</span>
-<span class="nc bnc" id="L277" title="All 2 branches missed.">                if (token != null) {</span>
-<span class="nc" id="L278">                    Kernel32.INSTANCE.CloseHandle(token);</span>
+<span class="nc" id="L282">                final HANDLE token = phToken.getValue();</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">                if (token != null) {</span>
+<span class="nc" id="L284">                    Kernel32.INSTANCE.CloseHandle(token);</span>
                 }
             }
-<span class="nc" id="L281">            Kernel32.INSTANCE.CloseHandle(pHandle);</span>
+<span class="nc" id="L287">            Kernel32.INSTANCE.CloseHandle(pHandle);</span>
         }
 
-<span class="nc bnc" id="L284" title="All 2 branches missed.">        return !this.state.equals(State.INVALID);</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">        return !this.state.equals(State.INVALID);</span>
     }
 
     private String queryCommandLine() {
-<span class="nc" id="L288">        WmiResult&lt;CommandLineProperty&gt; commandLineProcs = Win32Process</span>
-<span class="nc" id="L289">                .queryCommandLines(Collections.singleton(getProcessID()));</span>
-<span class="nc bnc" id="L290" title="All 2 branches missed.">        if (commandLineProcs.getResultCount() &gt; 0) {</span>
-<span class="nc" id="L291">            return WmiUtil.getString(commandLineProcs, CommandLineProperty.COMMANDLINE, 0);</span>
+        // If using batch mode fetch from WMI Cache
+<span class="nc bnc" id="L295" title="All 2 branches missed.">        if (USE_BATCH_COMMANDLINE) {</span>
+<span class="nc" id="L296">            return Win32ProcessCached.getInstance().getCommandLine(getProcessID(), getStartTime());</span>
         }
-<span class="nc" id="L293">        return Constants.UNKNOWN;</span>
+        // If no cache enabled, query line by line
+<span class="nc" id="L299">        WmiResult&lt;CommandLineProperty&gt; commandLineProcs = Win32Process</span>
+<span class="nc" id="L300">                .queryCommandLines(Collections.singleton(getProcessID()));</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">        if (commandLineProcs.getResultCount() &gt; 0) {</span>
+<span class="nc" id="L302">            return WmiUtil.getString(commandLineProcs, CommandLineProperty.COMMANDLINE, 0);</span>
+        }
+<span class="nc" id="L304">        return Constants.UNKNOWN;</span>
     }
 
     private Pair&lt;String, String&gt; queryUserInfo() {
-<span class="nc" id="L297">        Pair&lt;String, String&gt; pair = null;</span>
-<span class="nc" id="L298">        final HANDLE pHandle = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_QUERY_INFORMATION, false, getProcessID());</span>
-<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (pHandle != null) {</span>
-<span class="nc" id="L300">            final HANDLEByReference phToken = new HANDLEByReference();</span>
-<span class="nc bnc" id="L301" title="All 2 branches missed.">            if (Advapi32.INSTANCE.OpenProcessToken(pHandle, WinNT.TOKEN_DUPLICATE | WinNT.TOKEN_QUERY, phToken)) {</span>
-<span class="nc" id="L302">                Account account = Advapi32Util.getTokenAccount(phToken.getValue());</span>
-<span class="nc" id="L303">                pair = new Pair&lt;&gt;(account.name, account.sidString);</span>
-<span class="nc" id="L304">            } else {</span>
-<span class="nc" id="L305">                int error = Kernel32.INSTANCE.GetLastError();</span>
+<span class="nc" id="L308">        Pair&lt;String, String&gt; pair = null;</span>
+<span class="nc" id="L309">        final HANDLE pHandle = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_QUERY_INFORMATION, false, getProcessID());</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        if (pHandle != null) {</span>
+<span class="nc" id="L311">            final HANDLEByReference phToken = new HANDLEByReference();</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">            if (Advapi32.INSTANCE.OpenProcessToken(pHandle, WinNT.TOKEN_DUPLICATE | WinNT.TOKEN_QUERY, phToken)) {</span>
+<span class="nc" id="L313">                Account account = Advapi32Util.getTokenAccount(phToken.getValue());</span>
+<span class="nc" id="L314">                pair = new Pair&lt;&gt;(account.name, account.sidString);</span>
+<span class="nc" id="L315">            } else {</span>
+<span class="nc" id="L316">                int error = Kernel32.INSTANCE.GetLastError();</span>
                 // Access denied errors are common. Fail silently.
-<span class="nc bnc" id="L307" title="All 2 branches missed.">                if (error != WinError.ERROR_ACCESS_DENIED) {</span>
-<span class="nc" id="L308">                    LOG.error(&quot;Failed to get process token for process {}: {}&quot;, getProcessID(),</span>
-<span class="nc" id="L309">                            Kernel32.INSTANCE.GetLastError());</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">                if (error != WinError.ERROR_ACCESS_DENIED) {</span>
+<span class="nc" id="L319">                    LOG.error(&quot;Failed to get process token for process {}: {}&quot;, getProcessID(),</span>
+<span class="nc" id="L320">                            Kernel32.INSTANCE.GetLastError());</span>
                 }
             }
-<span class="nc" id="L312">            final HANDLE token = phToken.getValue();</span>
-<span class="nc bnc" id="L313" title="All 2 branches missed.">            if (token != null) {</span>
-<span class="nc" id="L314">                Kernel32.INSTANCE.CloseHandle(token);</span>
+<span class="nc" id="L323">            final HANDLE token = phToken.getValue();</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">            if (token != null) {</span>
+<span class="nc" id="L325">                Kernel32.INSTANCE.CloseHandle(token);</span>
             }
-<span class="nc" id="L316">            Kernel32.INSTANCE.CloseHandle(pHandle);</span>
+<span class="nc" id="L327">            Kernel32.INSTANCE.CloseHandle(pHandle);</span>
         }
-<span class="nc bnc" id="L318" title="All 2 branches missed.">        if (pair == null) {</span>
-<span class="nc" id="L319">            new Pair&lt;&gt;(Constants.UNKNOWN, Constants.UNKNOWN);</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">        if (pair == null) {</span>
+<span class="nc" id="L330">            new Pair&lt;&gt;(Constants.UNKNOWN, Constants.UNKNOWN);</span>
         }
-<span class="nc" id="L321">        return pair;</span>
+<span class="nc" id="L332">        return pair;</span>
     }
 
     private Pair&lt;String, String&gt; queryGroupInfo() {
-<span class="nc" id="L325">        Pair&lt;String, String&gt; pair = null;</span>
-<span class="nc" id="L326">        final HANDLE pHandle = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_QUERY_INFORMATION, false, getProcessID());</span>
-<span class="nc bnc" id="L327" title="All 2 branches missed.">        if (pHandle != null) {</span>
-<span class="nc" id="L328">            final HANDLEByReference phToken = new HANDLEByReference();</span>
-<span class="nc bnc" id="L329" title="All 2 branches missed.">            if (Advapi32.INSTANCE.OpenProcessToken(pHandle, WinNT.TOKEN_DUPLICATE | WinNT.TOKEN_QUERY, phToken)) {</span>
+<span class="nc" id="L336">        Pair&lt;String, String&gt; pair = null;</span>
+<span class="nc" id="L337">        final HANDLE pHandle = Kernel32.INSTANCE.OpenProcess(WinNT.PROCESS_QUERY_INFORMATION, false, getProcessID());</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">        if (pHandle != null) {</span>
+<span class="nc" id="L339">            final HANDLEByReference phToken = new HANDLEByReference();</span>
+<span class="nc bnc" id="L340" title="All 2 branches missed.">            if (Advapi32.INSTANCE.OpenProcessToken(pHandle, WinNT.TOKEN_DUPLICATE | WinNT.TOKEN_QUERY, phToken)) {</span>
                 // Fetching group information incurs ~10ms per process.
-<span class="nc" id="L331">                Account[] accounts = Advapi32Util.getTokenGroups(phToken.getValue());</span>
+<span class="nc" id="L342">                Account[] accounts = Advapi32Util.getTokenGroups(phToken.getValue());</span>
                 // get groups
-<span class="nc" id="L333">                List&lt;String&gt; groupList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L334">                List&lt;String&gt; groupIDList = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L335" title="All 2 branches missed.">                for (Account a : accounts) {</span>
-<span class="nc" id="L336">                    groupList.add(a.name);</span>
-<span class="nc" id="L337">                    groupIDList.add(a.sidString);</span>
+<span class="nc" id="L344">                List&lt;String&gt; groupList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L345">                List&lt;String&gt; groupIDList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L346" title="All 2 branches missed.">                for (Account a : accounts) {</span>
+<span class="nc" id="L347">                    groupList.add(a.name);</span>
+<span class="nc" id="L348">                    groupIDList.add(a.sidString);</span>
                 }
-<span class="nc" id="L339">                pair = new Pair&lt;&gt;(String.join(&quot;,&quot;, groupList), String.join(&quot;,&quot;, groupIDList));</span>
-<span class="nc" id="L340">            } else {</span>
-<span class="nc" id="L341">                int error = Kernel32.INSTANCE.GetLastError();</span>
+<span class="nc" id="L350">                pair = new Pair&lt;&gt;(String.join(&quot;,&quot;, groupList), String.join(&quot;,&quot;, groupIDList));</span>
+<span class="nc" id="L351">            } else {</span>
+<span class="nc" id="L352">                int error = Kernel32.INSTANCE.GetLastError();</span>
                 // Access denied errors are common. Fail silently.
-<span class="nc bnc" id="L343" title="All 2 branches missed.">                if (error != WinError.ERROR_ACCESS_DENIED) {</span>
-<span class="nc" id="L344">                    LOG.error(&quot;Failed to get process token for process {}: {}&quot;, getProcessID(),</span>
-<span class="nc" id="L345">                            Kernel32.INSTANCE.GetLastError());</span>
+<span class="nc bnc" id="L354" title="All 2 branches missed.">                if (error != WinError.ERROR_ACCESS_DENIED) {</span>
+<span class="nc" id="L355">                    LOG.error(&quot;Failed to get process token for process {}: {}&quot;, getProcessID(),</span>
+<span class="nc" id="L356">                            Kernel32.INSTANCE.GetLastError());</span>
                 }
             }
-<span class="nc" id="L348">            final HANDLE token = phToken.getValue();</span>
-<span class="nc bnc" id="L349" title="All 2 branches missed.">            if (token != null) {</span>
-<span class="nc" id="L350">                Kernel32.INSTANCE.CloseHandle(token);</span>
+<span class="nc" id="L359">            final HANDLE token = phToken.getValue();</span>
+<span class="nc bnc" id="L360" title="All 2 branches missed.">            if (token != null) {</span>
+<span class="nc" id="L361">                Kernel32.INSTANCE.CloseHandle(token);</span>
             }
-<span class="nc" id="L352">            Kernel32.INSTANCE.CloseHandle(pHandle);</span>
+<span class="nc" id="L363">            Kernel32.INSTANCE.CloseHandle(pHandle);</span>
         }
-<span class="nc bnc" id="L354" title="All 2 branches missed.">        if (pair == null) {</span>
-<span class="nc" id="L355">            new Pair&lt;&gt;(Constants.UNKNOWN, Constants.UNKNOWN);</span>
+<span class="nc bnc" id="L365" title="All 2 branches missed.">        if (pair == null) {</span>
+<span class="nc" id="L366">            new Pair&lt;&gt;(Constants.UNKNOWN, Constants.UNKNOWN);</span>
         }
-<span class="nc" id="L357">        return pair;</span>
+<span class="nc" id="L368">        return pair;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
