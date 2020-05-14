@@ -37,22 +37,22 @@ public interface PowerSource {
      * Units of Battery Capacity
      */
 <span class="fc" id="L39">    enum CapacityUnits {</span>
-    /**
-     * MilliWattHours (mWh).
-     */
-<span class="fc" id="L43">    MWH,</span>
+        /**
+         * MilliWattHours (mWh).
+         */
+<span class="fc" id="L43">        MWH,</span>
 
-    /**
-     * MilliAmpHours (mAh). Should be multiplied by voltage to convert to mWh.
-     */
-<span class="fc" id="L48">    MAH,</span>
+        /**
+         * MilliAmpHours (mAh). Should be multiplied by voltage to convert to mWh.
+         */
+<span class="fc" id="L48">        MAH,</span>
 
-    /**
-     * Relative units. The specific units are not defined. The ratio of current/max
-     * capacity still represents state of charge and the ratio of max/design
-     * capacity still represents state of health.
-     */
-<span class="fc" id="L55">    RELATIVE;</span>
+        /**
+         * Relative units. The specific units are not defined. The ratio of current/max
+         * capacity still represents state of charge and the ratio of max/design
+         * capacity still represents state of health.
+         */
+<span class="fc" id="L55">        RELATIVE;</span>
     }
 
     /**
@@ -77,36 +77,8 @@ public interface PowerSource {
      * ratio of {@link #getCurrentCapacity()} to {@link #getMaxCapacity()}.
      *
      * @return A value between 0.0 (fully drained) and 1.0 (fully charged)
-     * @deprecated Use {@link #getRemainingCapacityPercent()}
-     */
-    @Deprecated
-    double getRemainingCapacity();
-
-    /**
-     * Estimated remaining capacity as a fraction of max capacity.
-     * &lt;p&gt;
-     * This is an estimated/smoothed value which should correspond to the Operating
-     * System's &quot;percent power&quot; display, and may not directly correspond to the
-     * ratio of {@link #getCurrentCapacity()} to {@link #getMaxCapacity()}.
-     *
-     * @return A value between 0.0 (fully drained) and 1.0 (fully charged)
      */
     double getRemainingCapacityPercent();
-
-    /**
-     * Estimated time remaining on the power source, in seconds, as reported by the
-     * operating system.
-     * &lt;p&gt;
-     * This is an estimated/smoothed value which should correspond to the Operating
-     * System's &quot;battery time remaining&quot; display, and will react slowly to changes
-     * in power consumption.
-     *
-     * @return If positive, seconds remaining. If negative, -1.0 (calculating) or
-     *         -2.0 (unlimited)
-     * @deprecated Use {@link #getTimeRemainingEstimated()}
-     */
-    @Deprecated
-    double getTimeRemaining();
 
     /**
      * Estimated time remaining on the power source, in seconds, as reported by the
