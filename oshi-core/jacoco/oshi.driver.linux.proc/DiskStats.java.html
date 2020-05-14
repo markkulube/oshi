@@ -43,89 +43,89 @@ public final class DiskStats {
      * Enum corresponding to the fields in the output of {@code /proc/diskstats}
      */
 <span class="nc" id="L45">    public enum IoStat {</span>
-        /**
-         * The device major number.
-         */
-<span class="nc" id="L49">        MAJOR,</span>
-        /**
-         * The device minor number.
-         */
-<span class="nc" id="L53">        MINOR,</span>
-        /**
-         * The device name.
-         */
-<span class="nc" id="L57">        NAME,</span>
-        /**
-         * The total number of reads completed successfully.
-         */
-<span class="nc" id="L61">        READS,</span>
-        /**
-         * Reads which are adjacent to each other merged for efficiency.
-         */
-<span class="nc" id="L65">        READS_MERGED,</span>
-        /**
-         * The total number of sectors read successfully.
-         */
-<span class="nc" id="L69">        READS_SECTOR,</span>
-        /**
-         * The total number of milliseconds spent by all reads.
-         */
-<span class="nc" id="L73">        READS_MS,</span>
-        /**
-         * The total number of writes completed successfully.
-         */
-<span class="nc" id="L77">        WRITES,</span>
-        /**
-         * Writes which are adjacent to each other merged for efficiency.
-         */
-<span class="nc" id="L81">        WRITES_MERGED,</span>
-        /**
-         * The total number of sectors written successfully.
-         */
-<span class="nc" id="L85">        WRITES_SECTOR,</span>
-        /**
-         * The total number of milliseconds spent by all writes.
-         */
-<span class="nc" id="L89">        WRITES_MS,</span>
-        /**
-         * Incremented as requests are given to appropriate struct request_queue and
-         * decremented as they finish.
-         */
-<span class="nc" id="L94">        IO_QUEUE_LENGTH,</span>
-        /**
-         * The total number of milliseconds spent doing I/Os.
-         */
-<span class="nc" id="L98">        IO_MS,</span>
-        /**
-         * Incremented at each I/O start, I/O completion, I/O merge, or read of these
-         * stats by the number of I/Os in progress {@link #IO_QUEUE_LENGTH} times the
-         * number of milliseconds spent doing I/O since the last update of this field.
-         */
-<span class="nc" id="L104">        IO_MS_WEIGHTED,</span>
-        /**
-         * The total number of discards completed successfully.
-         */
-<span class="nc" id="L108">        DISCARDS,</span>
-        /**
-         * Discards which are adjacent to each other merged for efficiency.
-         */
-<span class="nc" id="L112">        DISCARDS_MERGED,</span>
-        /**
-         * The total number of sectors discarded successfully.
-         */
-<span class="nc" id="L116">        DISCARDS_SECTOR,</span>
-        /**
-         * The total number of milliseconds spent by all discards.
-         */
-<span class="nc" id="L120">        DISCARDS_MS,</span>
-        /**
-         * The total number of flush requests completed successfully.
-         */
-<span class="nc" id="L124">        FLUSHES,</span>
-        /**
-         * The total number of milliseconds spent by all flush requests.
-         */
-<span class="nc" id="L128">        FLUSHES_MS;</span>
+    /**
+     * The device major number.
+     */
+<span class="nc" id="L49">    MAJOR,</span>
+    /**
+     * The device minor number.
+     */
+<span class="nc" id="L53">    MINOR,</span>
+    /**
+     * The device name.
+     */
+<span class="nc" id="L57">    NAME,</span>
+    /**
+     * The total number of reads completed successfully.
+     */
+<span class="nc" id="L61">    READS,</span>
+    /**
+     * Reads which are adjacent to each other merged for efficiency.
+     */
+<span class="nc" id="L65">    READS_MERGED,</span>
+    /**
+     * The total number of sectors read successfully.
+     */
+<span class="nc" id="L69">    READS_SECTOR,</span>
+    /**
+     * The total number of milliseconds spent by all reads.
+     */
+<span class="nc" id="L73">    READS_MS,</span>
+    /**
+     * The total number of writes completed successfully.
+     */
+<span class="nc" id="L77">    WRITES,</span>
+    /**
+     * Writes which are adjacent to each other merged for efficiency.
+     */
+<span class="nc" id="L81">    WRITES_MERGED,</span>
+    /**
+     * The total number of sectors written successfully.
+     */
+<span class="nc" id="L85">    WRITES_SECTOR,</span>
+    /**
+     * The total number of milliseconds spent by all writes.
+     */
+<span class="nc" id="L89">    WRITES_MS,</span>
+    /**
+     * Incremented as requests are given to appropriate struct request_queue and
+     * decremented as they finish.
+     */
+<span class="nc" id="L94">    IO_QUEUE_LENGTH,</span>
+    /**
+     * The total number of milliseconds spent doing I/Os.
+     */
+<span class="nc" id="L98">    IO_MS,</span>
+    /**
+     * Incremented at each I/O start, I/O completion, I/O merge, or read of these
+     * stats by the number of I/Os in progress {@link #IO_QUEUE_LENGTH} times the
+     * number of milliseconds spent doing I/O since the last update of this field.
+     */
+<span class="nc" id="L104">    IO_MS_WEIGHTED,</span>
+    /**
+     * The total number of discards completed successfully.
+     */
+<span class="nc" id="L108">    DISCARDS,</span>
+    /**
+     * Discards which are adjacent to each other merged for efficiency.
+     */
+<span class="nc" id="L112">    DISCARDS_MERGED,</span>
+    /**
+     * The total number of sectors discarded successfully.
+     */
+<span class="nc" id="L116">    DISCARDS_SECTOR,</span>
+    /**
+     * The total number of milliseconds spent by all discards.
+     */
+<span class="nc" id="L120">    DISCARDS_MS,</span>
+    /**
+     * The total number of flush requests completed successfully.
+     */
+<span class="nc" id="L124">    FLUSHES,</span>
+    /**
+     * The total number of milliseconds spent by all flush requests.
+     */
+<span class="nc" id="L128">    FLUSHES_MS;</span>
     }
 
     private DiskStats() {
