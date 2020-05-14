@@ -328,6 +328,22 @@ public final class ProcessStat {
 <span class="nc" id="L328">        EXIT_CODE;</span>
     }
 
+    /**
+     * Constant defining the number of integer values in {@code /proc/pid/stat}. 2.6
+     * Kernel has 44 elements, 3.3 has 47, and 3.5 has 52.
+     */
+    public static final int PROC_PID_STAT_LENGTH;
+    static {
+<span class="nc" id="L337">        String stat = FileUtil.getStringFromFile(ProcPath.SELF_STAT);</span>
+<span class="nc bnc" id="L338" title="All 4 branches missed.">        if (!stat.isEmpty() &amp;&amp; stat.contains(&quot;)&quot;)) {</span>
+            // add 3 to account for pid, process name in prarenthesis, and state
+<span class="nc" id="L340">            PROC_PID_STAT_LENGTH = ParseUtil.countStringToLongArray(stat, ' ') + 3;</span>
+        } else {
+            // Default assuming recent kernel
+<span class="nc" id="L343">            PROC_PID_STAT_LENGTH = 52;</span>
+        }
+<span class="nc" id="L345">    }</span>
+
     private ProcessStat() {
     }
 
@@ -344,25 +360,25 @@ public final class ProcessStat {
      *         If the process doesn't exist, returns null.
      */
     public static Triplet&lt;String, Character, Map&lt;PidStat, Long&gt;&gt; getPidStats(int pid) {
-<span class="nc" id="L347">        String stat = FileUtil.getStringFromFile(String.format(ProcPath.PID_STAT, pid));</span>
-<span class="nc bnc" id="L348" title="All 2 branches missed.">        if (stat.isEmpty()) {</span>
+<span class="nc" id="L363">        String stat = FileUtil.getStringFromFile(String.format(ProcPath.PID_STAT, pid));</span>
+<span class="nc bnc" id="L364" title="All 2 branches missed.">        if (stat.isEmpty()) {</span>
             // If pid doesn't exist
-<span class="nc" id="L350">            return null;</span>
+<span class="nc" id="L366">            return null;</span>
         }
         // Get process name from between parentheses and state immediately after
-<span class="nc" id="L353">        int nameStart = stat.indexOf('(') + 1;</span>
-<span class="nc" id="L354">        int nameEnd = stat.indexOf(')');</span>
-<span class="nc" id="L355">        String name = stat.substring(nameStart, nameEnd);</span>
-<span class="nc" id="L356">        Character state = stat.charAt(nameEnd + 2);</span>
+<span class="nc" id="L369">        int nameStart = stat.indexOf('(') + 1;</span>
+<span class="nc" id="L370">        int nameEnd = stat.indexOf(')');</span>
+<span class="nc" id="L371">        String name = stat.substring(nameStart, nameEnd);</span>
+<span class="nc" id="L372">        Character state = stat.charAt(nameEnd + 2);</span>
         // Split everything after the state
-<span class="nc" id="L358">        String[] split = ParseUtil.whitespaces.split(stat.substring(nameEnd + 4).trim());</span>
+<span class="nc" id="L374">        String[] split = ParseUtil.whitespaces.split(stat.substring(nameEnd + 4).trim());</span>
 
-<span class="nc" id="L360">        Map&lt;PidStat, Long&gt; statMap = new EnumMap&lt;&gt;(PidStat.class);</span>
-<span class="nc" id="L361">        PidStat[] enumArray = PidStat.class.getEnumConstants();</span>
-<span class="nc bnc" id="L362" title="All 4 branches missed.">        for (int i = 3; i &lt; enumArray.length &amp;&amp; i - 3 &lt; split.length; i++) {</span>
-<span class="nc" id="L363">            statMap.put(enumArray[i], ParseUtil.parseLongOrDefault(split[i - 3], 0L));</span>
+<span class="nc" id="L376">        Map&lt;PidStat, Long&gt; statMap = new EnumMap&lt;&gt;(PidStat.class);</span>
+<span class="nc" id="L377">        PidStat[] enumArray = PidStat.class.getEnumConstants();</span>
+<span class="nc bnc" id="L378" title="All 4 branches missed.">        for (int i = 3; i &lt; enumArray.length &amp;&amp; i - 3 &lt; split.length; i++) {</span>
+<span class="nc" id="L379">            statMap.put(enumArray[i], ParseUtil.parseLongOrDefault(split[i - 3], 0L));</span>
         }
-<span class="nc" id="L365">        return new Triplet&lt;&gt;(name, state, statMap);</span>
+<span class="nc" id="L381">        return new Triplet&lt;&gt;(name, state, statMap);</span>
     }
 
     /**
@@ -372,9 +388,9 @@ public final class ProcessStat {
      * @return An array of File objects for the process files
      */
     public static File[] getPidFiles() {
-<span class="nc" id="L375">        File procdir = new File(ProcPath.PROC);</span>
-<span class="nc" id="L376">        File[] pids = procdir.listFiles(f -&gt; DIGITS.matcher(f.getName()).matches());</span>
-<span class="nc bnc" id="L377" title="All 2 branches missed.">        return pids != null ? pids : new File[0];</span>
+<span class="nc" id="L391">        File procdir = new File(ProcPath.PROC);</span>
+<span class="nc" id="L392">        File[] pids = procdir.listFiles(f -&gt; DIGITS.matcher(f.getName()).matches());</span>
+<span class="nc bnc" id="L393" title="All 2 branches missed.">        return pids != null ? pids : new File[0];</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
