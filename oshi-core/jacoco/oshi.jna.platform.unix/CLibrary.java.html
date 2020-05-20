@@ -37,27 +37,20 @@ import com.sun.jna.ptr.PointerByReference;
  */
 public interface CLibrary extends LibCAPI, Library {
 
-    /*
-     * For getaddrinfo()
-     */
-    /** Constant &lt;code&gt;AI_CANONNAME=2&lt;/code&gt; */
     int AI_CANONNAME = 2;
 
-    /**
-     * Return type for BSD sysctl kern.boottime
-     */
-    @FieldOrder({ &quot;tv_sec&quot;, &quot;tv_usec&quot; })
-<span class="nc" id="L50">    class Timeval extends Structure {</span>
-        public long tv_sec; // seconds
-        public long tv_usec; // microseconds
-    }
+    int UT_LINESIZE = 32;
+    int UT_NAMESIZE = 32;
+    int UT_HOSTSIZE = 256;
+    int LOGIN_PROCESS = 6; // Session leader of a logged in user.
+    int USER_PROCESS = 7; // Normal process.
 
     @FieldOrder({ &quot;sa_family&quot;, &quot;sa_data&quot; })
-<span class="nc" id="L56">    class Sockaddr extends Structure {</span>
+<span class="nc" id="L49">    class Sockaddr extends Structure {</span>
         public short sa_family;
-<span class="nc" id="L58">        public byte[] sa_data = new byte[14];</span>
+<span class="nc" id="L51">        public byte[] sa_data = new byte[14];</span>
 
-<span class="nc" id="L60">        public static class ByReference extends Sockaddr implements Structure.ByReference {</span>
+<span class="nc" id="L53">        public static class ByReference extends Sockaddr implements Structure.ByReference {</span>
         }
     }
 
@@ -73,16 +66,16 @@ public interface CLibrary extends LibCAPI, Library {
         public String ai_canonname;
         public ByReference ai_next;
 
-<span class="nc" id="L76">        public static class ByReference extends Addrinfo implements Structure.ByReference {</span>
+<span class="nc" id="L69">        public static class ByReference extends Addrinfo implements Structure.ByReference {</span>
         }
 
-<span class="nc" id="L79">        public Addrinfo() {</span>
-<span class="nc" id="L80">        }</span>
+<span class="nc" id="L72">        public Addrinfo() {</span>
+<span class="nc" id="L73">        }</span>
 
         public Addrinfo(Pointer p) {
-<span class="nc" id="L83">            super(p);</span>
-<span class="nc" id="L84">            read();</span>
-<span class="nc" id="L85">        }</span>
+<span class="nc" id="L76">            super(p);</span>
+<span class="nc" id="L77">            read();</span>
+<span class="nc" id="L78">        }</span>
     }
 
     /**
@@ -145,7 +138,7 @@ public interface CLibrary extends LibCAPI, Library {
             &quot;tcps_mptcp_handover_all_bytes&quot;, &quot;tcps_mptcp_interactive_all_bytes&quot;, &quot;tcps_mptcp_aggregate_all_bytes&quot;,
             &quot;tcps_mptcp_back_to_wifi&quot;, &quot;tcps_mptcp_wifi_proxy&quot;, &quot;tcps_mptcp_cell_proxy&quot;, &quot;tcps_ka_offload_drops&quot;,
             &quot;tcps_mptcp_triggered_cell&quot; })
-<span class="nc" id="L148">    class Tcpstat extends Structure {</span>
+<span class="nc" id="L141">    class Tcpstat extends Structure {</span>
         public int tcps_connattempt;
         public int tcps_accepts;
         public int tcps_connects;
@@ -397,7 +390,7 @@ public interface CLibrary extends LibCAPI, Library {
             &quot;ips_rcv_swcsum&quot;, &quot;ips_rcv_swcsum_bytes&quot;, &quot;ips_snd_swcsum&quot;, &quot;ips_snd_swcsum_bytes&quot;, &quot;ips_adj&quot;,
             &quot;ips_adj_hwcsum_clr&quot;, &quot;ips_rxc_collisions&quot;, &quot;ips_rxc_chained&quot;, &quot;ips_rxc_notchain&quot;, &quot;ips_rxc_chainsz_gt2&quot;,
             &quot;ips_rxc_chainsz_gt4&quot;, &quot;ips_rxc_notlist&quot;, &quot;ips_raw_sappend_fail&quot;, &quot;ips_necp_policy_drop&quot; })
-<span class="nc" id="L400">    class Ipstat extends Structure {</span>
+<span class="nc" id="L393">    class Ipstat extends Structure {</span>
         public int ips_total;
         public int ips_badsum;
         public int ips_tooshort;
@@ -457,7 +450,7 @@ public interface CLibrary extends LibCAPI, Library {
             &quot;ip6s_pullup_fail&quot;, &quot;ip6s_pullup2&quot;, &quot;ip6s_pullup2_copy&quot;, &quot;ip6s_pullup2_alloc&quot;, &quot;ip6s_pullup2_fail&quot;,
             &quot;ip6s_sources_none&quot;, &quot;ip6s_sources_sameif&quot;, &quot;ip6s_sources_otherif&quot;, &quot;ip6s_sources_samescope&quot;,
             &quot;ip6s_sources_otherscope&quot;, &quot;ip6s_sources_deprecated&quot; })
-<span class="nc" id="L460">    class Ip6stat extends Structure {</span>
+<span class="nc" id="L453">    class Ip6stat extends Structure {</span>
         public long ip6s_total;
         public long ip6s_tooshort;
         public long ip6s_toosmall;
@@ -481,9 +474,9 @@ public interface CLibrary extends LibCAPI, Library {
         public long ip6s_rawout;
         public long ip6s_badscope;
         public long ip6s_notmember;
-<span class="nc" id="L484">        public long[] ip6s_nxthist = new long[256];</span>
+<span class="nc" id="L477">        public long[] ip6s_nxthist = new long[256];</span>
         public long ip6s_m1;
-<span class="nc" id="L486">        public long[] ip6s_m2m = new long[32];</span>
+<span class="nc" id="L479">        public long[] ip6s_m2m = new long[32];</span>
         public long ip6s_mext1;
         public long ip6s_mext2m;
         public long ip6s_exthdrtoolong;
@@ -503,11 +496,11 @@ public interface CLibrary extends LibCAPI, Library {
         public long ip6s_pullup2_alloc;
         public long ip6s_pullup2_fail;
         public long ip6s_sources_none;
-<span class="nc" id="L506">        public long[] ip6s_sources_sameif = new long[16];</span>
-<span class="nc" id="L507">        public long[] ip6s_sources_otherif = new long[16];</span>
-<span class="nc" id="L508">        public long[] ip6s_sources_samescope = new long[16];</span>
-<span class="nc" id="L509">        public long[] ip6s_sources_otherscope = new long[16];</span>
-<span class="nc" id="L510">        public long[] ip6s_sources_deprecated = new long[16];</span>
+<span class="nc" id="L499">        public long[] ip6s_sources_sameif = new long[16];</span>
+<span class="nc" id="L500">        public long[] ip6s_sources_otherif = new long[16];</span>
+<span class="nc" id="L501">        public long[] ip6s_sources_samescope = new long[16];</span>
+<span class="nc" id="L502">        public long[] ip6s_sources_otherscope = new long[16];</span>
+<span class="nc" id="L503">        public long[] ip6s_sources_deprecated = new long[16];</span>
     }
 
     /**
@@ -518,7 +511,7 @@ public interface CLibrary extends LibCAPI, Library {
             &quot;udps_noportmcast&quot;, &quot;udps_filtermcast&quot;, &quot;udps_rcv_swcsum&quot;, &quot;udps_rcv_swcsum_bytes&quot;, &quot;udps_rcv6_swcsum&quot;,
             &quot;udps_rcv6_swcsum_bytes&quot;, &quot;udps_snd_swcsum&quot;, &quot;udps_snd_swcsum_bytes&quot;, &quot;udps_snd6_swcsum&quot;,
             &quot;udps_snd6_swcsum_bytes&quot; })
-<span class="nc" id="L521">    class Udpstat extends Structure {</span>
+<span class="nc" id="L514">    class Udpstat extends Structure {</span>
         public int udps_ipackets;
         public int udps_hdrops;
         public int udps_badsum;
@@ -588,5 +581,17 @@ public interface CLibrary extends LibCAPI, Library {
      * @return A human-readable version of the error code
      */
     String gai_strerror(int e);
+
+    /**
+     * Rewinds the file pointer to the beginning of the utmp file. It is generally a
+     * good idea to call it before any of the other functions.
+     */
+    void setutxent();
+
+    /**
+     * Closes the utmp file. It should be called when the user code is done
+     * accessing the file with the other functions.
+     */
+    void endutxent();
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

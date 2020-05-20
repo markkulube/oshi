@@ -74,7 +74,7 @@ import oshi.util.platform.unix.solaris.KstatUtil.KstatChain;
     }
 
     @Override
-    protected List&lt;LogicalProcessor&gt; initProcessorCounts() {
+    protected LogicalProcessor[] initProcessorCounts() {
 <span class="nc" id="L78">        Map&lt;Integer, Integer&gt; numaNodeMap = mapNumaNodes();</span>
 <span class="nc" id="L79">        List&lt;LogicalProcessor&gt; logProcs = new ArrayList&lt;&gt;();</span>
 <span class="nc" id="L80">        try (KstatChain kc = KstatUtil.openChain()) {</span>
@@ -94,7 +94,7 @@ import oshi.util.platform.unix.solaris.KstatUtil.KstatChain;
 <span class="nc bnc" id="L94" title="All 2 branches missed.">        if (logProcs.isEmpty()) {</span>
 <span class="nc" id="L95">            logProcs.add(new LogicalProcessor(0, 0, 0));</span>
         }
-<span class="nc" id="L97">        return logProcs;</span>
+<span class="nc" id="L97">        return logProcs.toArray(new LogicalProcessor[0]);</span>
     }
 
     private static Map&lt;Integer, Integer&gt; mapNumaNodes() {

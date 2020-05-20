@@ -499,7 +499,32 @@
 <a class="jxr_linenumber" name="L491" href="#L491">491</a>         assertTrue(parsed.contains(7));
 <a class="jxr_linenumber" name="L492" href="#L492">492</a>     }
 <a class="jxr_linenumber" name="L493" href="#L493">493</a> 
-<a class="jxr_linenumber" name="L494" href="#L494">494</a> }
+<a class="jxr_linenumber" name="L494" href="#L494">494</a>     @Test
+<a class="jxr_linenumber" name="L495" href="#L495">495</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testParseMmDdYyyyToYyyyMmDD() {
+<a class="jxr_linenumber" name="L496" href="#L496">496</a>         assertEquals(<span class="jxr_string">"Unable to parse MM-DD-YYYY date string into YYYY-MM-DD date string"</span>, <span class="jxr_string">"2222-00-11"</span>,
+<a class="jxr_linenumber" name="L497" href="#L497">497</a>                 ParseUtil.parseMmDdYyyyToYyyyMmDD(<span class="jxr_string">"00-11-2222"</span>));
+<a class="jxr_linenumber" name="L498" href="#L498">498</a>         assertEquals(<span class="jxr_string">"Date string should not be parsed"</span>, <span class="jxr_string">"badstr"</span>, ParseUtil.parseMmDdYyyyToYyyyMmDD(<span class="jxr_string">"badstr"</span>));
+<a class="jxr_linenumber" name="L499" href="#L499">499</a>     }
+<a class="jxr_linenumber" name="L500" href="#L500">500</a> 
+<a class="jxr_linenumber" name="L501" href="#L501">501</a>     @Test
+<a class="jxr_linenumber" name="L502" href="#L502">502</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testParseUtAddrV6toIP() {
+<a class="jxr_linenumber" name="L503" href="#L503">503</a>         <strong class="jxr_keyword">int</strong>[] zero = { 0, 0, 0, 0 };
+<a class="jxr_linenumber" name="L504" href="#L504">504</a>         <strong class="jxr_keyword">int</strong>[] loopback = { 0, 0, 0, 1 };
+<a class="jxr_linenumber" name="L505" href="#L505">505</a>         String v6test = <span class="jxr_string">"2001:db8:85a3::8a2e:370:7334"</span>;
+<a class="jxr_linenumber" name="L506" href="#L506">506</a>         <strong class="jxr_keyword">int</strong>[] v6 = <strong class="jxr_keyword">new</strong> <strong class="jxr_keyword">int</strong>[4];
+<a class="jxr_linenumber" name="L507" href="#L507">507</a>         v6[0] = Integer.parseUnsignedInt(<span class="jxr_string">"20010db8"</span>, 16);
+<a class="jxr_linenumber" name="L508" href="#L508">508</a>         v6[1] = Integer.parseUnsignedInt(<span class="jxr_string">"85a30000"</span>, 16);
+<a class="jxr_linenumber" name="L509" href="#L509">509</a>         v6[2] = Integer.parseUnsignedInt(<span class="jxr_string">"00008a2e"</span>, 16);
+<a class="jxr_linenumber" name="L510" href="#L510">510</a>         v6[3] = Integer.parseUnsignedInt(<span class="jxr_string">"03707334"</span>, 16);
+<a class="jxr_linenumber" name="L511" href="#L511">511</a>         String v4test = <span class="jxr_string">"127.0.0.1"</span>;
+<a class="jxr_linenumber" name="L512" href="#L512">512</a>         <strong class="jxr_keyword">int</strong>[] v4 = <strong class="jxr_keyword">new</strong> <strong class="jxr_keyword">int</strong>[4];
+<a class="jxr_linenumber" name="L513" href="#L513">513</a>         v4[0] = (127 &lt;&lt; 24) + 1;
+<a class="jxr_linenumber" name="L514" href="#L514">514</a>         assertEquals(<span class="jxr_string">"Unspecified address failed"</span>, <span class="jxr_string">"::"</span>, ParseUtil.parseUtAddrV6toIP(zero));
+<a class="jxr_linenumber" name="L515" href="#L515">515</a>         assertEquals(<span class="jxr_string">"Loopback address failed"</span>, <span class="jxr_string">"::1"</span>, ParseUtil.parseUtAddrV6toIP(loopback));
+<a class="jxr_linenumber" name="L516" href="#L516">516</a>         assertEquals(<span class="jxr_string">"V6 parsing failed"</span>, v6test, ParseUtil.parseUtAddrV6toIP(v6));
+<a class="jxr_linenumber" name="L517" href="#L517">517</a>         assertEquals(<span class="jxr_string">"V4 parsig failed"</span>, v4test, ParseUtil.parseUtAddrV6toIP(v4));
+<a class="jxr_linenumber" name="L518" href="#L518">518</a>     }
+<a class="jxr_linenumber" name="L519" href="#L519">519</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2010&#x2013;2020 <a href="https://github.com/oshi/">oshi</a>. All rights reserved.</div>

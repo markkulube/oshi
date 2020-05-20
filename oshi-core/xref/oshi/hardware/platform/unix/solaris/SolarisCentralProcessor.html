@@ -82,7 +82,7 @@
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>      }
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>  
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>      @Override
-<a class="jxr_linenumber" name="L77" href="#L77">77</a>      <strong class="jxr_keyword">protected</strong> List&lt;LogicalProcessor&gt; initProcessorCounts() {
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>      <strong class="jxr_keyword">protected</strong> LogicalProcessor[] initProcessorCounts() {
 <a class="jxr_linenumber" name="L78" href="#L78">78</a>          Map&lt;Integer, Integer&gt; numaNodeMap = mapNumaNodes();
 <a class="jxr_linenumber" name="L79" href="#L79">79</a>          List&lt;LogicalProcessor&gt; logProcs = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a class="jxr_linenumber" name="L80" href="#L80">80</a>          <strong class="jxr_keyword">try</strong> (KstatChain kc = KstatUtil.openChain()) {
@@ -102,7 +102,7 @@
 <a class="jxr_linenumber" name="L94" href="#L94">94</a>          <strong class="jxr_keyword">if</strong> (logProcs.isEmpty()) {
 <a class="jxr_linenumber" name="L95" href="#L95">95</a>              logProcs.add(<strong class="jxr_keyword">new</strong> LogicalProcessor(0, 0, 0));
 <a class="jxr_linenumber" name="L96" href="#L96">96</a>          }
-<a class="jxr_linenumber" name="L97" href="#L97">97</a>          <strong class="jxr_keyword">return</strong> logProcs;
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>          <strong class="jxr_keyword">return</strong> logProcs.toArray(<strong class="jxr_keyword">new</strong> LogicalProcessor[0]);
 <a class="jxr_linenumber" name="L98" href="#L98">98</a>      }
 <a class="jxr_linenumber" name="L99" href="#L99">99</a>  
 <a class="jxr_linenumber" name="L100" href="#L100">100</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Map&lt;Integer, Integer&gt; mapNumaNodes() {

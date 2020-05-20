@@ -109,7 +109,7 @@
 <a class="jxr_linenumber" name="L101" href="#L101">101</a> 
 <a class="jxr_linenumber" name="L102" href="#L102">102</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">long</strong> queryPagesIn() {
 <a class="jxr_linenumber" name="L103" href="#L103">103</a>         <strong class="jxr_keyword">long</strong> swapPagesIn = 0L;
-<a class="jxr_linenumber" name="L104" href="#L104">104</a>         <strong class="jxr_keyword">for</strong> (String s : ExecutingCommand.runNative(<span class="jxr_string">"kstat -p cpu_stat:::pgpgin"</span>)) {
+<a class="jxr_linenumber" name="L104" href="#L104">104</a>         <strong class="jxr_keyword">for</strong> (String s : ExecutingCommand.runNative(<span class="jxr_string">"kstat -p cpu_stat:::pgswapin"</span>)) {
 <a class="jxr_linenumber" name="L105" href="#L105">105</a>             swapPagesIn += ParseUtil.parseLastLong(s, 0L);
 <a class="jxr_linenumber" name="L106" href="#L106">106</a>         }
 <a class="jxr_linenumber" name="L107" href="#L107">107</a>         <strong class="jxr_keyword">return</strong> swapPagesIn;
@@ -117,7 +117,7 @@
 <a class="jxr_linenumber" name="L109" href="#L109">109</a> 
 <a class="jxr_linenumber" name="L110" href="#L110">110</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">long</strong> queryPagesOut() {
 <a class="jxr_linenumber" name="L111" href="#L111">111</a>         <strong class="jxr_keyword">long</strong> swapPagesOut = 0L;
-<a class="jxr_linenumber" name="L112" href="#L112">112</a>         <strong class="jxr_keyword">for</strong> (String s : ExecutingCommand.runNative(<span class="jxr_string">"kstat -p cpu_stat:::pgpgout"</span>)) {
+<a class="jxr_linenumber" name="L112" href="#L112">112</a>         <strong class="jxr_keyword">for</strong> (String s : ExecutingCommand.runNative(<span class="jxr_string">"kstat -p cpu_stat:::pgswapout"</span>)) {
 <a class="jxr_linenumber" name="L113" href="#L113">113</a>             swapPagesOut += ParseUtil.parseLastLong(s, 0L);
 <a class="jxr_linenumber" name="L114" href="#L114">114</a>         }
 <a class="jxr_linenumber" name="L115" href="#L115">115</a>         <strong class="jxr_keyword">return</strong> swapPagesOut;
