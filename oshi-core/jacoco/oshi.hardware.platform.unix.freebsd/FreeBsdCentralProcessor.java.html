@@ -104,13 +104,13 @@ import oshi.util.platform.unix.freebsd.BsdSysctlUtil;
     }
 
     @Override
-    protected LogicalProcessor[] initProcessorCounts() {
+    protected List&lt;LogicalProcessor&gt; initProcessorCounts() {
 <span class="nc" id="L108">        List&lt;LogicalProcessor&gt; logProcs = parseTopology();</span>
         // Force at least one processor
 <span class="nc bnc" id="L110" title="All 2 branches missed.">        if (logProcs.isEmpty()) {</span>
 <span class="nc" id="L111">            logProcs.add(new LogicalProcessor(0, 0, 0));</span>
         }
-<span class="nc" id="L113">        return logProcs.toArray(new LogicalProcessor[0]);</span>
+<span class="nc" id="L113">        return logProcs;</span>
     }
 
     private static List&lt;LogicalProcessor&gt; parseTopology() {
@@ -295,7 +295,7 @@ import oshi.util.platform.unix.freebsd.BsdSysctlUtil;
      * @param processorID
      * @return The ProcessorID string
      */
-    private String getProcessorIDfromDmiDecode(long processorID) {
+    private static String getProcessorIDfromDmiDecode(long processorID) {
 <span class="nc" id="L299">        boolean procInfo = false;</span>
 <span class="nc" id="L300">        String marker = &quot;Processor Information&quot;;</span>
 <span class="nc bnc" id="L301" title="All 2 branches missed.">        for (String checkLine : ExecutingCommand.runNative(&quot;dmidecode -t system&quot;)) {</span>
