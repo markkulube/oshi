@@ -26,7 +26,6 @@ package oshi.software.os;
 import java.util.Collection;
 import java.util.List;
 
-import oshi.annotation.concurrent.Immutable;
 import oshi.annotation.concurrent.ThreadSafe;
 import oshi.util.Constants;
 import oshi.util.Util;
@@ -35,6 +34,9 @@ import oshi.util.Util;
  * An operating system (OS) is the software on a computer that manages the way
  * different programs use its hardware, and regulates the ways that a user
  * controls the computer.
+ * &lt;p&gt;
+ * Considered thread safe, but see remarks for the {@link #getSessions()}
+ * method.
  */
 @ThreadSafe
 public interface OperatingSystem {
@@ -42,8 +44,8 @@ public interface OperatingSystem {
     /**
      * Controls sorting of Process output
      */
-<span class="fc" id="L45">    enum ProcessSort {</span>
-<span class="fc" id="L46">        CPU, MEMORY, OLDEST, NEWEST, PID, PARENTPID, NAME</span>
+<span class="fc" id="L47">    enum ProcessSort {</span>
+<span class="fc" id="L48">        CPU, MEMORY, OLDEST, NEWEST, PID, PARENTPID, NAME</span>
     }
 
     /**
@@ -61,6 +63,15 @@ public interface OperatingSystem {
     String getManufacturer();
 
     /**
+     * Operating system version.
+     *
+     * @return Version.
+     * @deprecated Use {@link #getVersionInfo}
+     */
+    @Deprecated
+    OperatingSystemVersion getVersion();
+
+    /**
      * Operating system version information.
      *
      * @return Version information.
@@ -76,51 +87,107 @@ public interface OperatingSystem {
 
     /**
      * Instantiates a {@link oshi.software.os.InternetProtocolStats} object.
-     *
+     * 
      * @return a {@link oshi.software.os.InternetProtocolStats} object.
      */
     InternetProtocolStats getInternetProtocolStats();
 
     /**
+     * Gets currently logged in users.
+     * &lt;p&gt;
+     * On macOS, Linux, and Unix systems, employs native code (see
+     * {@code man getutxent}) that is not thread safe. OSHI's use of this code is
+     * synchronized and may be used in a multi-threaded environment. Users should
+     * note, however, that other operating system code may access the same native
+     * code.
+     *
+     * @return An {@code UnmodifiableList} of {@link oshi.software.os.OSSession}
+     *         objects representing logged-in users
+     */
+    List&lt;OSSession&gt; getSessions();
+
+    /**
      * Gets currently running processes. No order is guaranteed.
      *
-     * @return An {@code UnmodifiableList} of {@link oshi.software.os.OSProcess}
-     *         objects for the specified number (or all) of currently running
-     *         processes, sorted as specified. The list may contain null elements or
-     *         processes with a state of {@link OSProcess.State#INVALID} if a
-     *         process terminates during iteration.
+     * @return An array of {@link oshi.software.os.OSProcess} objects for the
+     *         specified number (or all) of currently running processes, sorted as
+     *         specified. The array may contain null elements if a process
+     *         terminates during iteration. Some fields that are slow to retrieve
+     *         (e.g., commandlines and group information on Windows, open files on
+     *         Unix and Linux) will be skipped.
      */
-    List&lt;OSProcess&gt; getProcesses();
+    OSProcess[] getProcesses();
 
     /**
      * Gets currently running processes, optionally limited to the top &quot;N&quot; for a
      * particular sorting order. If a positive limit is specified, returns only that
      * number of processes; zero will return all processes. The order may be
      * specified by the sort parameter, for example, to return the top cpu or memory
-     * consuming processes; if the sort is {@code null}, no order is guaranteed.
+     * consuming processes; if null, no order is guaranteed.
      *
      * @param limit
      *            Max number of results to return, or 0 to return all results
      * @param sort
      *            If not null, determines sorting of results
-     * @return An {@code UnmodifiableList} of {@link oshi.software.os.OSProcess}
-     *         objects for the specified number (or all) of currently running
-     *         processes, sorted as specified. The list may contain null elements or
-     *         processes with a state of {@link OSProcess.State#INVALID} if a
-     *         process terminates during iteration.
+     * @return An array of {@link oshi.software.os.OSProcess} objects for the
+     *         specified number (or all) of currently running processes, sorted as
+     *         specified. The array may contain null elements if a process
+     *         terminates during iteration. Some fields that are slow to retrieve
+     *         (e.g., group information on Windows, open files on Unix and Linux)
+     *         will be skipped.
      */
-    List&lt;OSProcess&gt; getProcesses(int limit, ProcessSort sort);
+    OSProcess[] getProcesses(int limit, ProcessSort sort);
 
     /**
-     * Gets information on a {@link Collection} of currently running processes. This
-     * has potentially improved performance vs. iterating individual processes.
+     * Gets currently running processes. If a positive limit is specified, returns
+     * only that number of processes; zero will return all processes. The order may
+     * be specified by the sort parameter, for example, to return the top cpu or
+     * memory consuming processes; if null, no order is guaranteed.
+     *
+     * @param limit
+     *            Max number of results to return, or 0 to return all results
+     * @param sort
+     *            If not null, determines sorting of results
+     * @param slowFields
+     *            If false, skip {@link oshi.software.os.OSProcess} fields that are
+     *            slow to retrieve (e.g., group information on Windows, open files
+     *            on Unix and Linux). If true, include all fields, regardless of how
+     *            long it takes to retrieve the data.
+     * @return An array of {@link oshi.software.os.OSProcess} objects for the
+     *         specified number (or all) of currently running processes, sorted as
+     *         specified. The array may contain null elements if a process
+     *         terminates during iteration.
+     */
+    OSProcess[] getProcesses(int limit, ProcessSort sort, boolean slowFields);
+
+    /**
+     * Gets information on a currently running processes. This has improved
+     * performance on Windows based operating systems vs. iterating individual
+     * processes. By default, includes all process information.
      *
      * @param pids
      *            A collection of process IDs
-     * @return An {@code UnmodifiableList} of {@link oshi.software.os.OSProcess}
-     *         objects for the specified process ids if it is running
+     * @return An {@link oshi.software.os.OSProcess} object for the specified
+     *         process ids if it is running
      */
     List&lt;OSProcess&gt; getProcesses(Collection&lt;Integer&gt; pids);
+
+    /**
+     * Gets information on a currently running processes. This has improved
+     * performance on Windows based operating systems vs. iterating individual
+     * processes.
+     *
+     * @param pids
+     *            A collection of process IDs
+     * @param slowFields
+     *            If false, skip {@link oshi.software.os.OSProcess} fields that are
+     *            slow to retrieve (e.g., group information on Windows, open files
+     *            on Unix and Linux). If true, include all fields, regardless of how
+     *            long it takes to retrieve the data.
+     * @return An {@link oshi.software.os.OSProcess} object for the specified
+     *         process ids if it is running
+     */
+    List&lt;OSProcess&gt; getProcesses(Collection&lt;Integer&gt; pids, boolean slowFields);
 
     /**
      * Gets information on a currently running process
@@ -133,12 +200,26 @@ public interface OperatingSystem {
     OSProcess getProcess(int pid);
 
     /**
-     * Gets currently running child processes of provided parent PID, optionally
-     * limited to the top &quot;N&quot; for a particular sorting order. If a positive limit is
-     * specified, returns only that number of processes; zero will return all
+     * Gets information on a currently running process
+     *
+     * @param pid
+     *            A process ID
+     * @param slowFields
+     *            If false, skip {@link oshi.software.os.OSProcess} fields that are
+     *            slow to retrieve (e.g., group information on Windows, open files
+     *            on Unix and Linux). If true, include all fields, regardless of how
+     *            long it takes to retrieve the data.
+     * @return An {@link oshi.software.os.OSProcess} object for the specified
+     *         process id if it is running; null otherwise
+     */
+    OSProcess getProcess(int pid, boolean slowFields);
+
+    /**
+     * Gets currently running child processes of provided PID. If a positive limit
+     * is specified, returns only that number of processes; zero will return all
      * processes. The order may be specified by the sort parameter, for example, to
-     * return the top cpu or memory consuming processes; if the sort is
-     * {@code null}, no order is guaranteed.
+     * return the top cpu or memory consuming processes; if null, no order is
+     * guaranteed.
      *
      * @param parentPid
      *            A process ID
@@ -146,14 +227,31 @@ public interface OperatingSystem {
      *            Max number of results to return, or 0 to return all results
      * @param sort
      *            If not null, determines sorting of results
-     * @return An {@code UnmodifiableList} of {@link oshi.software.os.OSProcess}
-     *         objects representing the specified number (or all) of currently
-     *         running child processes of the provided PID, sorted as specified. The
-     *         list may contain null elements or processes with a state of
-     *         {@link OSProcess.State#INVALID} if a process terminates during
-     *         iteration.
+     * @return An array of {@link oshi.software.os.OSProcess} objects presenting the
+     *         specified number (or all) of currently running child processes of the
+     *         provided PID, sorted as specified. The array may contain null
+     *         elements if a process terminates during iteration.
      */
-    List&lt;OSProcess&gt; getChildProcesses(int parentPid, int limit, ProcessSort sort);
+    OSProcess[] getChildProcesses(int parentPid, int limit, ProcessSort sort);
+
+    /**
+     * Retrieves the process affinity mask for the specified process.
+     * &lt;p&gt;
+     * On Windows systems with more than 64 processors, if the threads of the
+     * calling process are in a single processor group, returns the process affinity
+     * mask for that group (which may be zero if the specified process is running in
+     * a different group). If the calling process contains threads in multiple
+     * groups, returns zero.
+     * &lt;p&gt;
+     * If the Operating System fails to retrieve an affinity mask (e.g., the process
+     * has terminated), returns zero.
+     *
+     * @param processId
+     *            The process ID for which to retrieve the affinity.
+     * @return a bit vector in which each bit represents the processors that a
+     *         process is allowed to run on.
+     */
+    long getProcessAffinityMask(int processId);
 
     /**
      * Gets the current process ID
@@ -222,29 +320,30 @@ public interface OperatingSystem {
     OSService[] getServices();
 
     /*
-     * A class representing the Operating System version details.
+     * A class representing a Logical Processor and its replationship to physical
+     * processors, physical packages, and logical groupings such as NUMA Nodes and
+     * Processor groups, useful for identifying processor topology.
      */
-    @Immutable
     class OSVersionInfo {
         private final String version;
         private final String codeName;
         private final String buildNumber;
         private final String versionStr;
 
-<span class="fc" id="L234">        public OSVersionInfo(String version, String codeName, String buildNumber) {</span>
-<span class="fc" id="L235">            this.version = version;</span>
-<span class="fc" id="L236">            this.codeName = codeName;</span>
-<span class="fc" id="L237">            this.buildNumber = buildNumber;</span>
+<span class="fc" id="L333">        public OSVersionInfo(String version, String codeName, String buildNumber) {</span>
+<span class="fc" id="L334">            this.version = version;</span>
+<span class="fc" id="L335">            this.codeName = codeName;</span>
+<span class="fc" id="L336">            this.buildNumber = buildNumber;</span>
 
-<span class="pc bpc" id="L239" title="1 of 2 branches missed.">            StringBuilder sb = new StringBuilder(getVersion() != null ? getVersion() : Constants.UNKNOWN);</span>
-<span class="pc bpc" id="L240" title="1 of 2 branches missed.">            if (!Util.isBlank(getCodeName())) {</span>
-<span class="fc" id="L241">                sb.append(&quot; (&quot;).append(getCodeName()).append(')');</span>
+<span class="pc bpc" id="L338" title="1 of 2 branches missed.">            StringBuilder sb = new StringBuilder(getVersion() != null ? getVersion() : Constants.UNKNOWN);</span>
+<span class="pc bpc" id="L339" title="1 of 2 branches missed.">            if (!Util.isBlank(getCodeName())) {</span>
+<span class="fc" id="L340">                sb.append(&quot; (&quot;).append(getCodeName()).append(')');</span>
             }
-<span class="pc bpc" id="L243" title="1 of 2 branches missed.">            if (!Util.isBlank(getBuildNumber())) {</span>
-<span class="fc" id="L244">                sb.append(&quot; build &quot;).append(getBuildNumber());</span>
+<span class="pc bpc" id="L342" title="1 of 2 branches missed.">            if (!Util.isBlank(getBuildNumber())) {</span>
+<span class="fc" id="L343">                sb.append(&quot; build &quot;).append(getBuildNumber());</span>
             }
-<span class="fc" id="L246">            this.versionStr = sb.toString();</span>
-<span class="fc" id="L247">        }</span>
+<span class="fc" id="L345">            this.versionStr = sb.toString();</span>
+<span class="fc" id="L346">        }</span>
 
         /**
          * Gets the operating system version.
@@ -252,7 +351,7 @@ public interface OperatingSystem {
          * @return The version, if any. May be {@code null}.
          */
         public String getVersion() {
-<span class="fc" id="L255">            return version;</span>
+<span class="fc" id="L354">            return version;</span>
         }
 
         /**
@@ -261,7 +360,7 @@ public interface OperatingSystem {
          * @return The code name, if any. May be {@code null}.
          */
         public String getCodeName() {
-<span class="fc" id="L264">            return codeName;</span>
+<span class="fc" id="L363">            return codeName;</span>
         }
 
         /**
@@ -270,12 +369,12 @@ public interface OperatingSystem {
          * @return The build number, if any. May be {@code null}.
          */
         public String getBuildNumber() {
-<span class="fc" id="L273">            return buildNumber;</span>
+<span class="fc" id="L372">            return buildNumber;</span>
         }
 
         @Override
         public String toString() {
-<span class="fc" id="L278">            return this.versionStr;</span>
+<span class="nc" id="L377">            return this.versionStr;</span>
         }
     }
 }
