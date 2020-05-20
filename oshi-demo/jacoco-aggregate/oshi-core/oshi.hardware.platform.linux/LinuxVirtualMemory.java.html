@@ -52,11 +52,11 @@ final class LinuxVirtualMemory extends AbstractVirtualMemory {
 
     /**
      * Constructor for LinuxVirtualMemory.
-     *
+     * 
      * @param linuxGlobalMemory
      *            The parent global memory class instantiating this
      */
-<span class="nc" id="L59">    LinuxVirtualMemory(LinuxGlobalMemory linuxGlobalMemory) {</span>
+<span class="nc" id="L59">    public LinuxVirtualMemory(LinuxGlobalMemory linuxGlobalMemory) {</span>
 <span class="nc" id="L60">        this.global = linuxGlobalMemory;</span>
 <span class="nc" id="L61">    }</span>
 
@@ -126,10 +126,10 @@ final class LinuxVirtualMemory extends AbstractVirtualMemory {
 <span class="nc" id="L126">            String[] memorySplit = ParseUtil.whitespaces.split(checkLine);</span>
 <span class="nc bnc" id="L127" title="All 2 branches missed.">            if (memorySplit.length &gt; 1) {</span>
 <span class="nc bnc" id="L128" title="All 3 branches missed.">                switch (memorySplit[0]) {</span>
-                case &quot;pgpgin&quot;:
+                case &quot;pswpin&quot;:
 <span class="nc" id="L130">                    swapPagesIn = ParseUtil.parseLongOrDefault(memorySplit[1], 0L);</span>
 <span class="nc" id="L131">                    break;</span>
-                case &quot;pgpgout&quot;:
+                case &quot;pswpout&quot;:
 <span class="nc" id="L133">                    swapPagesOut = ParseUtil.parseLongOrDefault(memorySplit[1], 0L);</span>
 <span class="nc" id="L134">                    break;</span>
                 default:

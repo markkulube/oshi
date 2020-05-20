@@ -101,7 +101,7 @@ final class SolarisVirtualMemory extends AbstractVirtualMemory {
 
     private static long queryPagesIn() {
 <span class="nc" id="L103">        long swapPagesIn = 0L;</span>
-<span class="nc bnc" id="L104" title="All 2 branches missed.">        for (String s : ExecutingCommand.runNative(&quot;kstat -p cpu_stat:::pgpgin&quot;)) {</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        for (String s : ExecutingCommand.runNative(&quot;kstat -p cpu_stat:::pgswapin&quot;)) {</span>
 <span class="nc" id="L105">            swapPagesIn += ParseUtil.parseLastLong(s, 0L);</span>
 <span class="nc" id="L106">        }</span>
 <span class="nc" id="L107">        return swapPagesIn;</span>
@@ -109,7 +109,7 @@ final class SolarisVirtualMemory extends AbstractVirtualMemory {
 
     private static long queryPagesOut() {
 <span class="nc" id="L111">        long swapPagesOut = 0L;</span>
-<span class="nc bnc" id="L112" title="All 2 branches missed.">        for (String s : ExecutingCommand.runNative(&quot;kstat -p cpu_stat:::pgpgout&quot;)) {</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        for (String s : ExecutingCommand.runNative(&quot;kstat -p cpu_stat:::pgswapout&quot;)) {</span>
 <span class="nc" id="L113">            swapPagesOut += ParseUtil.parseLastLong(s, 0L);</span>
 <span class="nc" id="L114">        }</span>
 <span class="nc" id="L115">        return swapPagesOut;</span>
