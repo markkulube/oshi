@@ -109,7 +109,7 @@ public final class ParseUtil {
 
     // PDH timestamps are 1601 epoch, local time
     // Constants to convert to UTC millis
-    private static final long EPOCH_DIFF = 11644473600000L;
+    private static final long EPOCH_DIFF = 11_644_473_600_000L;
 <span class="fc" id="L113">    private static final int TZ_OFFSET = TimeZone.getDefault().getOffset(System.currentTimeMillis());</span>
 
     /** Constant &lt;code&gt;whitespacesColonWhitespace&lt;/code&gt; */
@@ -405,7 +405,7 @@ public final class ParseUtil {
         // then drop any copies of the sign bit, to prevent the value being
         // considered a negative one by Java if it is set
 <span class="fc" id="L407">        long longValue = unsignedValue;</span>
-<span class="fc" id="L408">        return longValue &amp; 0xffffffffL;</span>
+<span class="fc" id="L408">        return longValue &amp; 0xffff_ffffL;</span>
     }
 
     /**
@@ -418,7 +418,7 @@ public final class ParseUtil {
      * @return The signed long value.
      */
     public static long unsignedLongToSignedLong(long unsignedValue) {
-<span class="fc" id="L421">        return unsignedValue &amp; 0x7fffffff_ffffffffL;</span>
+<span class="fc" id="L421">        return unsignedValue &amp; 0x7fff_ffff_ffff_ffffL;</span>
     }
 
     /**
@@ -542,13 +542,13 @@ public final class ParseUtil {
 <span class="fc bfc" id="L542" title="All 2 branches covered.">        if (m.matches()) {</span>
 <span class="fc" id="L543">            long milliseconds = 0L;</span>
 <span class="fc bfc" id="L544" title="All 2 branches covered.">            if (m.group(1) != null) {</span>
-<span class="fc" id="L545">                milliseconds += parseLongOrDefault(m.group(1), 0L) * 86400000L;</span>
+<span class="fc" id="L545">                milliseconds += parseLongOrDefault(m.group(1), 0L) * 86_400_000L;</span>
             }
 <span class="fc bfc" id="L547" title="All 2 branches covered.">            if (m.group(2) != null) {</span>
-<span class="fc" id="L548">                milliseconds += parseLongOrDefault(m.group(2), 0L) * 3600000L;</span>
+<span class="fc" id="L548">                milliseconds += parseLongOrDefault(m.group(2), 0L) * 3_600_000L;</span>
             }
 <span class="fc bfc" id="L550" title="All 2 branches covered.">            if (m.group(3) != null) {</span>
-<span class="fc" id="L551">                milliseconds += parseLongOrDefault(m.group(3), 0L) * 60000L;</span>
+<span class="fc" id="L551">                milliseconds += parseLongOrDefault(m.group(3), 0L) * 60_000L;</span>
             }
 <span class="fc" id="L553">            milliseconds += parseLongOrDefault(m.group(4), 0L) * 1000L;</span>
 <span class="fc" id="L554">            milliseconds += (long) (1000 * parseDoubleOrDefault(&quot;0.&quot; + m.group(5), 0d));</span>
@@ -746,7 +746,7 @@ public final class ParseUtil {
                 // Doesn't impact parsing, ignore
 <span class="fc" id="L747">                delimCurrent = false;</span>
 <span class="pc bpc" id="L748" title="1 of 6 branches missed.">            } else if (c &gt;= '0' &amp;&amp; c &lt;= '9' &amp;&amp; !dashSeen) {</span>
-<span class="pc bpc" id="L749" title="3 of 8 branches missed.">                if (power &gt; 18 || power == 17 &amp;&amp; c == '9' &amp;&amp; parsed[parsedIndex] &gt; 223372036854775807L) {</span>
+<span class="pc bpc" id="L749" title="3 of 8 branches missed.">                if (power &gt; 18 || power == 17 &amp;&amp; c == '9' &amp;&amp; parsed[parsedIndex] &gt; 223_372_036_854_775_807L) {</span>
 <span class="fc" id="L750">                    parsed[parsedIndex] = Long.MAX_VALUE;</span>
                 } else {
 <span class="fc" id="L752">                    parsed[parsedIndex] += (c - '0') * ParseUtil.POWERS_OF_TEN[power++];</span>
@@ -867,7 +867,7 @@ public final class ParseUtil {
      * @return Equivalent milliseconds since the epoch
      */
     public static long filetimeToUtcMs(long filetime, boolean local) {
-<span class="pc bpc" id="L870" title="1 of 2 branches missed.">        return filetime / 10000L - EPOCH_DIFF - (local ? TZ_OFFSET : 0L);</span>
+<span class="pc bpc" id="L870" title="1 of 2 branches missed.">        return filetime / 10_000L - EPOCH_DIFF - (local ? TZ_OFFSET : 0L);</span>
     }
 
     /**
