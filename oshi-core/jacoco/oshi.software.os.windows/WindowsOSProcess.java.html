@@ -270,7 +270,7 @@ public class WindowsOSProcess extends AbstractOSProcess {
             }
             // Full path
 <span class="nc" id="L272">            final HANDLEByReference phToken = new HANDLEByReference();</span>
-            try {// EXECUTABLEPATH
+            try { // EXECUTABLEPATH
 <span class="nc bnc" id="L274" title="All 2 branches missed.">                if (IS_WINDOWS7_OR_GREATER) {</span>
 <span class="nc" id="L275">                    this.path = Kernel32Util.QueryFullProcessImageName(pHandle, 0);</span>
                 }
