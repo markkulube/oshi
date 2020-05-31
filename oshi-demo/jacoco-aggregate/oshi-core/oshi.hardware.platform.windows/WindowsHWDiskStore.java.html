@@ -210,97 +210,98 @@ public final class WindowsHWDiskStore extends AbstractHWDiskStore {
     }
 
     /**
-     * Populates the maps for the specified index. If the index is null, populates
-     * all the maps
+     * Gets disk stats for the specified index. If the index is null, populates all
+     * the maps
      *
      * @param index
      *            The index to populate/update maps for
+     * @return An object encapsulating maps with the stats
      */
     private static DiskStats queryReadWriteStats(String index) {
         // Create object to hold and return results
-<span class="nc" id="L221">        DiskStats stats = new DiskStats();</span>
-<span class="nc" id="L222">        Pair&lt;List&lt;String&gt;, Map&lt;PhysicalDiskProperty, List&lt;Long&gt;&gt;&gt; instanceValuePair = PhysicalDisk.queryDiskCounters();</span>
-<span class="nc" id="L223">        List&lt;String&gt; instances = instanceValuePair.getA();</span>
-<span class="nc" id="L224">        Map&lt;PhysicalDiskProperty, List&lt;Long&gt;&gt; valueMap = instanceValuePair.getB();</span>
-<span class="nc" id="L225">        stats.timeStamp = System.currentTimeMillis();</span>
-<span class="nc" id="L226">        List&lt;Long&gt; readList = valueMap.get(PhysicalDiskProperty.DISKREADSPERSEC);</span>
-<span class="nc" id="L227">        List&lt;Long&gt; readByteList = valueMap.get(PhysicalDiskProperty.DISKREADBYTESPERSEC);</span>
-<span class="nc" id="L228">        List&lt;Long&gt; writeList = valueMap.get(PhysicalDiskProperty.DISKWRITESPERSEC);</span>
-<span class="nc" id="L229">        List&lt;Long&gt; writeByteList = valueMap.get(PhysicalDiskProperty.DISKWRITEBYTESPERSEC);</span>
-<span class="nc" id="L230">        List&lt;Long&gt; queueLengthList = valueMap.get(PhysicalDiskProperty.CURRENTDISKQUEUELENGTH);</span>
-<span class="nc" id="L231">        List&lt;Long&gt; idleTimeList = valueMap.get(PhysicalDiskProperty.PERCENTIDLETIME);</span>
+<span class="nc" id="L222">        DiskStats stats = new DiskStats();</span>
+<span class="nc" id="L223">        Pair&lt;List&lt;String&gt;, Map&lt;PhysicalDiskProperty, List&lt;Long&gt;&gt;&gt; instanceValuePair = PhysicalDisk.queryDiskCounters();</span>
+<span class="nc" id="L224">        List&lt;String&gt; instances = instanceValuePair.getA();</span>
+<span class="nc" id="L225">        Map&lt;PhysicalDiskProperty, List&lt;Long&gt;&gt; valueMap = instanceValuePair.getB();</span>
+<span class="nc" id="L226">        stats.timeStamp = System.currentTimeMillis();</span>
+<span class="nc" id="L227">        List&lt;Long&gt; readList = valueMap.get(PhysicalDiskProperty.DISKREADSPERSEC);</span>
+<span class="nc" id="L228">        List&lt;Long&gt; readByteList = valueMap.get(PhysicalDiskProperty.DISKREADBYTESPERSEC);</span>
+<span class="nc" id="L229">        List&lt;Long&gt; writeList = valueMap.get(PhysicalDiskProperty.DISKWRITESPERSEC);</span>
+<span class="nc" id="L230">        List&lt;Long&gt; writeByteList = valueMap.get(PhysicalDiskProperty.DISKWRITEBYTESPERSEC);</span>
+<span class="nc" id="L231">        List&lt;Long&gt; queueLengthList = valueMap.get(PhysicalDiskProperty.CURRENTDISKQUEUELENGTH);</span>
+<span class="nc" id="L232">        List&lt;Long&gt; idleTimeList = valueMap.get(PhysicalDiskProperty.PERCENTIDLETIME);</span>
 
-<span class="nc bnc" id="L233" title="All 14 branches missed.">        if (instances.isEmpty() || readList == null || readByteList == null || writeList == null</span>
+<span class="nc bnc" id="L234" title="All 14 branches missed.">        if (instances.isEmpty() || readList == null || readByteList == null || writeList == null</span>
                 || writeByteList == null || queueLengthList == null || idleTimeList == null) {
-<span class="nc" id="L235">            return stats;</span>
+<span class="nc" id="L236">            return stats;</span>
         }
-<span class="nc bnc" id="L237" title="All 2 branches missed.">        for (int i = 0; i &lt; instances.size(); i++) {</span>
-<span class="nc" id="L238">            String name = getIndexFromName(instances.get(i));</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        for (int i = 0; i &lt; instances.size(); i++) {</span>
+<span class="nc" id="L239">            String name = getIndexFromName(instances.get(i));</span>
             // If index arg passed, only update passed arg
-<span class="nc bnc" id="L240" title="All 4 branches missed.">            if (index != null &amp;&amp; !index.equals(name)) {</span>
-<span class="nc" id="L241">                continue;</span>
+<span class="nc bnc" id="L241" title="All 4 branches missed.">            if (index != null &amp;&amp; !index.equals(name)) {</span>
+<span class="nc" id="L242">                continue;</span>
             }
-<span class="nc" id="L243">            stats.readMap.put(name, readList.get(i));</span>
-<span class="nc" id="L244">            stats.readByteMap.put(name, readByteList.get(i));</span>
-<span class="nc" id="L245">            stats.writeMap.put(name, writeList.get(i));</span>
-<span class="nc" id="L246">            stats.writeByteMap.put(name, writeByteList.get(i));</span>
-<span class="nc" id="L247">            stats.queueLengthMap.put(name, queueLengthList.get(i));</span>
-<span class="nc" id="L248">            stats.idleTimeMap.put(name, idleTimeList.get(i) / 10_000L);</span>
+<span class="nc" id="L244">            stats.readMap.put(name, readList.get(i));</span>
+<span class="nc" id="L245">            stats.readByteMap.put(name, readByteList.get(i));</span>
+<span class="nc" id="L246">            stats.writeMap.put(name, writeList.get(i));</span>
+<span class="nc" id="L247">            stats.writeByteMap.put(name, writeByteList.get(i));</span>
+<span class="nc" id="L248">            stats.queueLengthMap.put(name, queueLengthList.get(i));</span>
+<span class="nc" id="L249">            stats.idleTimeMap.put(name, idleTimeList.get(i) / 10_000L);</span>
         }
-<span class="nc" id="L250">        return stats;</span>
+<span class="nc" id="L251">        return stats;</span>
     }
 
     private static PartitionMaps queryPartitionMaps() {
         // Create object to hold and return results
-<span class="nc" id="L255">        PartitionMaps maps = new PartitionMaps();</span>
+<span class="nc" id="L256">        PartitionMaps maps = new PartitionMaps();</span>
 
         // For Regexp matching DeviceIDs
         Matcher mAnt;
         Matcher mDep;
 
         // Map drives to partitions
-<span class="nc" id="L262">        WmiResult&lt;DriveToPartitionProperty&gt; drivePartitionMap = Win32DiskDriveToDiskPartition.queryDriveToPartition();</span>
-<span class="nc bnc" id="L263" title="All 2 branches missed.">        for (int i = 0; i &lt; drivePartitionMap.getResultCount(); i++) {</span>
-<span class="nc" id="L264">            mAnt = DEVICE_ID.matcher(WmiUtil.getRefString(drivePartitionMap, DriveToPartitionProperty.ANTECEDENT, i));</span>
-<span class="nc" id="L265">            mDep = DEVICE_ID.matcher(WmiUtil.getRefString(drivePartitionMap, DriveToPartitionProperty.DEPENDENT, i));</span>
-<span class="nc bnc" id="L266" title="All 4 branches missed.">            if (mAnt.matches() &amp;&amp; mDep.matches()) {</span>
-<span class="nc" id="L267">                maps.driveToPartitionMap</span>
-<span class="nc" id="L268">                        .computeIfAbsent(mAnt.group(1).replaceAll(&quot;\\\\\\\\&quot;, &quot;\\\\&quot;), x -&gt; new ArrayList&lt;&gt;())</span>
-<span class="nc" id="L269">                        .add(mDep.group(1));</span>
+<span class="nc" id="L263">        WmiResult&lt;DriveToPartitionProperty&gt; drivePartitionMap = Win32DiskDriveToDiskPartition.queryDriveToPartition();</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">        for (int i = 0; i &lt; drivePartitionMap.getResultCount(); i++) {</span>
+<span class="nc" id="L265">            mAnt = DEVICE_ID.matcher(WmiUtil.getRefString(drivePartitionMap, DriveToPartitionProperty.ANTECEDENT, i));</span>
+<span class="nc" id="L266">            mDep = DEVICE_ID.matcher(WmiUtil.getRefString(drivePartitionMap, DriveToPartitionProperty.DEPENDENT, i));</span>
+<span class="nc bnc" id="L267" title="All 4 branches missed.">            if (mAnt.matches() &amp;&amp; mDep.matches()) {</span>
+<span class="nc" id="L268">                maps.driveToPartitionMap</span>
+<span class="nc" id="L269">                        .computeIfAbsent(mAnt.group(1).replaceAll(&quot;\\\\\\\\&quot;, &quot;\\\\&quot;), x -&gt; new ArrayList&lt;&gt;())</span>
+<span class="nc" id="L270">                        .add(mDep.group(1));</span>
             }
         }
 
         // Map partitions to logical disks
-<span class="nc" id="L274">        WmiResult&lt;DiskToPartitionProperty&gt; diskPartitionMap = Win32LogicalDiskToPartition.queryDiskToPartition();</span>
-<span class="nc bnc" id="L275" title="All 2 branches missed.">        for (int i = 0; i &lt; diskPartitionMap.getResultCount(); i++) {</span>
-<span class="nc" id="L276">            mAnt = DEVICE_ID.matcher(WmiUtil.getRefString(diskPartitionMap, DiskToPartitionProperty.ANTECEDENT, i));</span>
-<span class="nc" id="L277">            mDep = DEVICE_ID.matcher(WmiUtil.getRefString(diskPartitionMap, DiskToPartitionProperty.DEPENDENT, i));</span>
-<span class="nc bnc" id="L278" title="All 4 branches missed.">            if (mAnt.matches() &amp;&amp; mDep.matches()) {</span>
-<span class="nc" id="L279">                maps.partitionToLogicalDriveMap.put(mAnt.group(1), mDep.group(1) + &quot;\\&quot;);</span>
+<span class="nc" id="L275">        WmiResult&lt;DiskToPartitionProperty&gt; diskPartitionMap = Win32LogicalDiskToPartition.queryDiskToPartition();</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">        for (int i = 0; i &lt; diskPartitionMap.getResultCount(); i++) {</span>
+<span class="nc" id="L277">            mAnt = DEVICE_ID.matcher(WmiUtil.getRefString(diskPartitionMap, DiskToPartitionProperty.ANTECEDENT, i));</span>
+<span class="nc" id="L278">            mDep = DEVICE_ID.matcher(WmiUtil.getRefString(diskPartitionMap, DiskToPartitionProperty.DEPENDENT, i));</span>
+<span class="nc bnc" id="L279" title="All 4 branches missed.">            if (mAnt.matches() &amp;&amp; mDep.matches()) {</span>
+<span class="nc" id="L280">                maps.partitionToLogicalDriveMap.put(mAnt.group(1), mDep.group(1) + &quot;\\&quot;);</span>
             }
         }
 
         // Next, get all partitions and create objects
-<span class="nc" id="L284">        WmiResult&lt;DiskPartitionProperty&gt; hwPartitionQueryMap = Win32DiskPartition.queryPartition();</span>
-<span class="nc bnc" id="L285" title="All 2 branches missed.">        for (int i = 0; i &lt; hwPartitionQueryMap.getResultCount(); i++) {</span>
-<span class="nc" id="L286">            String deviceID = WmiUtil.getString(hwPartitionQueryMap, DiskPartitionProperty.DEVICEID, i);</span>
-<span class="nc" id="L287">            String logicalDrive = maps.partitionToLogicalDriveMap.getOrDefault(deviceID, &quot;&quot;);</span>
-<span class="nc" id="L288">            String uuid = &quot;&quot;;</span>
-<span class="nc bnc" id="L289" title="All 2 branches missed.">            if (!logicalDrive.isEmpty()) {</span>
+<span class="nc" id="L285">        WmiResult&lt;DiskPartitionProperty&gt; hwPartitionQueryMap = Win32DiskPartition.queryPartition();</span>
+<span class="nc bnc" id="L286" title="All 2 branches missed.">        for (int i = 0; i &lt; hwPartitionQueryMap.getResultCount(); i++) {</span>
+<span class="nc" id="L287">            String deviceID = WmiUtil.getString(hwPartitionQueryMap, DiskPartitionProperty.DEVICEID, i);</span>
+<span class="nc" id="L288">            String logicalDrive = maps.partitionToLogicalDriveMap.getOrDefault(deviceID, &quot;&quot;);</span>
+<span class="nc" id="L289">            String uuid = &quot;&quot;;</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">            if (!logicalDrive.isEmpty()) {</span>
                 // Get matching volume for UUID
-<span class="nc" id="L291">                char[] volumeChr = new char[BUFSIZE];</span>
-<span class="nc" id="L292">                Kernel32.INSTANCE.GetVolumeNameForVolumeMountPoint(logicalDrive, volumeChr, BUFSIZE);</span>
-<span class="nc" id="L293">                uuid = ParseUtil.parseUuidOrDefault(new String(volumeChr).trim(), &quot;&quot;);</span>
+<span class="nc" id="L292">                char[] volumeChr = new char[BUFSIZE];</span>
+<span class="nc" id="L293">                Kernel32.INSTANCE.GetVolumeNameForVolumeMountPoint(logicalDrive, volumeChr, BUFSIZE);</span>
+<span class="nc" id="L294">                uuid = ParseUtil.parseUuidOrDefault(new String(volumeChr).trim(), &quot;&quot;);</span>
             }
-<span class="nc" id="L295">            maps.partitionMap.put(deviceID,</span>
-<span class="nc" id="L296">                    new HWPartition(WmiUtil.getString(hwPartitionQueryMap, DiskPartitionProperty.NAME, i),</span>
-<span class="nc" id="L297">                            WmiUtil.getString(hwPartitionQueryMap, DiskPartitionProperty.TYPE, i),</span>
-<span class="nc" id="L298">                            WmiUtil.getString(hwPartitionQueryMap, DiskPartitionProperty.DESCRIPTION, i), uuid,</span>
-<span class="nc" id="L299">                            WmiUtil.getUint64(hwPartitionQueryMap, DiskPartitionProperty.SIZE, i),</span>
-<span class="nc" id="L300">                            WmiUtil.getUint32(hwPartitionQueryMap, DiskPartitionProperty.DISKINDEX, i),</span>
-<span class="nc" id="L301">                            WmiUtil.getUint32(hwPartitionQueryMap, DiskPartitionProperty.INDEX, i), logicalDrive));</span>
+<span class="nc" id="L296">            maps.partitionMap.put(deviceID,</span>
+<span class="nc" id="L297">                    new HWPartition(WmiUtil.getString(hwPartitionQueryMap, DiskPartitionProperty.NAME, i),</span>
+<span class="nc" id="L298">                            WmiUtil.getString(hwPartitionQueryMap, DiskPartitionProperty.TYPE, i),</span>
+<span class="nc" id="L299">                            WmiUtil.getString(hwPartitionQueryMap, DiskPartitionProperty.DESCRIPTION, i), uuid,</span>
+<span class="nc" id="L300">                            WmiUtil.getUint64(hwPartitionQueryMap, DiskPartitionProperty.SIZE, i),</span>
+<span class="nc" id="L301">                            WmiUtil.getUint32(hwPartitionQueryMap, DiskPartitionProperty.DISKINDEX, i),</span>
+<span class="nc" id="L302">                            WmiUtil.getUint32(hwPartitionQueryMap, DiskPartitionProperty.INDEX, i), logicalDrive));</span>
         }
-<span class="nc" id="L303">        return maps;</span>
+<span class="nc" id="L304">        return maps;</span>
     }
 
     /**
@@ -311,32 +312,32 @@ public final class WindowsHWDiskStore extends AbstractHWDiskStore {
      * @return The first space-delimited value
      */
     private static String getIndexFromName(String s) {
-<span class="nc bnc" id="L314" title="All 2 branches missed.">        if (s.isEmpty()) {</span>
-<span class="nc" id="L315">            return s;</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">        if (s.isEmpty()) {</span>
+<span class="nc" id="L316">            return s;</span>
         }
-<span class="nc" id="L317">        return s.split(&quot;\\s&quot;)[0];</span>
+<span class="nc" id="L318">        return s.split(&quot;\\s&quot;)[0];</span>
     }
 
     /**
      * Maps to store read/write bytes per drive index
      */
-<span class="nc" id="L323">    private static final class DiskStats {</span>
-<span class="nc" id="L324">        private final Map&lt;String, Long&gt; readMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L325">        private final Map&lt;String, Long&gt; readByteMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L326">        private final Map&lt;String, Long&gt; writeMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L327">        private final Map&lt;String, Long&gt; writeByteMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L328">        private final Map&lt;String, Long&gt; queueLengthMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L329">        private final Map&lt;String, Long&gt; idleTimeMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L324">    private static final class DiskStats {</span>
+<span class="nc" id="L325">        private final Map&lt;String, Long&gt; readMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L326">        private final Map&lt;String, Long&gt; readByteMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L327">        private final Map&lt;String, Long&gt; writeMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L328">        private final Map&lt;String, Long&gt; writeByteMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L329">        private final Map&lt;String, Long&gt; queueLengthMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L330">        private final Map&lt;String, Long&gt; idleTimeMap = new HashMap&lt;&gt;();</span>
         private long timeStamp;
     }
 
     /**
      * Maps for the partition structure
      */
-<span class="nc" id="L336">    private static final class PartitionMaps {</span>
-<span class="nc" id="L337">        private final Map&lt;String, List&lt;String&gt;&gt; driveToPartitionMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L338">        private final Map&lt;String, String&gt; partitionToLogicalDriveMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L339">        private final Map&lt;String, HWPartition&gt; partitionMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L337">    private static final class PartitionMaps {</span>
+<span class="nc" id="L338">        private final Map&lt;String, List&lt;String&gt;&gt; driveToPartitionMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L339">        private final Map&lt;String, String&gt; partitionToLogicalDriveMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L340">        private final Map&lt;String, HWPartition&gt; partitionMap = new HashMap&lt;&gt;();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
