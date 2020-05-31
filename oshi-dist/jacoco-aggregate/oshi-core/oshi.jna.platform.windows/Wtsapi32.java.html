@@ -38,10 +38,76 @@ import oshi.jna.platform.windows.WinNT.LARGE_INTEGER;
 public interface Wtsapi32 extends com.sun.jna.platform.win32.Wtsapi32 {
 
 <span class="nc" id="L40">    Wtsapi32 INSTANCE = Native.load(&quot;Wtsapi32&quot;, Wtsapi32.class, W32APIOptions.DEFAULT_OPTIONS);</span>
-
+    /**
+     * Defined in {@code winsta.h} and present in this interface to properly size
+     * the {@link WTSINFO} structure.
+     */
     int DOMAIN_LENGTH = 17;
+
+    /**
+     * Defined in {@code winsta.h} and present in this interface to properly size
+     * the {@link WTSINFO} structure.
+     */
     int USERNAME_LENGTH = 20;
+
+    /**
+     * Defined in {@code winsta.h} and present in this interface to properly size
+     * the {@link WTSINFO} structure.
+     */
     int WINSTATIONNAME_LENGTH = 32;
+
+    /**
+     * Specifies the connection state of a Remote Desktop Services session.
+     */
+    public interface WTS_CONNECTSTATE_CLASS {
+        int WTSActive = 0;
+        int WTSConnected = 1;
+        int WTSConnectQuery = 2;
+        int WTSShadow = 3;
+        int WTSDisconnected = 4;
+        int WTSIdle = 5;
+        int WTSListen = 6;
+        int WTSReset = 7;
+        int WTSDown = 8;
+        int WTSInit = 9;
+    }
+
+    /**
+     * Contains values that indicate the type of session information to retrieve in
+     * a call to the {@code WTSQuerySessionInformation()} function.
+     */
+    public interface WTS_INFO_CLASS {
+        int WTSInitialProgram = 0;
+        int WTSApplicationName = 1;
+        int WTSWorkingDirectory = 2;
+        int WTSOEMId = 3;
+        int WTSSessionId = 4;
+        int WTSUserName = 5;
+        int WTSWinStationName = 6;
+        int WTSDomainName = 7;
+        int WTSConnectState = 8;
+        int WTSClientBuildNumber = 9;
+        int WTSClientName = 10;
+        int WTSClientDirectory = 11;
+        int WTSClientProductId = 12;
+        int WTSClientHardwareId = 13;
+        int WTSClientAddress = 14;
+        int WTSClientDisplay = 15;
+        int WTSClientProtocolType = 16;
+        int WTSIdleTime = 17;
+        int WTSLogonTime = 18;
+        int WTSIncomingBytes = 19;
+        int WTSOutgoingBytes = 20;
+        int WTSIncomingFrames = 21;
+        int WTSOutgoingFrames = 22;
+        int WTSClientInfo = 23;
+        int WTSSessionInfo = 24;
+        int WTSSessionInfoEx = 25;
+        int WTSConfigInfo = 26;
+        int WTSValidationInfo = 27;
+        int WTSSessionAddressV4 = 28;
+        int WTSIsRemoteSession = 29;
+    }
 
     /**
      * Contains information about a client session on a Remote Desktop Session Host
@@ -54,13 +120,13 @@ public interface Wtsapi32 extends com.sun.jna.platform.win32.Wtsapi32 {
         public int State; // WTS_CONNECTSTATE_CLASS
 
         public WTS_SESSION_INFO() {
-<span class="nc" id="L57">            super(W32APITypeMapper.DEFAULT);</span>
-<span class="nc" id="L58">        }</span>
+<span class="nc" id="L123">            super(W32APITypeMapper.DEFAULT);</span>
+<span class="nc" id="L124">        }</span>
 
         public WTS_SESSION_INFO(Pointer p) {
-<span class="nc" id="L61">            super(p, Structure.ALIGN_DEFAULT, W32APITypeMapper.DEFAULT);</span>
-<span class="nc" id="L62">            read();</span>
-<span class="nc" id="L63">        }</span>
+<span class="nc" id="L127">            super(p, Structure.ALIGN_DEFAULT, W32APITypeMapper.DEFAULT);</span>
+<span class="nc" id="L128">            read();</span>
+<span class="nc" id="L129">        }</span>
     }
 
     /**
@@ -69,16 +135,16 @@ public interface Wtsapi32 extends com.sun.jna.platform.win32.Wtsapi32 {
     @FieldOrder({ &quot;AddressFamily&quot;, &quot;Address&quot; })
     class WTS_CLIENT_ADDRESS extends Structure {
         public int AddressFamily;
-<span class="nc" id="L72">        public byte[] Address = new byte[20];</span>
+<span class="nc" id="L138">        public byte[] Address = new byte[20];</span>
 
         public WTS_CLIENT_ADDRESS() {
-<span class="nc" id="L75">            super();</span>
-<span class="nc" id="L76">        }</span>
+<span class="nc" id="L141">            super();</span>
+<span class="nc" id="L142">        }</span>
 
         public WTS_CLIENT_ADDRESS(Pointer p) {
-<span class="nc" id="L79">            super(p);</span>
-<span class="nc" id="L80">            read();</span>
-<span class="nc" id="L81">        }</span>
+<span class="nc" id="L145">            super(p);</span>
+<span class="nc" id="L146">            read();</span>
+<span class="nc" id="L147">        }</span>
     }
 
     /**
@@ -88,9 +154,9 @@ public interface Wtsapi32 extends com.sun.jna.platform.win32.Wtsapi32 {
             &quot;IncomingCompressedBytes&quot;, &quot;OutgoingCompressedBytes&quot;, &quot;WinStationName&quot;, &quot;Domain&quot;, &quot;UserName&quot;, &quot;ConnectTime&quot;,
             &quot;DisconnectTime&quot;, &quot;LastInputTime&quot;, &quot;LogonTime&quot;, &quot;CurrentTime&quot; })
     class WTSINFO extends Structure {
-<span class="nc bnc" id="L91" title="All 2 branches missed.">        private static final int CHAR_WIDTH = Boolean.getBoolean(&quot;w32.ascii&quot;) ? 1 : 2;</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        private static final int CHAR_WIDTH = Boolean.getBoolean(&quot;w32.ascii&quot;) ? 1 : 2;</span>
 
-        public int State;
+        public int State; // WTS_CONNECTSTATE_CLASS
         public int SessionId;
         public int IncomingBytes;
         public int OutgoingBytes;
@@ -98,9 +164,9 @@ public interface Wtsapi32 extends com.sun.jna.platform.win32.Wtsapi32 {
         public int OutgoingFrames;
         public int IncomingCompressedBytes;
         public int OutgoingCompressedBytes;
-<span class="nc" id="L101">        public byte[] WinStationName = new byte[WINSTATIONNAME_LENGTH * CHAR_WIDTH];</span>
-<span class="nc" id="L102">        public byte[] Domain = new byte[DOMAIN_LENGTH * CHAR_WIDTH];</span>
-<span class="nc" id="L103">        public byte[] UserName = new byte[(USERNAME_LENGTH + 1) * CHAR_WIDTH];</span>
+<span class="nc" id="L167">        public final byte[] WinStationName = new byte[WINSTATIONNAME_LENGTH * CHAR_WIDTH];</span>
+<span class="nc" id="L168">        public final byte[] Domain = new byte[DOMAIN_LENGTH * CHAR_WIDTH];</span>
+<span class="nc" id="L169">        public final byte[] UserName = new byte[(USERNAME_LENGTH + 1) * CHAR_WIDTH];</span>
         public LARGE_INTEGER ConnectTime;
         public LARGE_INTEGER DisconnectTime;
         public LARGE_INTEGER LastInputTime;
@@ -108,28 +174,49 @@ public interface Wtsapi32 extends com.sun.jna.platform.win32.Wtsapi32 {
         public LARGE_INTEGER CurrentTime;
 
         public WTSINFO() {
-<span class="nc" id="L111">            super(W32APITypeMapper.DEFAULT);</span>
-<span class="nc" id="L112">        }</span>
+<span class="nc" id="L177">            super();</span>
+<span class="nc" id="L178">        }</span>
 
         public WTSINFO(Pointer p) {
-<span class="nc" id="L115">            super(p, Structure.ALIGN_DEFAULT, W32APITypeMapper.DEFAULT);</span>
-<span class="nc" id="L116">            read();</span>
-<span class="nc" id="L117">        }</span>
+<span class="nc" id="L181">            super(p);</span>
+<span class="nc" id="L182">            read();</span>
+<span class="nc" id="L183">        }</span>
 
+        /**
+         * Convenience method to return the null-terminated string in the
+         * {@link #WinStationName} member, accounting for {@code CHAR} or {@code WCHAR}
+         * byte width.
+         *
+         * @return The {@code WinStationName} as a string.
+         */
         public String getWinStationName() {
-<span class="nc" id="L120">            return getStringAtOffset(fieldOffset(&quot;WinStationName&quot;));</span>
+<span class="nc" id="L193">            return getStringAtOffset(fieldOffset(&quot;WinStationName&quot;));</span>
         }
 
+        /**
+         * Convenience method to return the null-terminated string in the
+         * {@link #Domain} member, accounting for {@code CHAR} or {@code WCHAR} byte
+         * width.
+         *
+         * @return The {@code Domain} as a string.
+         */
         public String getDomain() {
-<span class="nc" id="L124">            return getStringAtOffset(fieldOffset(&quot;Domain&quot;));</span>
+<span class="nc" id="L204">            return getStringAtOffset(fieldOffset(&quot;Domain&quot;));</span>
         }
 
+        /**
+         * Convenience method to return the null-terminated string in the
+         * {@link #UserName} member, accounting for {@code CHAR} or {@code WCHAR} byte
+         * width.
+         *
+         * @return The {@code UserName} as a string.
+         */
         public String getUserName() {
-<span class="nc" id="L128">            return getStringAtOffset(fieldOffset(&quot;UserName&quot;));</span>
+<span class="nc" id="L215">            return getStringAtOffset(fieldOffset(&quot;UserName&quot;));</span>
         }
 
         private String getStringAtOffset(int offset) {
-<span class="nc bnc" id="L132" title="All 2 branches missed.">            return CHAR_WIDTH == 1 ? getPointer().getString(offset) : getPointer().getWideString(offset);</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">            return CHAR_WIDTH == 1 ? getPointer().getString(offset) : getPointer().getWideString(offset);</span>
         }
     }
 
@@ -191,7 +278,7 @@ public interface Wtsapi32 extends com.sun.jna.platform.win32.Wtsapi32 {
      *            To query information for another user's session, you must have
      *            Query Information permission.
      * @param WTSInfoClass
-     *            A value of the {@code WTS_INFO_CLASS} enumeration that indicates
+     *            A value of the {@link WTS_INFO_CLASS} enumeration that indicates
      *            the type of session information to retrieve in a call to the
      *            {@code WTSQuerySessionInformation} function.
      * @param ppBuffer
