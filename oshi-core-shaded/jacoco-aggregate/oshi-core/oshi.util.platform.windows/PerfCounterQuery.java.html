@@ -29,55 +29,41 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jna.platform.win32.COM.Wbemcli; //NOSONAR
+import com.sun.jna.platform.win32.PdhUtil; //NOSONAR
+import com.sun.jna.platform.win32.PdhUtil.PdhException;
+import com.sun.jna.platform.win32.Win32Exception;
+import com.sun.jna.platform.win32.COM.Wbemcli;
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiQuery;
 import com.sun.jna.platform.win32.COM.WbemcliUtil.WmiResult;
 
-import oshi.annotation.concurrent.NotThreadSafe;
+import oshi.annotation.concurrent.ThreadSafe;
 import oshi.util.platform.windows.PerfDataUtil.PerfCounter;
 
 /**
- * Encapsulates information for a Performance Counter query.
- * &lt;p&gt;
- * An instance of this class should only be instantiated and used within the
- * context of a single thread.
+ * Enables queries of Performance Counters using wild cards to filter instances
  */
-@NotThreadSafe
-public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
+@ThreadSafe
+public final class PerfCounterQuery {
 
 <span class="nc" id="L48">    private static final Logger LOG = LoggerFactory.getLogger(PerfCounterQuery.class);</span>
 
     /*
-     * Set on instantiation
-     */
-    protected final Class&lt;T&gt; propertyEnum;
-    protected final String perfObject;
-    protected final String perfWmiClass;
-    protected final String queryKey;
-    protected CounterDataSource source;
-    protected PerfCounterQueryHandler pdhQueryHandler;
-
-    /*
-     * Only one will be non-null depending on source
-     */
-<span class="nc" id="L63">    private EnumMap&lt;T, PerfCounter&gt; counterMap = null;</span>
-<span class="nc" id="L64">    protected WmiQuery&lt;T&gt; counterQuery = null;</span>
-
-    /*
      * Multiple classes use these constants
      */
-    /** Constant &lt;code&gt;TOTAL_INSTANCE=&quot;_Total&quot;&lt;/code&gt; */
     public static final String TOTAL_INSTANCE = &quot;_Total&quot;;
-    /** Constant &lt;code&gt;TOTAL_INSTANCES=&quot;*_Total&quot;&lt;/code&gt; */
     public static final String TOTAL_INSTANCES = &quot;*_Total&quot;;
-    /** Constant &lt;code&gt;NOT_TOTAL_INSTANCE=&quot;^ + TOTAL_INSTANCE&quot;&lt;/code&gt; */
     public static final String NOT_TOTAL_INSTANCE = &quot;^&quot; + TOTAL_INSTANCE;
-    /** Constant &lt;code&gt;NOT_TOTAL_INSTANCES=&quot;^ + TOTAL_INSTANCES&quot;&lt;/code&gt; */
     public static final String NOT_TOTAL_INSTANCES = &quot;^&quot; + TOTAL_INSTANCES;
 
+    private PerfCounterQuery() {
+    }
+
     /**
-     * Construct a new object to hold performance counter data source and results
+     * Query the a Performance Counter using PDH, with WMI backup on failure, for
+     * values corresponding to the property enum.
      *
+     * @param &lt;T&gt;
+     *            The enum type of {@code propertyEnum}
      * @param propertyEnum
      *            An enum which implements
      *            {@link oshi.util.platform.windows.PerfCounterQuery.PdhCounterProperty}
@@ -88,14 +74,24 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
      *            be refreshed at the same time
      * @param perfWmiClass
      *            The WMI PerfData_RawData_* class corresponding to the PDH object
+     * @return An {@link EnumMap} of the values indexed by {@code propertyEnum} on
+     *         success, or an empty map if both PDH and WMI queries failed.
      */
-    public PerfCounterQuery(Class&lt;T&gt; propertyEnum, String perfObject, String perfWmiClass) {
-<span class="nc" id="L93">        this(propertyEnum, perfObject, perfWmiClass, perfObject);</span>
-<span class="nc" id="L94">    }</span>
+    public static &lt;T extends Enum&lt;T&gt;&gt; Map&lt;T, Long&gt; queryValues(Class&lt;T&gt; propertyEnum, String perfObject,
+            String perfWmiClass) {
+<span class="nc" id="L82">        Map&lt;T, Long&gt; valueMap = queryValuesFromPDH(propertyEnum, perfObject);</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        if (valueMap.isEmpty()) {</span>
+<span class="nc" id="L84">            return queryValuesFromWMI(propertyEnum, perfWmiClass);</span>
+        }
+<span class="nc" id="L86">        return valueMap;</span>
+    }
 
     /**
-     * Construct a new object to hold performance counter data source and results
+     * Query the a Performance Counter using PDH for values corresponding to the
+     * property enum.
      *
+     * @param &lt;T&gt;
+     *            The enum type of {@code propertyEnum}
      * @param propertyEnum
      *            An enum which implements
      *            {@link oshi.util.platform.windows.PerfCounterQuery.PdhCounterProperty}
@@ -104,165 +100,108 @@ public class PerfCounterQuery&lt;T extends Enum&lt;T&gt;&gt; {
      * @param perfObject
      *            The PDH object for this counter; all counters on this object will
      *            be refreshed at the same time
-     * @param perfWmiClass
+     * @return An {@link EnumMap} of the values indexed by {@code propertyEnum} on
+     *         success, or an empty map if the PDH query failed.
+     */
+    public static &lt;T extends Enum&lt;T&gt;&gt; Map&lt;T, Long&gt; queryValuesFromPDH(Class&lt;T&gt; propertyEnum, String perfObject) {
+<span class="nc" id="L107">        T[] props = propertyEnum.getEnumConstants();</span>
+<span class="nc" id="L108">        String perfObjectLocalized = localize(perfObject);</span>
+<span class="nc" id="L109">        EnumMap&lt;T, PerfCounter&gt; counterMap = new EnumMap&lt;&gt;(propertyEnum);</span>
+<span class="nc" id="L110">        EnumMap&lt;T, Long&gt; valueMap = new EnumMap&lt;&gt;(propertyEnum);</span>
+<span class="nc" id="L111">        try (PerfCounterQueryHandler pdhQueryHandler = new PerfCounterQueryHandler()) {</span>
+            // Set up the query and counter handles
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            for (T prop : props) {</span>
+<span class="nc" id="L114">                PerfCounter counter = PerfDataUtil.createCounter(perfObjectLocalized,</span>
+<span class="nc" id="L115">                        ((PdhCounterProperty) prop).getInstance(), ((PdhCounterProperty) prop).getCounter());</span>
+<span class="nc" id="L116">                counterMap.put(prop, counter);</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">                if (!pdhQueryHandler.addCounterToQuery(counter)) {</span>
+<span class="nc" id="L118">                    return valueMap;</span>
+                }
+            }
+            // And then query. Zero timestamp means update failed
+<span class="nc bnc" id="L122" title="All 2 branches missed.">            if (0 &lt; pdhQueryHandler.updateQuery(perfObjectLocalized)) {</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">                for (T prop : props) {</span>
+<span class="nc" id="L124">                    valueMap.put(prop, pdhQueryHandler.queryCounter(counterMap.get(prop)));</span>
+                }
+            }
+<span class="nc" id="L127">        }</span>
+<span class="nc" id="L128">        return valueMap;</span>
+    }
+
+    /**
+     * Query the a Performance Counter using WMI for values corresponding to the
+     * property enum.
+     *
+     * @param &lt;T&gt;
+     *            The enum type of {@code propertyEnum}
+     * @param propertyEnum
+     *            An enum which implements
+     *            {@link oshi.util.platform.windows.PerfCounterQuery.PdhCounterProperty}
+     *            and contains the WMI field (Enum value) and PDH Counter string
+     *            (instance and counter)
+     * @param wmiClass
      *            The WMI PerfData_RawData_* class corresponding to the PDH object
-     * @param queryKey
-     *            An optional key for PDH counter updates; defaults to the PDH
-     *            object name
+     * @return An {@link EnumMap} of the values indexed by {@code propertyEnum} if
+     *         successful, an empty map if the WMI query failed.
      */
-<span class="nc" id="L113">    public PerfCounterQuery(Class&lt;T&gt; propertyEnum, String perfObject, String perfWmiClass, String queryKey) {</span>
-<span class="nc" id="L114">        this.propertyEnum = propertyEnum;</span>
-<span class="nc" id="L115">        this.perfObject = perfObject;</span>
-<span class="nc" id="L116">        this.perfWmiClass = perfWmiClass;</span>
-<span class="nc" id="L117">        this.queryKey = queryKey;</span>
-<span class="nc" id="L118">        this.pdhQueryHandler = new PerfCounterQueryHandler();</span>
-        // Start off with PDH as source; if query here fails we will permanently
-        // fall back to WMI
-<span class="nc" id="L121">        this.source = CounterDataSource.PDH;</span>
-<span class="nc" id="L122">    }</span>
-
-    /**
-     * Set the Data Source for these counters
-     *
-     * @param source
-     *            The source of data
-     * @return Whether the data source was successfully set
-     */
-    public boolean setDataSource(CounterDataSource source) {
-<span class="nc" id="L132">        this.source = source;</span>
-<span class="nc bnc" id="L133" title="All 3 branches missed.">        switch (source) {</span>
-        case PDH:
-<span class="nc" id="L135">            LOG.debug(&quot;Attempting to set PDH Data Source.&quot;);</span>
-<span class="nc" id="L136">            unInitWmiCounters();</span>
-<span class="nc" id="L137">            return initPdhCounters();</span>
-        case WMI:
-<span class="nc" id="L139">            LOG.debug(&quot;Attempting to set WMI Data Source.&quot;);</span>
-<span class="nc" id="L140">            unInitPdhCounters();</span>
-<span class="nc" id="L141">            initWmiCounters();</span>
-<span class="nc" id="L142">            return true;</span>
-        default:
-            // This should never happen unless you've added a new source and
-            // forgot to add a case for it
-<span class="nc" id="L146">            throw new IllegalArgumentException(&quot;Invalid Data Source specified.&quot;);</span>
-        }
-    }
-
-    /**
-     * Initialize PDH counters for this data source. Adds necessary counters to a
-     * PDH Query.
-     *
-     * @return True if the counters were successfully added.
-     */
-    protected boolean initPdhCounters() {
-<span class="nc" id="L157">        this.counterMap = new EnumMap&lt;&gt;(propertyEnum);</span>
-<span class="nc bnc" id="L158" title="All 2 branches missed.">        for (T prop : propertyEnum.getEnumConstants()) {</span>
-<span class="nc" id="L159">            PerfCounter counter = PerfDataUtil.createCounter(perfObject, ((PdhCounterProperty) prop).getInstance(),</span>
-<span class="nc" id="L160">                    ((PdhCounterProperty) prop).getCounter());</span>
-<span class="nc" id="L161">            counterMap.put(prop, counter);</span>
-<span class="nc bnc" id="L162" title="All 2 branches missed.">            if (!pdhQueryHandler.addCounterToQuery(counter, this.queryKey)) {</span>
-<span class="nc" id="L163">                unInitPdhCounters();</span>
-<span class="nc" id="L164">                return false;</span>
-            }
-        }
-<span class="nc" id="L167">        return true;</span>
-    }
-
-    /**
-     * Uninitialize PDH counters for this data source. Removes necessary counters
-     * from the PDH Query, releasing their handles.
-     */
-    protected void unInitPdhCounters() {
-<span class="nc" id="L175">        pdhQueryHandler.removeAllCountersFromQuery(this.queryKey);</span>
-<span class="nc" id="L176">        this.counterMap = null;</span>
-<span class="nc" id="L177">    }</span>
-
-    /**
-     * Initialize the WMI query object needed to retrieve counters for this data
-     * source.
-     */
-    protected void initWmiCounters() {
-<span class="nc" id="L184">        this.counterQuery = new WmiQuery&lt;&gt;(perfWmiClass, propertyEnum);</span>
-<span class="nc" id="L185">    }</span>
-
-    /**
-     * Uninitializes the WMI query object needed to retrieve counters for this data
-     * source, allowing it to be garbage collected.
-     */
-    protected void unInitWmiCounters() {
-<span class="nc" id="L192">        this.counterQuery = null;</span>
-<span class="nc" id="L193">    }</span>
-
-    /**
-     * Query the current data source (PDH or WMI) for the Performance Counter values
-     * corresponding to the property enum.
-     *
-     * @return A map of the values by the counter enum.
-     */
-    public Map&lt;T, Long&gt; queryValues() {
-<span class="nc" id="L202">        EnumMap&lt;T, Long&gt; valueMap = new EnumMap&lt;&gt;(propertyEnum);</span>
-<span class="nc" id="L203">        T[] props = this.propertyEnum.getEnumConstants();</span>
-<span class="nc bnc" id="L204" title="All 2 branches missed.">        if (source.equals(CounterDataSource.PDH)) {</span>
-            // Set up the query and counter handles, and query
-<span class="nc bnc" id="L206" title="All 4 branches missed.">            if (initPdhCounters() &amp;&amp; queryPdh(valueMap, props)) {</span>
-                // If both init and query return true, then valueMap contains
-                // the results. Release the handles.
-<span class="nc" id="L209">                unInitPdhCounters();</span>
-            } else {
-                // If either init or query failed, switch to WMI
-<span class="nc" id="L212">                setDataSource(CounterDataSource.WMI);</span>
-            }
-        }
-<span class="nc bnc" id="L215" title="All 2 branches missed.">        if (source.equals(CounterDataSource.WMI)) {</span>
-<span class="nc" id="L216">            queryWmi(valueMap, props);</span>
-        }
-<span class="nc" id="L218">        return valueMap;</span>
-    }
-
-    private boolean queryPdh(Map&lt;T, Long&gt; valueMap, T[] props) {
-<span class="nc bnc" id="L222" title="All 4 branches missed.">        if (counterMap != null &amp;&amp; 0 &lt; pdhQueryHandler.updateQuery(this.queryKey)) {</span>
-<span class="nc bnc" id="L223" title="All 2 branches missed.">            for (T prop : props) {</span>
-<span class="nc" id="L224">                valueMap.put(prop, pdhQueryHandler.queryCounter(counterMap.get(prop)));</span>
-            }
-<span class="nc" id="L226">            return true;</span>
-        }
-        // Zero timestamp means update failed after muliple
-        // attempts; fallback to WMI
-<span class="nc" id="L230">        return false;</span>
-    }
-
-    private void queryWmi(Map&lt;T, Long&gt; valueMap, T[] props) {
-<span class="nc" id="L234">        WmiResult&lt;T&gt; result = WmiQueryHandler.createInstance().queryWMI(this.counterQuery);</span>
-<span class="nc bnc" id="L235" title="All 2 branches missed.">        if (result.getResultCount() &gt; 0) {</span>
-<span class="nc bnc" id="L236" title="All 2 branches missed.">            for (T prop : props) {</span>
-<span class="nc bnc" id="L237" title="All 4 branches missed.">                switch (result.getCIMType(prop)) {</span>
+    public static &lt;T extends Enum&lt;T&gt;&gt; Map&lt;T, Long&gt; queryValuesFromWMI(Class&lt;T&gt; propertyEnum, String wmiClass) {
+<span class="nc" id="L148">        WmiQuery&lt;T&gt; query = new WmiQuery&lt;&gt;(wmiClass, propertyEnum);</span>
+<span class="nc" id="L149">        WmiResult&lt;T&gt; result = WmiQueryHandler.createInstance().queryWMI(query);</span>
+<span class="nc" id="L150">        EnumMap&lt;T, Long&gt; valueMap = new EnumMap&lt;&gt;(propertyEnum);</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (result.getResultCount() &gt; 0) {</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">            for (T prop : propertyEnum.getEnumConstants()) {</span>
+<span class="nc bnc" id="L153" title="All 5 branches missed.">                switch (result.getCIMType(prop)) {</span>
                 case Wbemcli.CIM_UINT16:
-<span class="nc" id="L239">                    valueMap.put(prop, Long.valueOf(WmiUtil.getUint16(result, prop, 0)));</span>
-<span class="nc" id="L240">                    break;</span>
+<span class="nc" id="L155">                    valueMap.put(prop, Long.valueOf(WmiUtil.getUint16(result, prop, 0)));</span>
+<span class="nc" id="L156">                    break;</span>
                 case Wbemcli.CIM_UINT32:
-<span class="nc" id="L242">                    valueMap.put(prop, WmiUtil.getUint32asLong(result, prop, 0));</span>
-<span class="nc" id="L243">                    break;</span>
+<span class="nc" id="L158">                    valueMap.put(prop, WmiUtil.getUint32asLong(result, prop, 0));</span>
+<span class="nc" id="L159">                    break;</span>
                 case Wbemcli.CIM_UINT64:
-<span class="nc" id="L245">                    valueMap.put(prop, WmiUtil.getUint64(result, prop, 0));</span>
-<span class="nc" id="L246">                    break;</span>
+<span class="nc" id="L161">                    valueMap.put(prop, WmiUtil.getUint64(result, prop, 0));</span>
+<span class="nc" id="L162">                    break;</span>
+                case Wbemcli.CIM_DATETIME:
+<span class="nc" id="L164">                    valueMap.put(prop, WmiUtil.getDateTime(result, prop, 0).toInstant().toEpochMilli());</span>
+<span class="nc" id="L165">                    break;</span>
                 default:
-<span class="nc" id="L248">                    throw new ClassCastException(&quot;Unimplemented CIM Type Mapping.&quot;);</span>
+<span class="nc" id="L167">                    throw new ClassCastException(&quot;Unimplemented CIM Type Mapping.&quot;);</span>
                 }
             }
         }
-<span class="nc" id="L252">    }</span>
+<span class="nc" id="L171">        return valueMap;</span>
+    }
 
     /**
-     * Source of performance counter data.
+     * Localize a PerfCounter string. English counter names should normally be in
+     * {@code HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows
+     * NT\CurrentVersion\Perflib\009\Counter}, but language manipulations may delete
+     * the {@code 009} index. In this case we can assume English must be the
+     * language and continue. We may still fail to match the name if the assumption
+     * is wrong but it's better than nothing.
+     *
+     * @param perfObject
+     *            A String to localize
+     * @return The localized string if localization successful, or the original
+     *         string otherwise.
      */
-<span class="nc" id="L257">    public enum CounterDataSource {</span>
-        /**
-         * Performance Counter data will be pulled from a PDH Counter
-         */
-<span class="nc" id="L261">        PDH,</span>
-        /**
-         * Performance Counter data will be pulled from a WMI PerfData_RawData_* table
-         */
-<span class="nc" id="L265">        WMI;</span>
+    public static String localize(String perfObject) {
+<span class="nc" id="L188">        String localized = perfObject;</span>
+        try {
+<span class="nc" id="L190">            localized = PdhUtil.PdhLookupPerfNameByIndex(null, PdhUtil.PdhLookupPerfIndexByEnglishName(perfObject));</span>
+<span class="nc" id="L191">        } catch (Win32Exception e) {</span>
+<span class="nc" id="L192">            LOG.warn(</span>
+                    &quot;Unable to locate English counter names in registry Perflib 009. Assuming English counters. Error {}. {}&quot;,
+<span class="nc" id="L194">                    String.format(&quot;0x%x&quot;, e.getHR().intValue()),</span>
+                    &quot;See https://support.microsoft.com/en-us/help/300956/how-to-manually-rebuild-performance-counter-library-values&quot;);
+<span class="nc" id="L196">        } catch (PdhException e) {</span>
+<span class="nc" id="L197">            LOG.warn(&quot;Unable to localize {} performance counter.  Error {}.&quot;, perfObject,</span>
+<span class="nc" id="L198">                    String.format(&quot;0x%x&quot;, e.getErrorCode()));</span>
+<span class="nc" id="L199">        }</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">        if (localized.isEmpty()) {</span>
+<span class="nc" id="L201">            return perfObject;</span>
+        }
+<span class="nc" id="L203">        LOG.debug(&quot;Localized {} to {}&quot;, perfObject, localized);</span>
+<span class="nc" id="L204">        return localized;</span>
     }
 
     /**

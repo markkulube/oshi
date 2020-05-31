@@ -72,9 +72,7 @@ public final class SystemInformation {
      * @return Context switches counter for the total of all processors.
      */
     public static Map&lt;ContextSwitchProperty, Long&gt; queryContextSwitchCounters() {
-<span class="nc" id="L75">        PerfCounterQuery&lt;ContextSwitchProperty&gt; contextSwitchPerfCounters = new PerfCounterQuery&lt;&gt;(</span>
-                ContextSwitchProperty.class, SYSTEM, WIN32_PERF_RAW_DATA_PERF_OS_SYSTEM);
-<span class="nc" id="L77">        return contextSwitchPerfCounters.queryValues();</span>
+<span class="nc" id="L75">        return PerfCounterQuery.queryValues(ContextSwitchProperty.class, SYSTEM, WIN32_PERF_RAW_DATA_PERF_OS_SYSTEM);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
