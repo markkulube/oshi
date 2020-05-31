@@ -76,12 +76,8 @@ public final class PhysicalDisk {
      * @return Performance Counters for physical disks.
      */
     public static Pair&lt;List&lt;String&gt;, Map&lt;PhysicalDiskProperty, List&lt;Long&gt;&gt;&gt; queryDiskCounters() {
-<span class="nc" id="L79">        PerfCounterWildcardQuery&lt;PhysicalDiskProperty&gt; physicalDiskPerfCounters = new PerfCounterWildcardQuery&lt;&gt;(</span>
-                PhysicalDiskProperty.class, PHYSICAL_DISK,
+<span class="nc" id="L79">        return PerfCounterWildcardQuery.queryInstancesAndValues(PhysicalDiskProperty.class, PHYSICAL_DISK,</span>
                 WIN32_PERF_RAW_DATA_PERF_DISK_PHYSICAL_DISK_WHERE_NOT_NAME_TOTAL);
-<span class="nc" id="L82">        Map&lt;PhysicalDiskProperty, List&lt;Long&gt;&gt; values = physicalDiskPerfCounters.queryValuesWildcard();</span>
-<span class="nc" id="L83">        List&lt;String&gt; instances = physicalDiskPerfCounters.getInstancesFromLastQuery();</span>
-<span class="nc" id="L84">        return new Pair&lt;&gt;(instances, values);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
