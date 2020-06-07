@@ -160,7 +160,7 @@ public final class LinuxHWDiskStore extends AbstractHWDiskStore {
         try {
 <span class="nc" id="L161">            UdevEnumerate enumerate = udev.enumerateNew();</span>
             try {
-<span class="nc" id="L163">                enumerate.addMatchSubsystem(&quot;block&quot;);</span>
+<span class="nc" id="L163">                enumerate.addMatchSubsystem(BLOCK);</span>
 <span class="nc" id="L164">                enumerate.scanDevices();</span>
 <span class="nc bnc" id="L165" title="All 2 branches missed.">                for (UdevListEntry entry = enumerate.getListEntry(); entry != null; entry = entry.getNext()) {</span>
 <span class="nc" id="L166">                    String syspath = entry.getName();</span>
@@ -201,92 +201,90 @@ public final class LinuxHWDiskStore extends AbstractHWDiskStore {
                                     // udev_device_get_parent_*() does not take a reference on the returned device,
                                     // it is automatically unref'd with the parent
 <span class="nc" id="L203">                                    UdevDevice parent = device.getParentWithSubsystemDevtype(BLOCK, DISK);</span>
-<span class="nc bnc" id="L204" title="All 2 branches missed.">                                    if (parent != null) {</span>
+<span class="nc bnc" id="L204" title="All 4 branches missed.">                                    if (parent != null &amp;&amp; store.getName().equals(parent.getDevnode())) {</span>
                                         // `store` should still point to the parent HWDiskStore this partition is
                                         // attached to. If not, it's an error, so skip.
-<span class="nc bnc" id="L207" title="All 2 branches missed.">                                        if (store.getName().equals(parent.getDevnode())) {</span>
-<span class="nc" id="L208">                                            String name = device.getDevnode();</span>
-<span class="nc" id="L209">                                            store.partitionList.add(new HWPartition(name, device.getSysname(),</span>
-<span class="nc bnc" id="L210" title="All 2 branches missed.">                                                    device.getPropertyValue(ID_FS_TYPE) == null ? PARTITION</span>
-<span class="nc" id="L211">                                                            : device.getPropertyValue(ID_FS_TYPE),</span>
-<span class="nc bnc" id="L212" title="All 2 branches missed.">                                                    device.getPropertyValue(ID_FS_UUID) == null ? &quot;&quot;</span>
-<span class="nc" id="L213">                                                            : device.getPropertyValue(ID_FS_UUID),</span>
-<span class="nc" id="L214">                                                    ParseUtil.parseLongOrDefault(device.getSysattrValue(SIZE), 0L)</span>
-                                                            * SECTORSIZE,
-<span class="nc" id="L216">                                                    ParseUtil.parseIntOrDefault(device.getPropertyValue(MAJOR), 0),</span>
-<span class="nc" id="L217">                                                    ParseUtil.parseIntOrDefault(device.getPropertyValue(MINOR), 0),</span>
-<span class="nc" id="L218">                                                    mountsMap.getOrDefault(name, &quot;&quot;)));</span>
-                                        }
+<span class="nc" id="L207">                                        String name = device.getDevnode();</span>
+<span class="nc" id="L208">                                        store.partitionList.add(new HWPartition(name, device.getSysname(),</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">                                                device.getPropertyValue(ID_FS_TYPE) == null ? PARTITION</span>
+<span class="nc" id="L210">                                                        : device.getPropertyValue(ID_FS_TYPE),</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">                                                device.getPropertyValue(ID_FS_UUID) == null ? &quot;&quot;</span>
+<span class="nc" id="L212">                                                        : device.getPropertyValue(ID_FS_UUID),</span>
+<span class="nc" id="L213">                                                ParseUtil.parseLongOrDefault(device.getSysattrValue(SIZE), 0L)</span>
+                                                        * SECTORSIZE,
+<span class="nc" id="L215">                                                ParseUtil.parseIntOrDefault(device.getPropertyValue(MAJOR), 0),</span>
+<span class="nc" id="L216">                                                ParseUtil.parseIntOrDefault(device.getPropertyValue(MINOR), 0),</span>
+<span class="nc" id="L217">                                                mountsMap.getOrDefault(name, &quot;&quot;)));</span>
                                     }
                                 }
                             }
                         } finally {
-<span class="nc" id="L224">                            device.unref();</span>
+<span class="nc" id="L222">                            device.unref();</span>
                         }
                     }
                 }
             } finally {
-<span class="nc" id="L229">                enumerate.unref();</span>
+<span class="nc" id="L227">                enumerate.unref();</span>
             }
         } finally {
-<span class="nc" id="L232">            udev.unref();</span>
+<span class="nc" id="L230">            udev.unref();</span>
         }
         // Iterate the list and make the partitions unmodifiable
-<span class="nc bnc" id="L235" title="All 2 branches missed.">        for (LinuxHWDiskStore hwds : result) {</span>
-<span class="nc" id="L236">            hwds.partitionList = Collections.unmodifiableList(hwds.partitionList.stream()</span>
-<span class="nc" id="L237">                    .sorted(Comparator.comparing(HWPartition::getName)).collect(Collectors.toList()));</span>
-<span class="nc" id="L238">        }</span>
-<span class="nc" id="L239">        return result;</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        for (LinuxHWDiskStore hwds : result) {</span>
+<span class="nc" id="L234">            hwds.partitionList = Collections.unmodifiableList(hwds.partitionList.stream()</span>
+<span class="nc" id="L235">                    .sorted(Comparator.comparing(HWPartition::getName)).collect(Collectors.toList()));</span>
+<span class="nc" id="L236">        }</span>
+<span class="nc" id="L237">        return result;</span>
     }
 
     @Override
     public boolean updateAttributes() {
         // If this returns non-empty (the same store, but updated) then we were
         // successful in the update
-<span class="nc bnc" id="L246" title="All 2 branches missed.">        return !getDisks(this).isEmpty();</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">        return !getDisks(this).isEmpty();</span>
     }
 
     private static Map&lt;String, String&gt; readMountsMap() {
-<span class="nc" id="L250">        Map&lt;String, String&gt; mountsMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L251">        List&lt;String&gt; mounts = FileUtil.readFile(ProcPath.MOUNTS);</span>
-<span class="nc bnc" id="L252" title="All 2 branches missed.">        for (String mount : mounts) {</span>
-<span class="nc" id="L253">            String[] split = ParseUtil.whitespaces.split(mount);</span>
-<span class="nc bnc" id="L254" title="All 4 branches missed.">            if (split.length &lt; 2 || !split[0].startsWith(&quot;/dev/&quot;)) {</span>
-<span class="nc" id="L255">                continue;</span>
+<span class="nc" id="L248">        Map&lt;String, String&gt; mountsMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L249">        List&lt;String&gt; mounts = FileUtil.readFile(ProcPath.MOUNTS);</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        for (String mount : mounts) {</span>
+<span class="nc" id="L251">            String[] split = ParseUtil.whitespaces.split(mount);</span>
+<span class="nc bnc" id="L252" title="All 4 branches missed.">            if (split.length &lt; 2 || !split[0].startsWith(&quot;/dev/&quot;)) {</span>
+<span class="nc" id="L253">                continue;</span>
             }
-<span class="nc" id="L257">            mountsMap.put(split[0], split[1]);</span>
-<span class="nc" id="L258">        }</span>
-<span class="nc" id="L259">        return mountsMap;</span>
+<span class="nc" id="L255">            mountsMap.put(split[0], split[1]);</span>
+<span class="nc" id="L256">        }</span>
+<span class="nc" id="L257">        return mountsMap;</span>
     }
 
     private static void computeDiskStats(LinuxHWDiskStore store, String devstat) {
-<span class="nc" id="L263">        long[] devstatArray = ParseUtil.parseStringToLongArray(devstat, UDEV_STAT_ORDERS, UDEV_STAT_LENGTH, ' ');</span>
-<span class="nc" id="L264">        store.timeStamp = System.currentTimeMillis();</span>
+<span class="nc" id="L261">        long[] devstatArray = ParseUtil.parseStringToLongArray(devstat, UDEV_STAT_ORDERS, UDEV_STAT_LENGTH, ' ');</span>
+<span class="nc" id="L262">        store.timeStamp = System.currentTimeMillis();</span>
 
         // Reads and writes are converted in bytes
-<span class="nc" id="L267">        store.reads = devstatArray[UdevStat.READS.ordinal()];</span>
-<span class="nc" id="L268">        store.readBytes = devstatArray[UdevStat.READ_BYTES.ordinal()] * SECTORSIZE;</span>
-<span class="nc" id="L269">        store.writes = devstatArray[UdevStat.WRITES.ordinal()];</span>
-<span class="nc" id="L270">        store.writeBytes = devstatArray[UdevStat.WRITE_BYTES.ordinal()] * SECTORSIZE;</span>
-<span class="nc" id="L271">        store.currentQueueLength = devstatArray[UdevStat.QUEUE_LENGTH.ordinal()];</span>
-<span class="nc" id="L272">        store.transferTime = devstatArray[UdevStat.ACTIVE_MS.ordinal()];</span>
-<span class="nc" id="L273">    }</span>
+<span class="nc" id="L265">        store.reads = devstatArray[UdevStat.READS.ordinal()];</span>
+<span class="nc" id="L266">        store.readBytes = devstatArray[UdevStat.READ_BYTES.ordinal()] * SECTORSIZE;</span>
+<span class="nc" id="L267">        store.writes = devstatArray[UdevStat.WRITES.ordinal()];</span>
+<span class="nc" id="L268">        store.writeBytes = devstatArray[UdevStat.WRITE_BYTES.ordinal()] * SECTORSIZE;</span>
+<span class="nc" id="L269">        store.currentQueueLength = devstatArray[UdevStat.QUEUE_LENGTH.ordinal()];</span>
+<span class="nc" id="L270">        store.transferTime = devstatArray[UdevStat.ACTIVE_MS.ordinal()];</span>
+<span class="nc" id="L271">    }</span>
 
     // Order the field is in udev stats
-<span class="nc" id="L276">    enum UdevStat {</span>
+<span class="nc" id="L274">    enum UdevStat {</span>
         // The parsing implementation in ParseUtil requires these to be declared
         // in increasing order. Use 0-ordered index here
-<span class="nc" id="L279">        READS(0), READ_BYTES(2), WRITES(4), WRITE_BYTES(6), QUEUE_LENGTH(8), ACTIVE_MS(9);</span>
+<span class="nc" id="L277">        READS(0), READ_BYTES(2), WRITES(4), WRITE_BYTES(6), QUEUE_LENGTH(8), ACTIVE_MS(9);</span>
 
         private int order;
 
         public int getOrder() {
-<span class="nc" id="L284">            return this.order;</span>
+<span class="nc" id="L282">            return this.order;</span>
         }
 
-<span class="nc" id="L287">        UdevStat(int order) {</span>
-<span class="nc" id="L288">            this.order = order;</span>
-<span class="nc" id="L289">        }</span>
+<span class="nc" id="L285">        UdevStat(int order) {</span>
+<span class="nc" id="L286">            this.order = order;</span>
+<span class="nc" id="L287">        }</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

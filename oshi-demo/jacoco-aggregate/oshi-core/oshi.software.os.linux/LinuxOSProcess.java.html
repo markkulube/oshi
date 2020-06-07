@@ -281,75 +281,78 @@ public class LinuxOSProcess extends AbstractOSProcess {
 <span class="nc" id="L281">        long[] statArray = ParseUtil.parseStringToLongArray(stat, PROC_PID_STAT_ORDERS,</span>
                 ProcessStat.PROC_PID_STAT_LENGTH, ' ');
 
-        // The /proc/pid/cmdline value is null-delimited
-<span class="nc" id="L285">        this.startTime = LinuxOperatingSystem.BOOTTIME</span>
-<span class="nc" id="L286">                + statArray[ProcPidStat.START_TIME.ordinal()] * 1000L / LinuxOperatingSystem.getHz();</span>
-        // BOOT_TIME could be up to 5ms off. In rare cases when a process has
-        // started within 5ms of boot it is possible to get negative uptime.
-<span class="nc bnc" id="L289" title="All 2 branches missed.">        if (startTime &gt;= now) {</span>
-<span class="nc" id="L290">            startTime = now - 1;</span>
+        // BOOTTIME is in seconds and start time from proc/pid/stat is in jiffies.
+        // Combine units to jiffies and convert to millijiffies before hz division to
+        // avoid precision loss without having to cast
+<span class="nc" id="L287">        this.startTime = (LinuxOperatingSystem.BOOTTIME * LinuxOperatingSystem.getHz()</span>
+<span class="nc" id="L288">                + statArray[ProcPidStat.START_TIME.ordinal()]) * 1000L / LinuxOperatingSystem.getHz();</span>
+        // BOOT_TIME could be up to 500ms off and start time up to 5ms off. A process
+        // that has started within last 505ms could produce a future start time/negative
+        // up time, so insert a sanity check.
+<span class="nc bnc" id="L292" title="All 2 branches missed.">        if (startTime &gt;= now) {</span>
+<span class="nc" id="L293">            startTime = now - 1;</span>
         }
-<span class="nc" id="L292">        this.parentProcessID = (int) statArray[ProcPidStat.PPID.ordinal()];</span>
-<span class="nc" id="L293">        this.threadCount = (int) statArray[ProcPidStat.THREAD_COUNT.ordinal()];</span>
-<span class="nc" id="L294">        this.priority = (int) statArray[ProcPidStat.PRIORITY.ordinal()];</span>
-<span class="nc" id="L295">        this.virtualSize = statArray[ProcPidStat.VSZ.ordinal()];</span>
-<span class="nc" id="L296">        this.residentSetSize = statArray[ProcPidStat.RSS.ordinal()] * PAGE_SIZE;</span>
-<span class="nc" id="L297">        this.kernelTime = statArray[ProcPidStat.KERNEL_TIME.ordinal()] * 1000L / LinuxOperatingSystem.getHz();</span>
-<span class="nc" id="L298">        this.userTime = statArray[ProcPidStat.USER_TIME.ordinal()] * 1000L / LinuxOperatingSystem.getHz();</span>
-<span class="nc" id="L299">        this.upTime = now - startTime;</span>
+<span class="nc" id="L295">        this.parentProcessID = (int) statArray[ProcPidStat.PPID.ordinal()];</span>
+<span class="nc" id="L296">        this.threadCount = (int) statArray[ProcPidStat.THREAD_COUNT.ordinal()];</span>
+<span class="nc" id="L297">        this.priority = (int) statArray[ProcPidStat.PRIORITY.ordinal()];</span>
+<span class="nc" id="L298">        this.virtualSize = statArray[ProcPidStat.VSZ.ordinal()];</span>
+<span class="nc" id="L299">        this.residentSetSize = statArray[ProcPidStat.RSS.ordinal()] * PAGE_SIZE;</span>
+<span class="nc" id="L300">        this.kernelTime = statArray[ProcPidStat.KERNEL_TIME.ordinal()] * 1000L / LinuxOperatingSystem.getHz();</span>
+<span class="nc" id="L301">        this.userTime = statArray[ProcPidStat.USER_TIME.ordinal()] * 1000L / LinuxOperatingSystem.getHz();</span>
+<span class="nc" id="L302">        this.upTime = now - startTime;</span>
 
         // See man proc for how to parse /proc/[pid]/io
-<span class="nc" id="L302">        this.bytesRead = ParseUtil.parseLongOrDefault(io.getOrDefault(&quot;read_bytes&quot;, &quot;&quot;), 0L);</span>
-<span class="nc" id="L303">        this.bytesWritten = ParseUtil.parseLongOrDefault(io.getOrDefault(&quot;write_bytes&quot;, &quot;&quot;), 0L);</span>
+<span class="nc" id="L305">        this.bytesRead = ParseUtil.parseLongOrDefault(io.getOrDefault(&quot;read_bytes&quot;, &quot;&quot;), 0L);</span>
+<span class="nc" id="L306">        this.bytesWritten = ParseUtil.parseLongOrDefault(io.getOrDefault(&quot;write_bytes&quot;, &quot;&quot;), 0L);</span>
 
         // Don't set open files or bitness or currentWorkingDirectory; fetch on demand.
 
-<span class="nc" id="L307">        this.userID = ParseUtil.whitespaces.split(status.getOrDefault(&quot;Uid&quot;, &quot;&quot;))[0];</span>
-<span class="nc" id="L308">        this.user = UserGroupInfo.getUser(userID);</span>
-<span class="nc" id="L309">        this.groupID = ParseUtil.whitespaces.split(status.getOrDefault(&quot;Gid&quot;, &quot;&quot;))[0];</span>
-<span class="nc" id="L310">        this.group = UserGroupInfo.getGroupName(groupID);</span>
-<span class="nc" id="L311">        this.name = status.getOrDefault(&quot;Name&quot;, &quot;&quot;);</span>
-<span class="nc bnc" id="L312" title="All 6 branches missed.">        switch (status.getOrDefault(&quot;State&quot;, &quot;U&quot;).charAt(0)) {</span>
+<span class="nc" id="L310">        this.userID = ParseUtil.whitespaces.split(status.getOrDefault(&quot;Uid&quot;, &quot;&quot;))[0];</span>
+<span class="nc" id="L311">        this.user = UserGroupInfo.getUser(userID);</span>
+<span class="nc" id="L312">        this.groupID = ParseUtil.whitespaces.split(status.getOrDefault(&quot;Gid&quot;, &quot;&quot;))[0];</span>
+<span class="nc" id="L313">        this.group = UserGroupInfo.getGroupName(groupID);</span>
+<span class="nc" id="L314">        this.name = status.getOrDefault(&quot;Name&quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L315" title="All 6 branches missed.">        switch (status.getOrDefault(&quot;State&quot;, &quot;U&quot;).charAt(0)) {</span>
         case 'R':
-<span class="nc" id="L314">            this.state = State.RUNNING;</span>
-<span class="nc" id="L315">            break;</span>
-        case 'S':
-<span class="nc" id="L317">            this.state = State.SLEEPING;</span>
+<span class="nc" id="L317">            this.state = State.RUNNING;</span>
 <span class="nc" id="L318">            break;</span>
-        case 'D':
-<span class="nc" id="L320">            this.state = State.WAITING;</span>
+        case 'S':
+<span class="nc" id="L320">            this.state = State.SLEEPING;</span>
 <span class="nc" id="L321">            break;</span>
-        case 'Z':
-<span class="nc" id="L323">            this.state = State.ZOMBIE;</span>
+        case 'D':
+<span class="nc" id="L323">            this.state = State.WAITING;</span>
 <span class="nc" id="L324">            break;</span>
-        case 'T':
-<span class="nc" id="L326">            this.state = State.STOPPED;</span>
+        case 'Z':
+<span class="nc" id="L326">            this.state = State.ZOMBIE;</span>
 <span class="nc" id="L327">            break;</span>
+        case 'T':
+<span class="nc" id="L329">            this.state = State.STOPPED;</span>
+<span class="nc" id="L330">            break;</span>
         default:
-<span class="nc" id="L329">            this.state = State.OTHER;</span>
+<span class="nc" id="L332">            this.state = State.OTHER;</span>
             break;
         }
-<span class="nc" id="L332">        return true;</span>
+<span class="nc" id="L335">        return true;</span>
     }
 
     /**
      * Enum used to update attributes. The order field represents the 1-indexed
      * numeric order of the stat in /proc/pid/stat per the man file.
      */
-<span class="nc" id="L339">    private enum ProcPidStat {</span>
+<span class="nc" id="L342">    private enum ProcPidStat {</span>
         // The parsing implementation in ParseUtil requires these to be declared
         // in increasing order
-<span class="nc" id="L342">        PPID(4), USER_TIME(14), KERNEL_TIME(15), PRIORITY(18), THREAD_COUNT(20), START_TIME(22), VSZ(23), RSS(24);</span>
+<span class="nc" id="L345">        PPID(4), USER_TIME(14), KERNEL_TIME(15), PRIORITY(18), THREAD_COUNT(20), START_TIME(22), VSZ(23), RSS(24);</span>
 
         private int order;
 
         public int getOrder() {
-<span class="nc" id="L347">            return this.order;</span>
+<span class="nc" id="L350">            return this.order;</span>
         }
 
-<span class="nc" id="L350">        ProcPidStat(int order) {</span>
-<span class="nc" id="L351">            this.order = order;</span>
-<span class="nc" id="L352">        }</span>
+<span class="nc" id="L353">        ProcPidStat(int order) {</span>
+<span class="nc" id="L354">            this.order = order;</span>
+<span class="nc" id="L355">        }</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
