@@ -119,7 +119,7 @@ public final class PerfCounterQuery {
                 }
             }
             // And then query. Zero timestamp means update failed
-<span class="nc bnc" id="L122" title="All 2 branches missed.">            if (0 &lt; pdhQueryHandler.updateQuery(perfObjectLocalized)) {</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">            if (0 &lt; pdhQueryHandler.updateQuery()) {</span>
 <span class="nc bnc" id="L123" title="All 2 branches missed.">                for (T prop : props) {</span>
 <span class="nc" id="L124">                    valueMap.put(prop, pdhQueryHandler.queryCounter(counterMap.get(prop)));</span>
                 }

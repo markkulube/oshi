@@ -162,7 +162,7 @@ public final class FormatUtil {
      */
     public static String formatValue(long value, String unit) {
 <span class="fc bfc" id="L164" title="All 2 branches covered.">        if (value &lt; KILO) {</span>
-<span class="fc" id="L165">            return String.format(&quot;%d %s&quot;, value, unit);</span>
+<span class="fc" id="L165">            return String.format(&quot;%d %s&quot;, value, unit).trim();</span>
 <span class="fc bfc" id="L166" title="All 2 branches covered.">        } else if (value &lt; MEGA) { // K</span>
 <span class="fc" id="L167">            return formatUnits(value, KILO, &quot;K&quot; + unit);</span>
 <span class="fc bfc" id="L168" title="All 2 branches covered.">        } else if (value &lt; GIGA) { // M</span>
@@ -219,7 +219,7 @@ public final class FormatUtil {
      * @return long value of x unsigned
      */
     public static long getUnsignedInt(int x) {
-<span class="fc" id="L222">        return x &amp; 0x0000_0000_ffff_ffffL;</span>
+<span class="fc" id="L222">        return x &amp; 0x00000000ffffffffL;</span>
     }
 
     /**
