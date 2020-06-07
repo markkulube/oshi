@@ -117,7 +117,7 @@
 <a class="jxr_linenumber" name="L109" href="#L109">109</a> 
 <a class="jxr_linenumber" name="L110" href="#L110">110</a>     <em class="jxr_comment">// PDH timestamps are 1601 epoch, local time</em>
 <a class="jxr_linenumber" name="L111" href="#L111">111</a>     <em class="jxr_comment">// Constants to convert to UTC millis</em>
-<a class="jxr_linenumber" name="L112" href="#L112">112</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> EPOCH_DIFF = 11_644_473_600_000L;
+<a class="jxr_linenumber" name="L112" href="#L112">112</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> EPOCH_DIFF = 11644473600000L;
 <a class="jxr_linenumber" name="L113" href="#L113">113</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> TZ_OFFSET = TimeZone.getDefault().getOffset(System.currentTimeMillis());
 <a class="jxr_linenumber" name="L114" href="#L114">114</a> 
 <a class="jxr_linenumber" name="L115" href="#L115">115</a>     <em class="jxr_javadoccomment">/** Constant &lt;code&gt;whitespacesColonWhitespace&lt;/code&gt; */</em>
@@ -413,7 +413,7 @@
 <a class="jxr_linenumber" name="L405" href="#L405">405</a>         <em class="jxr_comment">// then drop any copies of the sign bit, to prevent the value being</em>
 <a class="jxr_linenumber" name="L406" href="#L406">406</a>         <em class="jxr_comment">// considered a negative one by Java if it is set</em>
 <a class="jxr_linenumber" name="L407" href="#L407">407</a>         <strong class="jxr_keyword">long</strong> longValue = unsignedValue;
-<a class="jxr_linenumber" name="L408" href="#L408">408</a>         <strong class="jxr_keyword">return</strong> longValue &amp; 0xffff_ffffL;
+<a class="jxr_linenumber" name="L408" href="#L408">408</a>         <strong class="jxr_keyword">return</strong> longValue &amp; 0xffffffffL;
 <a class="jxr_linenumber" name="L409" href="#L409">409</a>     }
 <a class="jxr_linenumber" name="L410" href="#L410">410</a> 
 <a class="jxr_linenumber" name="L411" href="#L411">411</a>     <em class="jxr_javadoccomment">/**</em>
@@ -426,7 +426,7 @@
 <a class="jxr_linenumber" name="L418" href="#L418">418</a> <em class="jxr_javadoccomment">     * @return The signed long value.</em>
 <a class="jxr_linenumber" name="L419" href="#L419">419</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L420" href="#L420">420</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">long</strong> unsignedLongToSignedLong(<strong class="jxr_keyword">long</strong> unsignedValue) {
-<a class="jxr_linenumber" name="L421" href="#L421">421</a>         <strong class="jxr_keyword">return</strong> unsignedValue &amp; 0x7fff_ffff_ffff_ffffL;
+<a class="jxr_linenumber" name="L421" href="#L421">421</a>         <strong class="jxr_keyword">return</strong> unsignedValue &amp; 0x7fffffff_ffffffffL;
 <a class="jxr_linenumber" name="L422" href="#L422">422</a>     }
 <a class="jxr_linenumber" name="L423" href="#L423">423</a> 
 <a class="jxr_linenumber" name="L424" href="#L424">424</a>     <em class="jxr_javadoccomment">/**</em>
@@ -550,13 +550,13 @@
 <a class="jxr_linenumber" name="L542" href="#L542">542</a>         <strong class="jxr_keyword">if</strong> (m.matches()) {
 <a class="jxr_linenumber" name="L543" href="#L543">543</a>             <strong class="jxr_keyword">long</strong> milliseconds = 0L;
 <a class="jxr_linenumber" name="L544" href="#L544">544</a>             <strong class="jxr_keyword">if</strong> (m.group(1) != <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L545" href="#L545">545</a>                 milliseconds += parseLongOrDefault(m.group(1), 0L) * 86_400_000L;
+<a class="jxr_linenumber" name="L545" href="#L545">545</a>                 milliseconds += parseLongOrDefault(m.group(1), 0L) * 86400000L;
 <a class="jxr_linenumber" name="L546" href="#L546">546</a>             }
 <a class="jxr_linenumber" name="L547" href="#L547">547</a>             <strong class="jxr_keyword">if</strong> (m.group(2) != <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L548" href="#L548">548</a>                 milliseconds += parseLongOrDefault(m.group(2), 0L) * 3_600_000L;
+<a class="jxr_linenumber" name="L548" href="#L548">548</a>                 milliseconds += parseLongOrDefault(m.group(2), 0L) * 3600000L;
 <a class="jxr_linenumber" name="L549" href="#L549">549</a>             }
 <a class="jxr_linenumber" name="L550" href="#L550">550</a>             <strong class="jxr_keyword">if</strong> (m.group(3) != <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L551" href="#L551">551</a>                 milliseconds += parseLongOrDefault(m.group(3), 0L) * 60_000L;
+<a class="jxr_linenumber" name="L551" href="#L551">551</a>                 milliseconds += parseLongOrDefault(m.group(3), 0L) * 60000L;
 <a class="jxr_linenumber" name="L552" href="#L552">552</a>             }
 <a class="jxr_linenumber" name="L553" href="#L553">553</a>             milliseconds += parseLongOrDefault(m.group(4), 0L) * 1000L;
 <a class="jxr_linenumber" name="L554" href="#L554">554</a>             milliseconds += (<strong class="jxr_keyword">long</strong>) (1000 * parseDoubleOrDefault(<span class="jxr_string">"0."</span> + m.group(5), 0d));
@@ -754,7 +754,7 @@
 <a class="jxr_linenumber" name="L746" href="#L746">746</a>                 <em class="jxr_comment">// Doesn't impact parsing, ignore</em>
 <a class="jxr_linenumber" name="L747" href="#L747">747</a>                 delimCurrent = false;
 <a class="jxr_linenumber" name="L748" href="#L748">748</a>             } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (c &gt;= '0' &amp;&amp; c &lt;= '9' &amp;&amp; !dashSeen) {
-<a class="jxr_linenumber" name="L749" href="#L749">749</a>                 <strong class="jxr_keyword">if</strong> (power &gt; 18 || power == 17 &amp;&amp; c == '9' &amp;&amp; parsed[parsedIndex] &gt; 223_372_036_854_775_807L) {
+<a class="jxr_linenumber" name="L749" href="#L749">749</a>                 <strong class="jxr_keyword">if</strong> (power &gt; 18 || power == 17 &amp;&amp; c == '9' &amp;&amp; parsed[parsedIndex] &gt; 223372036854775807L) {
 <a class="jxr_linenumber" name="L750" href="#L750">750</a>                     parsed[parsedIndex] = Long.MAX_VALUE;
 <a class="jxr_linenumber" name="L751" href="#L751">751</a>                 } <strong class="jxr_keyword">else</strong> {
 <a class="jxr_linenumber" name="L752" href="#L752">752</a>                     parsed[parsedIndex] += (c - '0') * ParseUtil.POWERS_OF_TEN[power++];
@@ -875,7 +875,7 @@
 <a class="jxr_linenumber" name="L867" href="#L867">867</a> <em class="jxr_javadoccomment">     * @return Equivalent milliseconds since the epoch</em>
 <a class="jxr_linenumber" name="L868" href="#L868">868</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L869" href="#L869">869</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">long</strong> filetimeToUtcMs(<strong class="jxr_keyword">long</strong> filetime, <strong class="jxr_keyword">boolean</strong> local) {
-<a class="jxr_linenumber" name="L870" href="#L870">870</a>         <strong class="jxr_keyword">return</strong> filetime / 10_000L - EPOCH_DIFF - (local ? TZ_OFFSET : 0L);
+<a class="jxr_linenumber" name="L870" href="#L870">870</a>         <strong class="jxr_keyword">return</strong> filetime / 10000L - EPOCH_DIFF - (local ? TZ_OFFSET : 0L);
 <a class="jxr_linenumber" name="L871" href="#L871">871</a>     }
 <a class="jxr_linenumber" name="L872" href="#L872">872</a> 
 <a class="jxr_linenumber" name="L873" href="#L873">873</a>     <em class="jxr_javadoccomment">/**</em>
