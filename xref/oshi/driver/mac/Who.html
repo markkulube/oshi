@@ -64,21 +64,27 @@
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>          MacUtmpx ut;
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>          <em class="jxr_comment">// Rewind</em>
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>          SYS.setutxent();
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>          <em class="jxr_comment">// Iterate</em>
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>          <strong class="jxr_keyword">while</strong> ((ut = SYS.getutxent()) != <strong class="jxr_keyword">null</strong>) {
-<a class="jxr_linenumber" name="L61" href="#L61">61</a>              <strong class="jxr_keyword">if</strong> (ut.ut_type == USER_PROCESS || ut.ut_type == LOGIN_PROCESS) {
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>                  String user = <strong class="jxr_keyword">new</strong> String(ut.ut_user, StandardCharsets.US_ASCII).trim();
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>                  String device = <strong class="jxr_keyword">new</strong> String(ut.ut_line, StandardCharsets.US_ASCII).trim();
-<a class="jxr_linenumber" name="L64" href="#L64">64</a>                  String host = <strong class="jxr_keyword">new</strong> String(ut.ut_host, StandardCharsets.US_ASCII).trim();
-<a class="jxr_linenumber" name="L65" href="#L65">65</a>                  <strong class="jxr_keyword">long</strong> loginTime = ut.ut_tv.tv_sec.longValue() * 1000L + ut.ut_tv.tv_usec / 1000L;
-<a class="jxr_linenumber" name="L66" href="#L66">66</a>                  whoList.add(<strong class="jxr_keyword">new</strong> <a name="OSSession" href="../../../oshi/software/os/OSSession.html#OSSession">OSSession</a>(user, device, loginTime, host));
-<a class="jxr_linenumber" name="L67" href="#L67">67</a>              }
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>          }
-<a class="jxr_linenumber" name="L69" href="#L69">69</a>          <em class="jxr_comment">// Close</em>
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>          SYS.endutxent();
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>          <strong class="jxr_keyword">return</strong> whoList;
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>      }
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>  }
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>          <strong class="jxr_keyword">try</strong> { <em class="jxr_comment">// Iterate</em>
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>              <strong class="jxr_keyword">while</strong> ((ut = SYS.getutxent()) != <strong class="jxr_keyword">null</strong>) {
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>                  <strong class="jxr_keyword">if</strong> (ut.ut_type == USER_PROCESS || ut.ut_type == LOGIN_PROCESS) {
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>                      String user = <strong class="jxr_keyword">new</strong> String(ut.ut_user, StandardCharsets.US_ASCII).trim();
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>                      String device = <strong class="jxr_keyword">new</strong> String(ut.ut_line, StandardCharsets.US_ASCII).trim();
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>                      String host = <strong class="jxr_keyword">new</strong> String(ut.ut_host, StandardCharsets.US_ASCII).trim();
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>                      <strong class="jxr_keyword">long</strong> loginTime = ut.ut_tv.tv_sec.longValue() * 1000L + ut.ut_tv.tv_usec / 1000L;
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>                      <em class="jxr_comment">// Sanity check. If errors, default to who command line</em>
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>                      <strong class="jxr_keyword">if</strong> (user.isEmpty() || device.isEmpty() || loginTime &lt; 0 || loginTime &gt; System.currentTimeMillis()) {
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>                          <strong class="jxr_keyword">return</strong> oshi.driver.unix.Who.queryWho();
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>                      }
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>                      whoList.add(<strong class="jxr_keyword">new</strong> <a name="OSSession" href="../../../oshi/software/os/OSSession.html#OSSession">OSSession</a>(user, device, loginTime, host));
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>                  }
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>              }
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>          } <strong class="jxr_keyword">finally</strong> {
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>              <em class="jxr_comment">// Close</em>
+<a class="jxr_linenumber" name="L75" href="#L75">75</a>              SYS.endutxent();
+<a class="jxr_linenumber" name="L76" href="#L76">76</a>          }
+<a class="jxr_linenumber" name="L77" href="#L77">77</a>          <strong class="jxr_keyword">return</strong> whoList;
+<a class="jxr_linenumber" name="L78" href="#L78">78</a>      }
+<a class="jxr_linenumber" name="L79" href="#L79">79</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2010&#x2013;2020 <a href="https://github.com/oshi/">oshi</a>. All rights reserved.</div>

@@ -146,7 +146,7 @@
 <a class="jxr_linenumber" name="L138" href="#L138">138</a>                 counterListMap.put(prop, counterList);
 <a class="jxr_linenumber" name="L139" href="#L139">139</a>             }
 <a class="jxr_linenumber" name="L140" href="#L140">140</a>             <em class="jxr_comment">// And then query. Zero timestamp means update failed</em>
-<a class="jxr_linenumber" name="L141" href="#L141">141</a>             <strong class="jxr_keyword">if</strong> (0 &lt; pdhQueryHandler.updateQuery(perfObjectLocalized)) {
+<a class="jxr_linenumber" name="L141" href="#L141">141</a>             <strong class="jxr_keyword">if</strong> (0 &lt; pdhQueryHandler.updateQuery()) {
 <a class="jxr_linenumber" name="L142" href="#L142">142</a>                 <em class="jxr_comment">// Start at 1, first counter defines instance filter</em>
 <a class="jxr_linenumber" name="L143" href="#L143">143</a>                 <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 1; i &lt; props.length; i++) {
 <a class="jxr_linenumber" name="L144" href="#L144">144</a>                     T prop = props[i];
